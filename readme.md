@@ -2,13 +2,13 @@
 
 <!-- title -->
 
-# matterhorn
+# renami
 
 <!-- /title -->
 
 <!-- badges -->
 
-[![NPM Package matterhorn](https://img.shields.io/npm/v/matterhorn.svg)](https://npmjs.com/package/matterhorn)
+[![NPM Package renami](https://img.shields.io/npm/v/renami.svg)](https://npmjs.com/package/renami)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <!-- /badges -->
@@ -47,7 +47,18 @@
 
 ### Implementation notes
 
+Renaming...
+
+- <https://github.com/vfile/vfile-rename>
+
+Markdown body selection...
+
+- <https://github.com/syntax-tree/unist-util-select>
+- <https://github.com/yshavit/mdq>
+
 ### Similar projects
+
+- <https://github.com/75lb/renamer> (Close! Depends on Node. JS instead of TS. No config file.)
 
 ## The future
 
@@ -63,7 +74,7 @@ _State anyone or anything that significantly helped with the development of your
 
 ## Contributing
 
-[Issues](https://github.com/kitschpatrol/matterhorn/issues) and pull requests are welcome.
+[Issues](https://github.com/kitschpatrol/renami/issues) and pull requests are welcome.
 
 <!-- /contributing -->
 

@@ -1,19 +1,18 @@
 {
-	"name": "matterhorn",
+	"name": "renami",
 	"version": "1.0.0",
-	"description": "A CLI tool and TypeScript library for automatically renaming Markdown files based on their frontmatter.",
+	"description": "A CLI tool and TypeScript library for config-driven automatic filename management.",
 	"keywords": [
-		"frontmatter",
+		"rename",
 		"filename",
-		"markdown",
 		"cli",
 		"npm-package"
 	],
-	"homepage": "https://github.com/kitschpatrol/matterhorn",
-	"bugs": "https://github.com/kitschpatrol/matterhorn/issues",
+	"homepage": "https://github.com/kitschpatrol/renami",
+	"bugs": "https://github.com/kitschpatrol/renami/issues",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/kitschpatrol/matterhorn.git"
+		"url": "git+https://github.com/kitschpatrol/renami.git"
 	},
 	"license": "MIT",
 	"author": {
@@ -32,7 +31,7 @@
 	"module": "./dist/lib/index.js",
 	"types": "./dist/lib/index.d.ts",
 	"bin": {
-		"matterhorn": "dist/bin/cli.js"
+		"renami": "dist/bin/cli.js"
 	},
 	"files": [
 		"dist/*"
@@ -55,6 +54,7 @@
 		"@types/node": "^20.17.23",
 		"bumpp": "^10.0.3",
 		"chalk": "^5.4.1",
+		"deepmerge-ts": "^7.1.5",
 		"pkgroll": "^2.11.2",
 		"pretty-ms": "^9.2.0",
 		"typescript": "~5.7.3",

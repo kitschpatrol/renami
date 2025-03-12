@@ -27,6 +27,9 @@ importers:
       chalk:
         specifier: ^5.4.1
         version: 5.4.1
+      deepmerge-ts:
+        specifier: ^7.1.5
+        version: 7.1.5
       pkgroll:
         specifier: ^2.11.2
         version: 2.11.2(typescript@5.7.3)

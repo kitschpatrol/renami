@@ -10,7 +10,7 @@ const startTime = performance.now()
 const yargsInstance = yargs(hideBin(process.argv))
 
 await yargsInstance
-	.scriptName('matterhorn')
+	.scriptName('renami')
 	.command(
 		'$0',
 		'Command description',
