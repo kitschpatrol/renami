@@ -334,10 +334,23 @@ export function stripIncrement(filename: string): string {
 /**
  * Strip the trailing increment from a filename
  * @param filename File name only, without an extension
- * @returns filename without the increment
+ * @returns filename with the increment
  */
 export function appendIncrement(filename: string, index: number): string {
 	return `${filename} (${index})`
+}
+
+/**
+ * Get the increment from a filename as a number
+ * @param filename File name only, without an extension
+ * @returns The increment as a number, or undefined if there is no increment
+ */
+export function getIncrement(filename: string): number | undefined {
+	const match = /\s\((\d+)\)$/.exec(filename)
+	if (match) {
+		return Number.parseInt(match[1], 10)
+	}
+	return undefined
 }
 
 /**

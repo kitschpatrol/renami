@@ -1,5 +1,7 @@
+/* eslint-disable max-depth */
 import { deepmerge } from 'deepmerge-ts'
 import { nanoid } from 'nanoid'
+import { orderBy } from 'natural-orderby'
 import path from 'path-browserify-esm'
 import {
 	caseTransform,
@@ -12,7 +14,7 @@ import { exists, type FileAdapter, getDefaultFileAdapter } from '../utilities/fi
 import log from '../utilities/log'
 import { isAbsolute, normalize, type PathObject, pathObjectToString } from '../utilities/path'
 import { FILENAME_MAX_LENGTH } from '../utilities/platform'
-import { appendIncrement, type CaseType, convertCase } from '../utilities/string'
+import { appendIncrement, type CaseType, convertCase, getIncrement } from '../utilities/string'
 
 function localeSort(a: PathObject, b: PathObject): number {
 	return pathObjectToString(a).localeCompare(pathObjectToString(b))
@@ -166,7 +168,13 @@ export async function renameFiles(
 		truncateOnWordBoundary,
 		truncationString,
 		validateInput,
+		verbose,
 	} = deepmerge(defaultRenameOptions, options ?? {})
+
+	const initialVerbosity = log.verbose
+	if (verbose) {
+		log.verbose = true
+	}
 
 	// Validate, throws if any file is invalid
 	if (validateInput) {
@@ -174,9 +182,16 @@ export async function renameFiles(
 	}
 
 	// Build the rename plan
-	const fileRenamePlan: FileRenameTask[] = []
+	let fileRenamePlan: FileRenameTask[] = []
 
-	for (const filePath of filePaths) {
+	// TODO user-provided sort?
+	// Sort the paths based on original file names
+	const sortedFilePaths = orderBy(filePaths)
+	// FileRenamePlan.sort((a, b) =>
+	// 	sort(path.parse(a.filePathOriginal), path.parse(b.filePathOriginal), fileAdapter),
+	// )
+
+	for (const filePath of sortedFilePaths) {
 		fileRenamePlan.push({
 			filePathIntermediate: undefined,
 			filePathOriginal: filePath,
@@ -184,11 +199,6 @@ export async function renameFiles(
 			status: 'scheduled', // Will be tested for later once we know the final file name
 		})
 	}
-
-	// Sort the paths based on original file names
-	fileRenamePlan.sort((a, b) =>
-		sort(path.parse(a.filePathOriginal), path.parse(b.filePathOriginal), fileAdapter),
-	)
 
 	// Run the action function on each valid file and update its file path renamed value
 	for (const task of fileRenamePlan) {
@@ -220,7 +230,7 @@ export async function renameFiles(
 		})
 
 		pathObject.name = await truncateTransform(pathObject, {
-			fileSystemMaxLength: Number.MAX_SAFE_INTEGER, // TODO: Get from platform...
+			fileSystemMaxLength: FILENAME_MAX_LENGTH,
 			maxLength,
 			truncateOnWordBoundary,
 			truncationString,
@@ -230,33 +240,75 @@ export async function renameFiles(
 	}
 
 	// Sort the paths again based on the new file names
-	fileRenamePlan.sort((a, b) =>
-		localeSort(path.parse(a.filePathRenamed!), path.parse(b.filePathRenamed!)),
-	)
+	// fileRenamePlan.sort((a, b) =>
+	// 	localeSort(path.parse(a.filePathRenamed!), path.parse(b.filePathRenamed!)),
+	// )
+	// TODO user-provided sort?
+	fileRenamePlan = orderBy(fileRenamePlan, [(v) => v.filePathRenamed])
 
 	// Find duplicates that need to be incremented
 	const duplicateGroups: FileRenameTask[][] = []
 	for (const [index, task] of fileRenamePlan.entries()) {
-		if (task.filePathRenamed === undefined) {
-			throw new Error('Renamed file path is undefined')
-		}
-
 		const duplicateGroup = [task]
-
+		console.log('----------------------------------')
+		console.log(task.filePathOriginal)
 		// Look forward for duplicates, we're trusting in the sort
 		for (let i = index + 1; i < fileRenamePlan.length; i++) {
 			const nextTask = fileRenamePlan[i]
-			if (nextTask.filePathRenamed?.toLowerCase() === task.filePathRenamed.toLowerCase()) {
-				duplicateGroup.push(nextTask)
+			if (nextTask.filePathRenamed!.toLowerCase() === task.filePathRenamed!.toLowerCase()) {
+				// But only push if it's not in a previous group of duplicateGroups
+				// Skip this file if it's already been identified as a duplicate earlier
+
+				let alreadyInDuplicateGroup = false
+				console.log(`Next Task: ${nextTask.filePathOriginal} ${alreadyInDuplicateGroup}`)
+				for (const group of duplicateGroups) {
+					if (group.includes(nextTask)) {
+						alreadyInDuplicateGroup = true
+						break
+					}
+				}
+				if (!alreadyInDuplicateGroup) {
+					duplicateGroup.push(nextTask)
+				}
 			}
 		}
 
 		if (duplicateGroup.length > 1) {
-			// TODO sort based on original file name so that the increment is consistent?
+			// Try to preserve original increments
+			for (let index = 0; index < duplicateGroup.length; index++) {
+				const task = duplicateGroup[index]
+				// Console.log(`Task: ${task.filePathOriginal}`)
+
+				// Get the original increment (1-based index)
+				const originalIncrement = getIncrement(path.parse(task.filePathOriginal).name)
+
+				// If it has an increment and that position is available in our array (0-based index)
+				if (originalIncrement !== undefined && originalIncrement - 1 < duplicateGroup.length) {
+					// Try to move this file to the position matching its increment - 1
+					const targetIndex = originalIncrement - 1
+
+					// If current position is different from target position
+					if (index !== targetIndex) {
+						// Remove from current position
+						const movedTask = duplicateGroup.splice(index, 1)[0]
+
+						// Insert at target position, shifting other items if needed
+						duplicateGroup.splice(targetIndex, 0, movedTask)
+
+						// Adjust current position if we moved the item earlier in the array
+						if (targetIndex < index) {
+							index--
+						}
+					}
+				}
+			}
 
 			duplicateGroups.push(duplicateGroup)
 		}
 	}
+
+	console.log('----------------------------------')
+	console.log(duplicateGroups)
 
 	// Increment duplicates, truncating first to make room for the increment
 	for (const group of duplicateGroups) {
@@ -272,7 +324,8 @@ export async function renameFiles(
 				truncationString,
 			})
 
-			appendIncrement(pathObject.name, index + 1)
+			pathObject.name = appendIncrement(pathObject.name, index + 1)
+			task.filePathRenamed = pathObjectToString(pathObject)
 		}
 	}
 
@@ -293,9 +346,11 @@ export async function renameFiles(
 	}
 
 	// Sort the paths based on final filenames
-	fileRenamePlan.sort((a, b) =>
-		sort(path.parse(a.filePathRenamed!), path.parse(b.filePathRenamed!), fileAdapter),
-	)
+	// fileRenamePlan.sort((a, b) =>
+	// 	sort(path.parse(a.filePathRenamed!), path.parse(b.filePathRenamed!), fileAdapter),
+	// )
+	// TODO user-provided sort?
+	fileRenamePlan = orderBy(fileRenamePlan, [(v) => v.filePathRenamed])
 
 	// Checking for conflicts with existing files!
 	for (const task of fileRenamePlan) {
@@ -324,6 +379,7 @@ export async function renameFiles(
 				if (dryRun) {
 					log.info(`Would rename ${filePathOriginal} to ${filePathIntermediate}`)
 				} else {
+					log.info(`Renaming ${filePathOriginal} to ${filePathIntermediate}`)
 					await fileAdapter.rename(filePathOriginal, filePathIntermediate)
 				}
 			} catch {
@@ -348,6 +404,7 @@ export async function renameFiles(
 				if (dryRun) {
 					log.info(`Would rename ${sourcePath} to ${filePathRenamed}`)
 				} else {
+					log.info(`Renaming ${sourcePath} to ${filePathRenamed}`)
 					await fileAdapter.rename(sourcePath, filePathRenamed!)
 				}
 				task.status = 'renamed'
@@ -356,6 +413,9 @@ export async function renameFiles(
 			}
 		}
 	}
+
+	// Restore verbosity
+	log.verbose = initialVerbosity
 
 	// Return a report
 	return {

@@ -1,3 +1,4 @@
+/* eslint-disable ts/require-await */
 import { describe, expect, it } from 'vitest'
 import { type FileRenameReport, renameFiles, type RenameOptions } from '../src/lib'
 import { useTempFiles } from './fixtures/file-fixture'
@@ -14,7 +15,7 @@ function sanitizeOutput(report: FileRenameReport, tempPath: string): FileRenameR
 	}
 }
 
-describe('File processing tests', () => {
+describe('basic rename tests', () => {
 	// Setup the temp files fixture with source files from './test-files'
 	const tempFiles = useTempFiles({
 		cleanup: true, // Will clean up after each test
@@ -100,14 +101,14 @@ describe('File processing tests', () => {
 	it('should truncate on word boundary requested', async () => {
 		const files = await tempFiles.getFiles()
 		const result = await renameFiles(files, [], {
-			dryRun: true,
+			dryRun: false,
 			maxLength: 15,
 			truncateOnWordBoundary: true,
 		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
-			  "dryRun": true,
+			  "dryRun": false,
 			  "duration": 0,
 			  "files": [
 			    {
@@ -138,6 +139,223 @@ describe('File processing tests', () => {
 			    {
 			      "filePathOriginal": "/snake_case_file.md",
 			      "filePathRenamed": "/snake....md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+
+	it('should use intermediate files as needed', async () => {
+		const files = await tempFiles.getFiles()
+		const result = await renameFiles(
+			files,
+			[
+				async ({ name }) => {
+					if (name === 'basic') {
+						return 'camelCaseFile'
+					}
+					if (name === 'camelCaseFile') {
+						return 'basic'
+					}
+				},
+			],
+			{
+				dryRun: false,
+				maxLength: 255,
+				truncateOnWordBoundary: true,
+				verbose: true,
+			},
+		)
+
+		console.log(tempFiles.getTempPath())
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": false,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/camelCaseFile.md",
+			      "filePathRenamed": "/basic.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/basic.md",
+			      "filePathRenamed": "/camelCaseFile.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/kebab-case-file.md",
+			      "filePathRenamed": "/kebab-case-file.md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/miXedC_aseF-ile.md",
+			      "filePathRenamed": "/miXedC_aseF-ile.md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/Sentence case file.md",
+			      "filePathRenamed": "/Sentence case file.md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/snake_case_file.md",
+			      "filePathRenamed": "/snake_case_file.md",
+			      "status": "unchanged",
+			    },
+			  ],
+			}
+		`)
+	})
+
+	it('should increment duplicate files as needed', async () => {
+		const files = await tempFiles.getFiles()
+		const result = await renameFiles(files, [async () => 'basic'], {
+			dryRun: false,
+			maxLength: 255,
+			truncateOnWordBoundary: true,
+			verbose: false,
+		})
+
+		console.log(tempFiles.getTempPath())
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": false,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/basic.md",
+			      "filePathRenamed": "/basic (1).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/camelCaseFile.md",
+			      "filePathRenamed": "/basic (2).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/kebab-case-file.md",
+			      "filePathRenamed": "/basic (3).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/miXedC_aseF-ile.md",
+			      "filePathRenamed": "/basic (4).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/Sentence case file.md",
+			      "filePathRenamed": "/basic (5).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/snake_case_file.md",
+			      "filePathRenamed": "/basic (6).md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+})
+
+describe('increment duplicate tests', () => {
+	// Setup the temp files fixture with source files from './test-files'
+	const tempFiles = useTempFiles({
+		cleanup: true, // Will clean up after each test
+		prefix: 'my-test-',
+		sourcePath: './test/assets/test-increment',
+	})
+
+	it('should preserve original increments suffixes', async () => {
+		const files = await tempFiles.getFiles()
+
+		const result = await renameFiles(
+			files,
+			[
+				async ({ name }) => {
+					if (name.startsWith('rename')) {
+						return 'Basic'
+					}
+				},
+			],
+			{
+				dryRun: true,
+			},
+		)
+
+		expect(result.duration).toBeLessThan(20)
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/Basic (1).md",
+			      "filePathRenamed": "/Basic (1).md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/Basic (10).md",
+			      "filePathRenamed": "/Basic (2).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/Basic (3).md",
+			      "filePathRenamed": "/Basic (3).md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 1.md",
+			      "filePathRenamed": "/Basic (4).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 2.md",
+			      "filePathRenamed": "/Basic (5).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 3.md",
+			      "filePathRenamed": "/Basic (6).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 4.md",
+			      "filePathRenamed": "/Basic (7).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 5.md",
+			      "filePathRenamed": "/Basic (8).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 6.md",
+			      "filePathRenamed": "/Basic (9).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 7.md",
+			      "filePathRenamed": "/Basic (10).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 8.md",
+			      "filePathRenamed": "/Basic (11).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 9.md",
+			      "filePathRenamed": "/Basic (12).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/rename me 10.md",
+			      "filePathRenamed": "/Basic (13).md",
 			      "status": "renamed",
 			    },
 			  ],
