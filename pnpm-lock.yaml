@@ -54,6 +54,9 @@ importers:
       pretty-ms:
         specifier: ^9.2.0
         version: 9.2.0
+      pupa:
+        specifier: ^3.1.0
+        version: 3.1.0
       slash:
         specifier: ^5.1.0
         version: 5.1.0
@@ -61,6 +64,12 @@ importers:
         specifier: ~5.8.2
         version: 5.8.2
       untildify:
+        specifier: ^5.0.0
+        version: 5.0.0
+      vfile:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vfile-matter:
         specifier: ^5.0.0
         version: 5.0.0
       vitest:
@@ -2119,6 +2128,10 @@ packages:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
     engines: {node: '>=6'}
 
+  escape-goat@4.0.0:
+    resolution: {integrity: sha512-2Sd4ShcWxbx6OY1IHyla/CVNwvg7XwZVoXZHcSu9w9SReNP1EzzD5T8NWKIR38fIqEns9kDWKUQTXXAmlDrdPg==}
+    engines: {node: '>=12'}
+
   escape-html@1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
 
@@ -3910,6 +3923,10 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  pupa@3.1.0:
+    resolution: {integrity: sha512-FLpr4flz5xZTSJxSeaheeMKN/EDzMdK7b8PTOC6a5PYFKTucWbdqjgqaEyH0shFiSJrVB1+Qqi4Tk19ccU6Aug==}
+    engines: {node: '>=12.20'}
+
   puppeteer-core@24.4.0:
     resolution: {integrity: sha512-eFw66gCnWo0X8Hyf9KxxJtms7a61NJVMiSaWfItsFPzFBsjsWdmcNlBdsA1WVwln6neoHhsG+uTVesKmTREn/g==}
     engines: {node: '>=18'}
@@ -4722,6 +4739,9 @@ packages:
 
   vfile-location@5.0.3:
     resolution: {integrity: sha512-5yXvWDEgqeiYiBe1lbxYF7UMAIm/IcopxMHrMQDq3nvKcjPKIhZklUKL+AE7J7uApI4kwe2snsK+eI6UTj9EHg==}
+
+  vfile-matter@5.0.0:
+    resolution: {integrity: sha512-jhPSqlj8hTSkTXOqyxbUeZAFFVq/iwu/jukcApEqc/7DOidaAth6rDc0Zgg0vWpzUnWkwFP7aK28l6nBmxMqdQ==}
 
   vfile-message@4.0.2:
     resolution: {integrity: sha512-jRDZ1IMLttGj41KcZvlrYAaI3CfqpLpfpf+Mfig13viT6NKvRzWZ+lXz0Y5D60w6uJIBAOGq9mSHf0gktF0duw==}
@@ -7270,6 +7290,8 @@ snapshots:
 
   escalade@3.2.0: {}
 
+  escape-goat@4.0.0: {}
+
   escape-html@1.0.3: {}
 
   escape-string-regexp@1.0.5: {}
@@ -9572,6 +9594,10 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  pupa@3.1.0:
+    dependencies:
+      escape-goat: 4.0.0
+
   puppeteer-core@24.4.0:
     dependencies:
       '@puppeteer/browsers': 2.8.0
@@ -10812,6 +10838,11 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
       vfile: 6.0.3
+
+  vfile-matter@5.0.0:
+    dependencies:
+      vfile: 6.0.3
+      yaml: 2.7.0
 
   vfile-message@4.0.2:
     dependencies:

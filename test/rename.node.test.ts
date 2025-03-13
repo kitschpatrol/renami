@@ -1,6 +1,11 @@
 /* eslint-disable ts/require-await */
 import { describe, expect, it } from 'vitest'
 import { type FileRenameReport, renameFiles, type RenameOptions } from '../src/lib'
+import {
+	frontmatter,
+	frontmatterTemplate,
+	frontmatterTransform,
+} from '../src/lib/transforms/frontmatter'
 import { useTempFiles } from './fixtures/file-fixture'
 
 function sanitizeOutput(report: FileRenameReport, tempPath: string): FileRenameReport {
@@ -345,6 +350,77 @@ describe('increment duplicate tests', () => {
 			    {
 			      "filePathOriginal": "/rename me 10.md",
 			      "filePathRenamed": "/Basic (13).md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+})
+
+describe('frontmatter template tests', () => {
+	// Setup the temp files fixture with source files from './test-files'
+	const tempFiles = useTempFiles({
+		cleanup: true, // Will clean up after each test
+		prefix: 'renami-test-',
+		sourcePath: './test/assets/test-frontmatter',
+	})
+
+	it('should handle frontmatter callback', async () => {
+		const files = await tempFiles.getFiles()
+
+		const result = await renameFiles(
+			files,
+			[frontmatter((data) => String(data.title) || 'Untitled')],
+			{
+				dryRun: true,
+			},
+		)
+
+		expect(result.duration).toBeLessThan(20)
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/frontmatter-1.md",
+			      "filePathRenamed": "/Hello World.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/frontmatter-2.md",
+			      "filePathRenamed": "/Some Title.md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+
+	it('should handle frontmatter templates', async () => {
+		const files = await tempFiles.getFiles()
+
+		const result = await renameFiles(files, [frontmatterTemplate('{title}')], {
+			dryRun: true,
+		})
+
+		expect(result.duration).toBeLessThan(20)
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/frontmatter-1.md",
+			      "filePathRenamed": "/Hello World.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/frontmatter-2.md",
+			      "filePathRenamed": "/Some Title.md",
 			      "status": "renamed",
 			    },
 			  ],

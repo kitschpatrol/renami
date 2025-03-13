@@ -185,6 +185,8 @@ export type CaseType =
 
 /**
  * Converts a string to the specified case format
+ *
+ * Also look at: https://unjs.io/packages/scule
  * @param text - The input string to convert
  * @param caseType - The case format to convert to
  * @returns The converted string in the specified case format

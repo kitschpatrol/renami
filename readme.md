@@ -50,6 +50,13 @@
 Case sensitivity...
 
 - Will change case as requested, but doesn't allow identically named but differently-cased files.
+- <https://unjs.io/packages/scule>
+
+Template expansion...
+
+- <https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914>
+- <https://github.com/josh-hemphill/subslate>
+- <https://github.com/sindresorhus/pupa>
 
 Renaming...
 
