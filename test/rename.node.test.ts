@@ -161,7 +161,6 @@ describe('basic rename tests', () => {
 			],
 			{
 				dryRun: false,
-				maxLength: 255,
 			},
 		)
 
@@ -209,7 +208,6 @@ describe('basic rename tests', () => {
 		const files = await tempFiles.getFiles()
 		const result = await renameFiles(files, [async () => 'basic'], {
 			dryRun: false,
-			maxLength: 255,
 		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`

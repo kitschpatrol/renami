@@ -21,23 +21,32 @@ export const defaultRenameOptions: RenameOptions = {
 	defaultName: 'Untitled',
 	dryRun: false,
 	fileAdapter: undefined, // Must be passed in later, deepmerge will not work
-	maxLength: 255,
+	maxLength: FILENAME_MAX_LENGTH,
 	truncateOnWordBoundary: true,
 	truncationString: '...',
 	validateInput: true,
-	verbose: false,
+	validateOutput: true,
 }
 
 export type RenameOptions = {
+	/** Enforce a specific letter casing on the final file names. */
 	caseType: CaseType
+	/** In rare cases a path that's all unsave characters will become zero-length... this default is used in such cases. */
 	defaultName: string
+	/** Don't actually rename any files */
 	dryRun: boolean
+	/** Filesystem access implementation for isomorphism  */
 	fileAdapter: FileAdapter | undefined
+	/** Maximum number of characters in the file, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum. */
 	maxLength: number
+	/** Try to truncate the file on a word boundary, might result in files shorter than the maxLength target. */
 	truncateOnWordBoundary: boolean
+	/** String like '...' to use when truncation is needed */
 	truncationString: string
+	/** Run some checks to make sure the input file list is sane */
 	validateInput: boolean
-	verbose: boolean
+	/** Make sure we're not overwriting a file that wasn't included in the files argument */
+	validateOutput: boolean
 }
 
 type FileRenameTask = {
@@ -161,13 +170,8 @@ export async function renameFiles(
 		truncateOnWordBoundary,
 		truncationString,
 		validateInput,
-		verbose,
+		validateOutput,
 	} = deepmerge(defaultRenameOptions, options ?? {})
-
-	const initialVerbosity = log.verbose
-	if (verbose) {
-		log.verbose = true
-	}
 
 	// Validate, throws if any file is invalid
 	if (validateInput) {
@@ -351,21 +355,23 @@ export async function renameFiles(
 	fileRenamePlan = orderBy(fileRenamePlan, [(v) => v.filePathRenamed])
 
 	// Checking for conflicts with existing files!
-	for (const task of fileRenamePlan) {
-		if (task.filePathIntermediate !== undefined) {
-			// The existing file is going to be overwritten, not a file outside the provided set
-			continue
-		}
+	if (validateOutput) {
+		for (const task of fileRenamePlan) {
+			if (task.filePathIntermediate !== undefined) {
+				// The existing file is going to be overwritten, not a file outside the provided set
+				continue
+			}
 
-		// Transform case for accurate comparison, since the fileAdapter functions are not case sensitive!
-		const originalPathObject = path.parse(task.filePathOriginal)
-		originalPathObject.name = convertCase(originalPathObject.name, caseType)
+			// Transform case for accurate comparison, since the fileAdapter functions are not case sensitive!
+			const originalPathObject = path.parse(task.filePathOriginal)
+			originalPathObject.name = convertCase(originalPathObject.name, caseType)
 
-		if (
-			pathObjectToString(originalPathObject) !== task.filePathRenamed &&
-			(await exists(task.filePathRenamed!, fileAdapter))
-		) {
-			task.status = 'conflict'
+			if (
+				pathObjectToString(originalPathObject) !== task.filePathRenamed &&
+				(await exists(task.filePathRenamed!, fileAdapter))
+			) {
+				task.status = 'conflict'
+			}
 		}
 	}
 
@@ -374,10 +380,7 @@ export async function renameFiles(
 		const { filePathIntermediate, filePathOriginal, status } = task
 		if (status === 'scheduled' && filePathIntermediate !== undefined) {
 			try {
-				if (dryRun) {
-					log.info(`Would rename ${filePathOriginal} to ${filePathIntermediate}`)
-				} else {
-					log.info(`Renaming ${filePathOriginal} to ${filePathIntermediate}`)
+				if (!dryRun) {
 					await fileAdapter.rename(filePathOriginal, filePathIntermediate)
 				}
 			} catch {
@@ -399,10 +402,7 @@ export async function renameFiles(
 			}
 
 			try {
-				if (dryRun) {
-					log.info(`Would rename ${sourcePath} to ${filePathRenamed}`)
-				} else {
-					log.info(`Renaming ${sourcePath} to ${filePathRenamed}`)
+				if (!dryRun) {
 					await fileAdapter.rename(sourcePath, filePathRenamed!)
 				}
 				task.status = 'renamed'
@@ -411,9 +411,6 @@ export async function renameFiles(
 			}
 		}
 	}
-
-	// Restore verbosity
-	log.verbose = initialVerbosity
 
 	// Return a report
 	return {
