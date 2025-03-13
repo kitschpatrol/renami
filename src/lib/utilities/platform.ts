@@ -1,6 +1,8 @@
 /* eslint-disable unicorn/prefer-global-this */
 /* eslint-disable node/no-unsupported-features/node-builtins */
 
+export const FILENAME_MAX_LENGTH = 255
+
 export const ENVIRONMENT =
 	typeof window === 'undefined' ? (typeof process === 'undefined' ? 'other' : 'node') : 'browser'
 

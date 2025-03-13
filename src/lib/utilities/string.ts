@@ -1,8 +1,4 @@
-/* eslint-disable jsdoc/require-jsdoc */
-
-export function capitalize(text: string): string {
-	return text.charAt(0).toUpperCase() + text.slice(1)
-}
+import filenamify from 'filenamify'
 
 /**
  * Determines if a position in a string is a word boundary.
@@ -86,7 +82,13 @@ export function truncate(
 	return text.slice(0, boundary) + truncationString
 }
 
-export function emptyIsUndefined(text: string | undefined): string | undefined {
+/**
+ * Converts empty strings to undefined
+ * @param text - The input value to check
+ * @returns The input value if it is not an empty string, otherwise undefined
+ * @public
+ */
+export function emptyIsUndefined(text?: string): string | undefined {
 	if (text === undefined) {
 		return undefined
 	}
@@ -95,73 +97,80 @@ export function emptyIsUndefined(text: string | undefined): string | undefined {
 }
 
 /**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
- * @public
+ * Removes leading indentation from template literals.
+ *
+ * This function trims consistent leading whitespace from multiline template strings,
+ * making it easier to include properly formatted text in code without having to
+ * manually remove indentation.
+ * @param strings - Template string array from a tagged template literal
+ * @param values - Values interpolated into the template string
+ * @returns A string with consistent leading indentation removed from each line
  */
-export function markdown(strings: TemplateStringsArray, ...values: unknown[]): string {
-	return trimLeadingIndentation(strings, ...values)
-}
+export function trimLeadingIndentation(
+	strings: TemplateStringsArray,
+	...values: unknown[]
+): string {
+	// Combine template parts and values into a single string.
+	// eslint-disable-next-line ts/restrict-plus-operands, ts/no-base-to-string
+	let raw = strings.reduce((acc, part, i) => acc + part + (values[i] ?? ''), '')
 
-/**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
- * @public
- */
-export function md(strings: TemplateStringsArray, ...values: unknown[]): string {
-	return trimLeadingIndentation(strings, ...values)
-}
+	// Normalize tabs to two spaces.
+	raw = raw.replaceAll('\t', '  ')
 
-/**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
- * @public
- */
-export function html(strings: TemplateStringsArray, ...values: unknown[]): string {
-	return trimLeadingIndentation(strings, ...values)
-}
+	// Split into lines.
+	const lines = raw.split(/\r?\n/)
 
-/**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
- * @public
- */
-export function css(strings: TemplateStringsArray, ...values: unknown[]): string {
-	return trimLeadingIndentation(strings, ...values)
-}
-
-function trimLeadingIndentation(strings: TemplateStringsArray, ...values: unknown[]): string {
-	const lines = strings
-		// eslint-disable-next-line unicorn/no-array-reduce, ts/no-base-to-string
-		.reduce((result, text, i) => `${result}${text}${String(values[i] ?? '')}`, '')
-		.split(/\r?\n/)
-		.filter((line) => line.trim() !== '')
-
-	// Get leading white space of first line, and trim that much white space
-	// from subsequent lines
-	// eslint-disable-next-line regexp/no-unused-capturing-group
-	const leadingSpace = /^(\s+)/.exec(lines[0])?.[0] ?? ''
-	const leadingSpaceRegex = new RegExp(`^${leadingSpace}`)
-	return lines.map((line) => line.replace(leadingSpaceRegex, '').trimEnd()).join('\n')
-}
-
-export function splitAtFirstMatch(text: string, regex: RegExp): [string, string | undefined] {
-	// Find the first match of the regex
-	const match = text.match(regex)
-
-	if (match?.index === undefined) {
-		return [text, undefined] // If no match is found, return the whole string and an empty string
+	// Remove leading/trailing blank lines.
+	while (lines.length > 0 && lines[0].trim() === '') {
+		lines.shift()
+	}
+	while (lines.length > 0 && lines.at(-1)?.trim() === '') {
+		lines.pop()
 	}
 
-	// Get the position and length of the first match
-	const { index } = match
+	// Determine the minimum indentation across non-blank lines.
+	let minIndent = Infinity
+	for (const line of lines) {
+		if (line.trim() === '') continue
+		// eslint-disable-next-line regexp/no-unused-capturing-group
+		const match = /^( *)/.exec(line)
+		if (match) {
+			minIndent = Math.min(minIndent, match[0].length)
+		}
+	}
+	if (minIndent === Infinity) {
+		minIndent = 0
+	}
 
-	// Split the string into two parts
-	const beforeMatch = text.slice(0, index)
-	const afterMatch = text.slice(index)
-
-	return [beforeMatch, afterMatch]
+	// Remove the common indent from each line.
+	const trimmedLines = lines.map((line) => line.slice(minIndent))
+	return trimmedLines.join('\n')
 }
 
+/**
+ * Converts a string to an array of Unicode code points in hexadecimal format.
+ *
+ * Currently used for testing only
+ *
+ * This function takes a string and returns an array where each element is the
+ * hexadecimal representation of the corresponding Unicode code point in the original string.
+ * Uses Intl.Segmenter for proper handling of grapheme clusters (emojis, combined characters).
+ * @param text - The input string to convert to Unicode code points
+ * @returns An array of strings, each representing a Unicode code point in hexadecimal format
+ */
 export function getUnicodeCodePoints(text: string): string[] {
-	// eslint-disable-next-line ts/no-misused-spread
-	return [...text].map((char) => char.codePointAt(0)!.toString(16))
+	const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+	const segments = segmenter.segment(text)
+	const codePoints: string[] = []
+
+	for (const { segment } of segments) {
+		// Iterate over each code point in the grapheme cluster.
+		for (const char of segment) {
+			const cp = char.codePointAt(0)!
+			codePoints.push(cp.toString(16))
+		}
+	}
+	return codePoints
 }
 
 export type CaseType =
@@ -290,4 +299,91 @@ export function convertCase(text: string, caseType: CaseType): string {
 				.join(' ')
 		}
 	}
+}
+
+/**
+ * Ensures that the filename is filesystem-safe and Unicode normalized
+ * @param text Text to be converted to a safe filename, just the extension-less name NOT the full path
+ * @returns A safe filename
+ */
+export function getSafeFilename(text: string, defaultEmptyFilename = 'Untitled'): string {
+	let basicSafeFilename = filenamify(text.trim(), {
+		maxLength: Number.MAX_SAFE_INTEGER,
+		replacement: ' ',
+	})
+		.replaceAll(/\s+/g, ' ')
+		.trim()
+
+	// Edge case where the filename is empty after invalid characters are removed
+	if (basicSafeFilename.length === 0) {
+		basicSafeFilename = defaultEmptyFilename
+	}
+
+	// Unicode normalization
+	// https://github.com/kitschpatrol/yanki-obsidian/issues/13
+	basicSafeFilename = basicSafeFilename.normalize('NFC')
+
+	return basicSafeFilename
+}
+
+/**
+ * Strip the trailing increment from a filename
+ * @param filename File name only, without an extension
+ * @returns filename without the increment
+ */
+export function stripIncrement(filename: string): string {
+	return filename.replace(/\s\(\d+\)$/, '')
+}
+
+/**
+ * Strip the trailing increment from a filename
+ * @param filename File name only, without an extension
+ * @returns filename without the increment
+ */
+export function appendIncrement(filename: string, index: number): string {
+	return `${filename} (${index})`
+}
+
+/**
+ * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * @param strings - Template string array from a tagged template literal
+ * @param values - Values interpolated into the template string
+ * @returns A string which will be formatted correctly by prettier
+ * @public
+ */
+export function markdown(strings: TemplateStringsArray, ...values: unknown[]): string {
+	return trimLeadingIndentation(strings, ...values)
+}
+
+/**
+ * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * @param strings - Template string array from a tagged template literal
+ * @param values - Values interpolated into the template string
+ * @returns A string which will be formatted correctly by prettier
+ * @public
+ */
+export function md(strings: TemplateStringsArray, ...values: unknown[]): string {
+	return trimLeadingIndentation(strings, ...values)
+}
+
+/**
+ * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * @param strings - Template string array from a tagged template literal
+ * @param values - Values interpolated into the template string
+ * @returns A string which will be formatted correctly by prettier
+ * @public
+ */
+export function html(strings: TemplateStringsArray, ...values: unknown[]): string {
+	return trimLeadingIndentation(strings, ...values)
+}
+
+/**
+ * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * @param strings - Template string array from a tagged template literal
+ * @param values - Values interpolated into the template string
+ * @returns A string which will be formatted correctly by prettier
+ * @public
+ */
+export function css(strings: TemplateStringsArray, ...values: unknown[]): string {
+	return trimLeadingIndentation(strings, ...values)
 }

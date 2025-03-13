@@ -1,6 +1,5 @@
+export { renameFiles } from './actions/rename'
 export { default as log } from './utilities/log'
-
-//FrontmatterTemplate().truncate().kebab()
 
 // Thinking about config
 // const config = {

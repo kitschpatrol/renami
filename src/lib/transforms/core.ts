@@ -1,13 +1,14 @@
 /* eslint-disable ts/require-await */
 
-import filenamify from 'filenamify'
 import { type FileAdapter } from '../utilities/file'
-import { getSafeFilename, stripFilenameIncrement } from '../utilities/filenames'
 import { type PathObject } from '../utilities/path'
-import { type CaseType, convertCase, truncate } from '../utilities/string'
-
-const FILENAME_MAX_LENGTH = 255
-const TEMPORARY_ID_LENGTH = 4
+import {
+	type CaseType,
+	convertCase,
+	getSafeFilename,
+	stripIncrement,
+	truncate,
+} from '../utilities/string'
 
 /**
  * Must return JUST the file name, no path or extension
@@ -67,7 +68,7 @@ export async function truncateTransform(
  */
 export async function stripIncrementTransform(filePath: PathObject): Promise<string> {
 	const { name } = filePath
-	return stripFilenameIncrement(name)
+	return stripIncrement(name)
 }
 
 /**

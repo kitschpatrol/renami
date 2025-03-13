@@ -1,16 +1,8 @@
-/* eslint-disable jsdoc/require-jsdoc */
-
 import isAbsolutePath from '@stdlib/assert-is-absolute-path'
 import path from 'path-browserify-esm'
 import slash from 'slash'
-import { splitAtFirstMatch } from './string'
 
 export type PathObject = path.PathObject
-
-// Unused...
-// function stripLeadingSlash(filePath: string): string {
-// 	return filePath.startsWith('/') ? filePath.slice(1) : filePath
-// }
 
 /**
  * The browserify polyfill doesn't implement win32 absolute path detection...
@@ -59,8 +51,6 @@ export function normalize(filePath: string): string {
  * Special handling for `/absolute-path.md` style links in Obsidian
  * and static site generators, where absolute paths are relative to a base path
  * instead of the volume root.
- *
- 
  *
  * Paths starting with Windows drive letters, while technically absolute, are _not_ prepended with the base:
  * - If no base path is provided, paths are resolved relative to the the provided CWD.
@@ -115,55 +105,3 @@ export function resolveWithBasePath(
 	// Relative
 	return path.join(cwd, filePath)
 }
-
-// Function resolveWithCwd(filePath: string, cwd: string): string {
-// 	if (filePath.startsWith('cwd')) {
-// 		return filePath
-// 	}
-
-// 	return path.join(cwd, filePath)
-// }
-
-export function stripBasePath(filePath: string, basePath: string): string {
-	const regex = new RegExp(`^${basePath}`, 'i')
-	return filePath.replace(regex, '')
-}
-
-export function getBaseAndQueryParts(filePath: string): [string, string | undefined] {
-	const directoryPath = path.dirname(filePath)
-	const fileName = path.basename(filePath)
-	const [base, query] = splitAtFirstMatch(fileName, /[#?^]/)
-	return [path.join(directoryPath, base), query]
-}
-
-export function getBase(filePath: string): string {
-	return getBaseAndQueryParts(filePath)[0]
-}
-
-export function getQuery(filePath: string): string {
-	return getBaseAndQueryParts(filePath).at(1) ?? ''
-}
-
-function hasExtension(filePath: string): boolean {
-	return getExtension(filePath) !== ''
-}
-
-export function getExtension(filePath: string): string {
-	return path.extname(getBase(filePath))
-}
-
-export function addExtensionIfMissing(filePath: string, extension: string): string {
-	if (hasExtension(filePath)) {
-		return filePath
-	}
-
-	const [base, query] = getBaseAndQueryParts(filePath)
-	return `${base}.${extension}${query ?? ''}`
-}
-
-// Function quantifyPathDistance(relativePath: string): { down: number; up: number } {
-// 	const up = relativePath.split('../').length - 1
-// 	const down = relativePath.replaceAll('../', '').split('/').length - 1
-
-// 	return { down, up }
-// }

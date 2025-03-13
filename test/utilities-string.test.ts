@@ -1,0 +1,408 @@
+import { describe, expect, test } from 'vitest'
+import {
+	appendIncrement,
+	convertCase,
+	css,
+	emptyIsUndefined,
+	getSafeFilename,
+	getUnicodeCodePoints,
+	html,
+	markdown,
+	md,
+	stripIncrement,
+	truncate,
+} from '../src/lib/utilities/string'
+
+describe('getSafeFilename', () => {
+	test('returns safe filename by replacing invalid characters', () => {
+		expect(getSafeFilename('file:name?with*invalid/chars')).not.toContain(':?*/')
+		expect(getSafeFilename('file:name?with*invalid/chars')).toMatch(
+			/file.+name.+with.+invalid.+chars/,
+		)
+	})
+
+	test('trims whitespace', () => {
+		expect(getSafeFilename('  filename  ')).toBe('filename')
+	})
+
+	test('collapses multiple spaces', () => {
+		expect(getSafeFilename('file  name  with    spaces')).toBe('file name with spaces')
+	})
+
+	test('returns default name when input is empty', () => {
+		expect(getSafeFilename('')).toBe('Untitled')
+	})
+
+	test('handles custom default filename', () => {
+		expect(getSafeFilename('', 'CustomDefault')).toBe('CustomDefault')
+	})
+
+	test('applies Unicode normalization', () => {
+		// Create a string with a combining character that should be normalized
+		const nonNormalizedString = 'cafe\u0301' // Café with combining acute accent
+		const result = getSafeFilename(nonNormalizedString)
+
+		// The result should be the NFC normalized form
+		expect(result).toBe('café')
+		// Check that the length is 4 characters (not 5 as in the original)
+		expect(result.length).toBe(4)
+	})
+
+	test('returns safe filename for strings with purely invalid characters', () => {
+		// This string contains only characters that would be replaced
+		expect(getSafeFilename('?*:|<>/\\')).toBe('Untitled')
+	})
+
+	test('preserves case when sanitizing', () => {
+		const mixedCase = 'File-NAME_example'
+		expect(getSafeFilename(mixedCase)).toMatch(/File-NAME_example/)
+	})
+})
+
+describe('truncate', () => {
+	test('returns original string when it is shorter than maxLength', () => {
+		expect(truncate('hello', 10, 100, false)).toBe('hello')
+	})
+
+	test('truncates string to maxLength with default truncation string', () => {
+		expect(truncate('hello world', 8, 100, false)).toBe('hello...')
+	})
+
+	test('respects fileSystemMaxLength when it is smaller than maxLength', () => {
+		expect(truncate('hello world', 10, 7, false)).toBe('hell...')
+	})
+
+	test('returns just truncation string when maxLength equals truncation string length', () => {
+		expect(truncate('hello', 3, 100, false)).toBe('...')
+	})
+
+	test('truncates at word boundary when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello world', 8, 100, true)).toBe('hello...')
+	})
+
+	test('handles custom truncation string', () => {
+		expect(truncate('hello world', 8, 100, false, '…')).toBe('hello w…')
+	})
+
+	test('handles camelCase boundaries when truncateOnWordBoundary is true', () => {
+		expect(truncate('helloWorld', 8, 100, true)).toBe('hello...')
+	})
+
+	test('handles hyphen boundaries when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello-world', 8, 100, true)).toBe('hello...')
+	})
+
+	test('truncates at original position if no word boundary found within search range', () => {
+		const longWord = 'supercalifragilisticexpialidocious'
+		expect(truncate(longWord, 8, 100, true)).toBe('super...')
+	})
+
+	test('returns truncation string when safeMaxLength is 0', () => {
+		expect(truncate('hello', 3, 3, false)).toBe('...')
+	})
+
+	test('truncates string when truncation string is shorter than maxLength', () => {
+		expect(truncate('hello world', 8, 100, false, '..')).toBe('hello ..')
+	})
+
+	test('truncates at period delimiter when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello.world', 8, 100, true)).toBe('hello...')
+	})
+
+	test('truncates at underscore delimiter when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello_world', 8, 100, true)).toBe('hello...')
+	})
+
+	test('handles edge case with very long truncation string', () => {
+		const longTruncation = '...............'
+		expect(truncate('hello', 5, 10, false, longTruncation)).toBe('.....')
+	})
+})
+
+describe('emptyIsUndefined', () => {
+	test('returns undefined when input is undefined', () => {
+		expect(emptyIsUndefined()).toBeUndefined()
+	})
+
+	test('returns undefined when input is empty string', () => {
+		expect(emptyIsUndefined('')).toBeUndefined()
+	})
+
+	test('returns undefined when input is whitespace only', () => {
+		expect(emptyIsUndefined('  ')).toBeUndefined()
+		expect(emptyIsUndefined('\t\n')).toBeUndefined()
+	})
+
+	test('returns original string when input has content', () => {
+		expect(emptyIsUndefined('hello')).toBe('hello')
+		expect(emptyIsUndefined(' hello ')).toBe(' hello ')
+	})
+
+	test('handles strings with only non-space whitespace characters', () => {
+		expect(emptyIsUndefined('\t\r\n')).toBeUndefined()
+	})
+
+	test('preserves strings that contain whitespace and non-whitespace', () => {
+		expect(emptyIsUndefined(' a ')).toBe(' a ')
+		expect(emptyIsUndefined('\thello\n')).toBe('\thello\n')
+	})
+})
+
+describe('template tag functions', () => {
+	test('markdown function trims leading indentation', () => {
+		const result = markdown`
+			# Heading
+
+			Some content
+
+			- Indented bullet
+		`
+		expect(result).toBe('# Heading\n\nSome content\n\n- Indented bullet')
+	})
+
+	test('md function works the same as markdown', () => {
+		const mdResult = md`
+			# Heading
+
+			Some content
+		`
+		const markdownResult = markdown`
+			# Heading
+
+			Some content
+		`
+		expect(mdResult).toBe(markdownResult)
+	})
+
+	test('html function trims leading indentation', () => {
+		const result = html`
+			<div>
+				<p>Content</p>
+			</div>
+		`
+		expect(result).toBe('<div>\n  <p>Content</p>\n</div>')
+	})
+
+	test('css function trims leading indentation', () => {
+		const result = css`
+			.class {
+				color: blue;
+			}
+		`
+		expect(result).toBe('.class {\n  color: blue;\n}')
+	})
+
+	test('template functions handle values correctly', () => {
+		const name = 'World'
+		const result = markdown`
+      # Hello ${name}
+      Welcome!
+    `
+		expect(result).toBe('# Hello World\nWelcome!')
+	})
+
+	test('template functions handle multiple values', () => {
+		const name = 'World'
+		const greeting = 'Hello'
+		const result = markdown`
+      # ${greeting} ${name}
+      Welcome!
+    `
+		expect(result).toBe('# Hello World\nWelcome!')
+	})
+
+	test('template functions preserve indentation relative to first line', () => {
+		const result = markdown`
+			# Heading
+
+			This line is indented
+			This line is more indented
+		`
+		expect(result).toBe('# Heading\n\nThis line is indented\nThis line is more indented')
+	})
+
+	test('template functions handle empty lines', () => {
+		const result = markdown`
+			# Heading
+
+			Paragraph after empty line
+		`
+		expect(result).toBe('# Heading\n\nParagraph after empty line')
+	})
+})
+
+describe('convertCase', () => {
+	const testString = 'hello World-example_string'
+
+	test('preserves original case', () => {
+		expect(convertCase(testString, 'preserve')).toBe(testString)
+	})
+
+	test('converts to lowercase', () => {
+		expect(convertCase(testString, 'lowercase')).toBe('hello world-example_string')
+	})
+
+	test('converts to uppercase', () => {
+		expect(convertCase(testString, 'uppercase')).toBe('HELLO WORLD-EXAMPLE_STRING')
+	})
+
+	test('converts to camelCase', () => {
+		expect(convertCase(testString, 'camel')).toBe('helloWorldExampleString')
+	})
+
+	test('converts to kebab-case', () => {
+		expect(convertCase(testString, 'kebab')).toBe('hello-world-example-string')
+	})
+
+	test('converts to PascalCase', () => {
+		expect(convertCase(testString, 'pascal')).toBe('HelloWorldExampleString')
+	})
+
+	test('converts to SCREAMING-KEBAB-CASE', () => {
+		expect(convertCase(testString, 'screaming-kebab')).toBe('HELLO-WORLD-EXAMPLE-STRING')
+	})
+
+	test('converts to SCREAMING_SNAKE_CASE', () => {
+		expect(convertCase(testString, 'screaming-snake')).toBe('HELLO_WORLD_EXAMPLE_STRING')
+	})
+
+	test('converts to Sentence case', () => {
+		expect(convertCase(testString, 'sentence')).toBe('Hello world example string')
+	})
+
+	test('converts to snake_case', () => {
+		expect(convertCase(testString, 'snake')).toBe('hello_world_example_string')
+	})
+
+	test('converts to Title Case', () => {
+		expect(convertCase(testString, 'title')).toBe('Hello World Example String')
+	})
+
+	test('handles title case with small words', () => {
+		expect(convertCase('this is a test for the title case', 'title')).toBe(
+			'This Is a Test for the Title Case',
+		)
+	})
+
+	test('handles empty string', () => {
+		expect(convertCase('', 'camel')).toBe('')
+	})
+
+	test('handles sentence case with no spaces', () => {
+		expect(convertCase('helloworld', 'sentence')).toBe('Helloworld')
+	})
+
+	test('handles camelCase to kebab conversion correctly', () => {
+		expect(convertCase('helloWorldExample', 'kebab')).toBe('hello-world-example')
+	})
+
+	test('handles PascalCase to snake conversion correctly', () => {
+		expect(convertCase('HelloWorldExample', 'snake')).toBe('hello_world_example')
+	})
+
+	test('handles title case first and last word capitalization rule', () => {
+		expect(convertCase('the quick brown fox jumps over the lazy dog', 'title')).toBe(
+			'The Quick Brown Fox Jumps Over the Lazy Dog',
+		)
+	})
+})
+
+describe('getUnicodeCodePoints', () => {
+	test('returns code points for ASCII characters', () => {
+		expect(getUnicodeCodePoints('AB')).toEqual(['41', '42'])
+	})
+
+	test('returns code points for emoji', () => {
+		expect(getUnicodeCodePoints('😊')).toEqual(['1f60a'])
+	})
+
+	test('returns code points for mixed content', () => {
+		expect(getUnicodeCodePoints('a😊b')).toEqual(['61', '1f60a', '62'])
+	})
+
+	test('handles empty string', () => {
+		expect(getUnicodeCodePoints('')).toEqual([])
+	})
+
+	test('handles complex emojis correctly', () => {
+		// Family emoji (may be a single grapheme but multiple code points)
+		expect(getUnicodeCodePoints('👨‍👩‍👧‍👦')).toEqual([
+			'1f468',
+			'200d',
+			'1f469',
+			'200d',
+			'1f467',
+			'200d',
+			'1f466',
+		])
+	})
+
+	test('handles combining characters correctly', () => {
+		// E with acute accent as a combining character
+		expect(getUnicodeCodePoints('é')).toEqual(['e9'])
+
+		// E with combining acute accent
+		expect(getUnicodeCodePoints('e\u0301')).toEqual(['65', '301'])
+	})
+
+	test('handles special Unicode characters', () => {
+		// Zero-width joiner
+		expect(getUnicodeCodePoints('\u200D')).toEqual(['200d'])
+
+		// Non-breaking space
+		expect(getUnicodeCodePoints('\u00A0')).toEqual(['a0'])
+	})
+
+	test('handles multi-code point characters', () => {
+		// Characters that require more than 16 bits (outside BMP)
+		expect(getUnicodeCodePoints('𐐷')).toEqual(['10437'])
+	})
+})
+
+describe('stripIncrement', () => {
+	test('removes trailing increment from filename without extension', () => {
+		expect(stripIncrement('document (1)')).toBe('document')
+	})
+
+	test('does not modify filename without increment', () => {
+		expect(stripIncrement('document')).toBe('document')
+	})
+
+	test('handles filenames that contain parentheses elsewhere', () => {
+		expect(stripIncrement('document (old) (1)')).toBe('document (old)')
+	})
+
+	test('handles multi-digit increments', () => {
+		expect(stripIncrement('document (123)')).toBe('document')
+	})
+
+	test('does not modify filename with parentheses not containing numbers', () => {
+		expect(stripIncrement('document (abc)')).toBe('document (abc)')
+	})
+
+	test('does not modify filename with parentheses containing non-trailing numbers', () => {
+		expect(stripIncrement('document (1) suffix')).toBe('document (1) suffix')
+	})
+})
+
+describe('appendIncrement', () => {
+	test('appends increment to filename', () => {
+		expect(appendIncrement('document', 1)).toBe('document (1)')
+	})
+
+	test('appends different increment value', () => {
+		expect(appendIncrement('document', 42)).toBe('document (42)')
+	})
+
+	test('works with empty string', () => {
+		expect(appendIncrement('', 1)).toBe(' (1)')
+	})
+
+	test('works with already incremented filenames', () => {
+		expect(appendIncrement('document (1)', 2)).toBe('document (1) (2)')
+	})
+
+	test('handles zero as increment', () => {
+		expect(appendIncrement('document', 0)).toBe('document (0)')
+	})
+})

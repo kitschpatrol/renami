@@ -1,4 +1,5 @@
 import { deepmerge } from 'deepmerge-ts'
+import { nanoid } from 'nanoid'
 import path from 'path-browserify-esm'
 import {
 	caseTransform,
@@ -6,15 +7,12 @@ import {
 	stripIncrementTransform,
 	type Transform,
 	truncateTransform,
-} from './transforms/core'
-import { exists, type FileAdapter, getDefaultFileAdapter } from './utilities/file'
-import { appendFilenameIncrement, getTemporarilyUniqueFilePath } from './utilities/filenames'
-import log from './utilities/log'
-import { isAbsolute, normalize } from './utilities/path'
-
-path.parse('')
-
-type PathObject = path.PathObject
+} from '../transforms/core'
+import { exists, type FileAdapter, getDefaultFileAdapter } from '../utilities/file'
+import log from '../utilities/log'
+import { isAbsolute, normalize, type PathObject } from '../utilities/path'
+import { FILENAME_MAX_LENGTH } from '../utilities/platform'
+import { appendIncrement } from '../utilities/string'
 
 function localeSort(a: PathObject, b: PathObject): number {
 	return path.format(a).localeCompare(path.format(b))
@@ -241,13 +239,13 @@ export async function renameFiles(
 
 			// Truncate to make room for the increment
 			pathObject.name = await truncateTransform(pathObject, {
-				fileSystemMaxLength: Number.MAX_SAFE_INTEGER, // TODO: Get from platform...
+				fileSystemMaxLength: FILENAME_MAX_LENGTH,
 				maxLength: maxLengthWithIncrement,
 				truncateOnWordBoundary,
 				truncationString,
 			})
 
-			appendFilenameIncrement(pathObject.name, index + 1)
+			appendIncrement(pathObject.name, index + 1)
 		}
 	}
 
@@ -259,7 +257,9 @@ export async function renameFiles(
 			}
 
 			if (task.filePathRenamed === otherTask.filePathOriginal) {
-				task.filePathIntermediate = getTemporarilyUniqueFilePath()
+				const tempPathObject = path.parse(task.filePathRenamed)
+				tempPathObject.name = nanoid()
+				task.filePathIntermediate = path.format(tempPathObject)
 				break
 			}
 		}
