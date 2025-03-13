@@ -96,4 +96,52 @@ describe('File processing tests', () => {
 			expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchSnapshot()
 		}
 	})
+
+	it('should truncate on word boundary requested', async () => {
+		const files = await tempFiles.getFiles()
+		const result = await renameFiles(files, [], {
+			dryRun: true,
+			maxLength: 15,
+			truncateOnWordBoundary: true,
+		})
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/basic.md",
+			      "filePathRenamed": "/basic.md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/camelCaseFile.md",
+			      "filePathRenamed": "/camelCase....md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/kebab-case-file.md",
+			      "filePathRenamed": "/kebab....md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/miXedC_aseF-ile.md",
+			      "filePathRenamed": "/miXedC....md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/Sentence case file.md",
+			      "filePathRenamed": "/Sentence....md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/snake_case_file.md",
+			      "filePathRenamed": "/snake....md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
 })

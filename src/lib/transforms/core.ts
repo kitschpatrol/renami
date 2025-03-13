@@ -56,7 +56,7 @@ export async function truncateTransform(
 
 	return truncate(
 		name,
-		maxLength - (ext.length + 1),
+		maxLength - ext.length,
 		fileSystemMaxLength,
 		truncateOnWordBoundary,
 		truncationString,

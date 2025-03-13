@@ -76,25 +76,8 @@ describe('truncate', () => {
 		expect(truncate('hello', 3, 100, false)).toBe('...')
 	})
 
-	test('truncates at word boundary when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello world', 8, 100, true)).toBe('hello...')
-	})
-
 	test('handles custom truncation string', () => {
 		expect(truncate('hello world', 8, 100, false, '…')).toBe('hello w…')
-	})
-
-	test('handles camelCase boundaries when truncateOnWordBoundary is true', () => {
-		expect(truncate('helloWorld', 8, 100, true)).toBe('hello...')
-	})
-
-	test('handles hyphen boundaries when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello-world', 8, 100, true)).toBe('hello...')
-	})
-
-	test('truncates at original position if no word boundary found within search range', () => {
-		const longWord = 'supercalifragilisticexpialidocious'
-		expect(truncate(longWord, 8, 100, true)).toBe('super...')
 	})
 
 	test('returns truncation string when safeMaxLength is 0', () => {
@@ -105,17 +88,46 @@ describe('truncate', () => {
 		expect(truncate('hello world', 8, 100, false, '..')).toBe('hello ..')
 	})
 
-	test('truncates at period delimiter when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello.world', 8, 100, true)).toBe('hello...')
-	})
-
-	test('truncates at underscore delimiter when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello_world', 8, 100, true)).toBe('hello...')
-	})
-
 	test('handles edge case with very long truncation string', () => {
 		const longTruncation = '...............'
 		expect(truncate('hello', 5, 10, false, longTruncation)).toBe('.....')
+	})
+
+	test('truncates at word boundary when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello world', 10, 100, true)).toBe('hello...')
+	})
+
+	test('handles camelCase boundaries when exact length', () => {
+		expect(truncate('helloWorld', 10, 100, true)).toBe('helloWorld')
+	})
+
+	test('handles near break max length when truncateOnWordBoundary is true', () => {
+		expect(truncate('helloWorld', 7, 100, true)).toBe('hell...')
+	})
+
+	test('handles break and truncation string summing to maxlength when truncateOnWordBoundary is true', () => {
+		expect(truncate('helloWorld', 8, 100, true)).toBe('hello...')
+	})
+
+	test('handles one more than break max length when truncateOnWordBoundary is true', () => {
+		expect(truncate('helloWorld', 9, 100, true)).toBe('hello...')
+	})
+
+	test('handles hyphen boundaries when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello-world', 10, 100, true)).toBe('hello...')
+	})
+
+	test('truncates at period delimiter when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello.world', 10, 100, true)).toBe('hello...')
+	})
+
+	test('truncates at underscore delimiter when truncateOnWordBoundary is true', () => {
+		expect(truncate('hello_world', 10, 100, true)).toBe('hello...')
+	})
+
+	test('truncates at original position if no word boundary found within search range', () => {
+		const longWord = 'supercalifragilisticexpialidocious'
+		expect(truncate(longWord, 8, 100, true)).toBe('super...')
 	})
 })
 

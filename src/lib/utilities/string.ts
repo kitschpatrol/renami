@@ -41,8 +41,6 @@ export function truncate(
 	truncateOnWordBoundary: boolean,
 	truncationString = '...',
 ): string {
-	// Input validation removed as requested
-
 	// If the truncation string is longer than either max length, we can't proceed sensibly
 	if (truncationString.length > Math.min(maxLength, fileSystemMaxLength)) {
 		return truncationString.slice(0, Math.min(maxLength, fileSystemMaxLength))
@@ -69,9 +67,7 @@ export function truncate(
 
 	// Look backwards from safeMaxLength to find a boundary
 	let boundary = safeMaxLength
-	const searchRange = Math.min(30, Math.floor(safeMaxLength / 2)) // Limit search to reasonable range
-
-	for (let i = safeMaxLength; i > safeMaxLength - searchRange && i > 0; i--) {
+	for (let i = safeMaxLength; i > 0; i--) {
 		if (isWordBoundary(text, i)) {
 			boundary = i
 			break
