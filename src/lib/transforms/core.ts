@@ -21,7 +21,6 @@ export type Transform<T extends Record<string, unknown> | undefined = undefined>
 
 /**
  * Ensures that the filename is filesystem-safe and Unicode normalized
- * @returns safe filename
  */
 export async function safeTransform(
 	filePath: PathObject,
@@ -38,7 +37,6 @@ export async function safeTransform(
 /**
  * Truncates a filename at word boundaries and adds an ellipsis
  * Word boundaries include spaces, case changes (camelCase/PascalCase), hyphens, and underscores.
- * @returns Truncated filename
  */
 export async function truncateTransform(
 	filePath: PathObject,
@@ -49,8 +47,7 @@ export async function truncateTransform(
 		truncationString: string
 	},
 ): Promise<string> {
-	// TODO increment-aware truncation
-
+	// TODO increment-aware truncation?
 	const { fileSystemMaxLength, maxLength, truncateOnWordBoundary, truncationString } = options
 	const { ext, name } = filePath
 

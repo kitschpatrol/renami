@@ -101,6 +101,7 @@ export function emptyIsUndefined(text?: string): string | undefined {
  * @param strings - Template string array from a tagged template literal
  * @param values - Values interpolated into the template string
  * @returns A string with consistent leading indentation removed from each line
+ * @public
  */
 export function trimLeadingIndentation(
 	strings: TemplateStringsArray,

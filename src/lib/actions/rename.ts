@@ -12,13 +12,9 @@ import {
 } from '../transforms/core'
 import { exists, type FileAdapter, getDefaultFileAdapter } from '../utilities/file'
 import log from '../utilities/log'
-import { isAbsolute, normalize, type PathObject, pathObjectToString } from '../utilities/path'
+import { isAbsolute, normalize, pathObjectToString } from '../utilities/path'
 import { FILENAME_MAX_LENGTH } from '../utilities/platform'
 import { appendIncrement, type CaseType, convertCase, getIncrement } from '../utilities/string'
-
-function localeSort(a: PathObject, b: PathObject): number {
-	return pathObjectToString(a).localeCompare(pathObjectToString(b))
-}
 
 export const defaultRenameOptions: RenameOptions = {
 	caseType: 'preserve',
@@ -26,7 +22,6 @@ export const defaultRenameOptions: RenameOptions = {
 	dryRun: false,
 	fileAdapter: undefined, // Must be passed in later, deepmerge will not work
 	maxLength: 255,
-	sort: undefined, // Must be passed in later, deepmerge will not work?
 	truncateOnWordBoundary: true,
 	truncationString: '...',
 	validateInput: true,
@@ -39,7 +34,6 @@ export type RenameOptions = {
 	dryRun: boolean
 	fileAdapter: FileAdapter | undefined
 	maxLength: number
-	sort: ((a: PathObject, b: PathObject, fileAdapter?: FileAdapter) => number) | undefined
 	truncateOnWordBoundary: boolean
 	truncationString: string
 	validateInput: boolean
@@ -164,7 +158,6 @@ export async function renameFiles(
 		dryRun,
 		fileAdapter = await getDefaultFileAdapter(),
 		maxLength,
-		sort = localeSort,
 		truncateOnWordBoundary,
 		truncationString,
 		validateInput,
@@ -184,12 +177,8 @@ export async function renameFiles(
 	// Build the rename plan
 	let fileRenamePlan: FileRenameTask[] = []
 
-	// TODO user-provided sort?
 	// Sort the paths based on original file names
 	const sortedFilePaths = orderBy(filePaths)
-	// FileRenamePlan.sort((a, b) =>
-	// 	sort(path.parse(a.filePathOriginal), path.parse(b.filePathOriginal), fileAdapter),
-	// )
 
 	for (const filePath of sortedFilePaths) {
 		fileRenamePlan.push({
@@ -240,10 +229,6 @@ export async function renameFiles(
 	}
 
 	// Sort the paths again based on the new file names
-	// fileRenamePlan.sort((a, b) =>
-	// 	localeSort(path.parse(a.filePathRenamed!), path.parse(b.filePathRenamed!)),
-	// )
-	// TODO user-provided sort?
 	fileRenamePlan = orderBy(fileRenamePlan, [(v) => v.filePathRenamed])
 
 	// Find duplicates that need to be incremented

@@ -64,11 +64,11 @@
 		"pkgroll": "^2.11.2",
 		"pretty-ms": "^9.2.0",
 		"slash": "^5.1.0",
-		"typescript": "~5.7.3",
+		"typescript": "~5.8.2",
 		"untildify": "^5.0.0",
 		"vitest": "^3.0.8"
 	},
-	"packageManager": "pnpm@10.6.2",
+	"packageManager": "pnpm@10.6.3",
 	"engines": {
 		"node": "^18.15.0 || >=20.11.0"
 	},

@@ -19,7 +19,7 @@ describe('basic rename tests', () => {
 	// Setup the temp files fixture with source files from './test-files'
 	const tempFiles = useTempFiles({
 		cleanup: true, // Will clean up after each test
-		prefix: 'my-test-',
+		prefix: 'renami-test-',
 		sourcePath: './test/assets/test-basic',
 	})
 
@@ -103,7 +103,6 @@ describe('basic rename tests', () => {
 		const result = await renameFiles(files, [], {
 			dryRun: false,
 			maxLength: 15,
-			truncateOnWordBoundary: true,
 		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
@@ -163,8 +162,6 @@ describe('basic rename tests', () => {
 			{
 				dryRun: false,
 				maxLength: 255,
-				truncateOnWordBoundary: true,
-				verbose: true,
 			},
 		)
 
@@ -213,8 +210,6 @@ describe('basic rename tests', () => {
 		const result = await renameFiles(files, [async () => 'basic'], {
 			dryRun: false,
 			maxLength: 255,
-			truncateOnWordBoundary: true,
-			verbose: false,
 		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
@@ -262,7 +257,7 @@ describe('increment duplicate tests', () => {
 	// Setup the temp files fixture with source files from './test-files'
 	const tempFiles = useTempFiles({
 		cleanup: true, // Will clean up after each test
-		prefix: 'my-test-',
+		prefix: 'renami-test-',
 		sourcePath: './test/assets/test-increment',
 	})
 
