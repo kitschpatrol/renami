@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`File processing tests > should set the case appropriately 1`] = `
+exports[`basic rename tests > should set the case appropriately 1`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -39,7 +39,7 @@ exports[`File processing tests > should set the case appropriately 1`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 2`] = `
+exports[`basic rename tests > should set the case appropriately 2`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -78,7 +78,7 @@ exports[`File processing tests > should set the case appropriately 2`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 3`] = `
+exports[`basic rename tests > should set the case appropriately 3`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -117,7 +117,7 @@ exports[`File processing tests > should set the case appropriately 3`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 4`] = `
+exports[`basic rename tests > should set the case appropriately 4`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -156,7 +156,7 @@ exports[`File processing tests > should set the case appropriately 4`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 5`] = `
+exports[`basic rename tests > should set the case appropriately 5`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -195,7 +195,7 @@ exports[`File processing tests > should set the case appropriately 5`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 6`] = `
+exports[`basic rename tests > should set the case appropriately 6`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -234,7 +234,7 @@ exports[`File processing tests > should set the case appropriately 6`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 7`] = `
+exports[`basic rename tests > should set the case appropriately 7`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -273,7 +273,7 @@ exports[`File processing tests > should set the case appropriately 7`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 8`] = `
+exports[`basic rename tests > should set the case appropriately 8`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -312,7 +312,7 @@ exports[`File processing tests > should set the case appropriately 8`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 9`] = `
+exports[`basic rename tests > should set the case appropriately 9`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -351,7 +351,7 @@ exports[`File processing tests > should set the case appropriately 9`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 10`] = `
+exports[`basic rename tests > should set the case appropriately 10`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -390,7 +390,7 @@ exports[`File processing tests > should set the case appropriately 10`] = `
 }
 `;
 
-exports[`File processing tests > should set the case appropriately 11`] = `
+exports[`basic rename tests > should set the case appropriately 11`] = `
 {
   "dryRun": true,
   "duration": 0,

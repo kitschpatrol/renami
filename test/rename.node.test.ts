@@ -168,8 +168,6 @@ describe('basic rename tests', () => {
 			},
 		)
 
-		console.log(tempFiles.getTempPath())
-
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
 			  "dryRun": false,
@@ -218,8 +216,6 @@ describe('basic rename tests', () => {
 			truncateOnWordBoundary: true,
 			verbose: false,
 		})
-
-		console.log(tempFiles.getTempPath())
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
@@ -299,7 +295,7 @@ describe('increment duplicate tests', () => {
 			      "status": "unchanged",
 			    },
 			    {
-			      "filePathOriginal": "/Basic (10).md",
+			      "filePathOriginal": "/rename me 1.md",
 			      "filePathRenamed": "/Basic (2).md",
 			      "status": "renamed",
 			    },
@@ -309,39 +305,39 @@ describe('increment duplicate tests', () => {
 			      "status": "unchanged",
 			    },
 			    {
-			      "filePathOriginal": "/rename me 1.md",
+			      "filePathOriginal": "/rename me 2.md",
 			      "filePathRenamed": "/Basic (4).md",
 			      "status": "renamed",
 			    },
 			    {
-			      "filePathOriginal": "/rename me 2.md",
+			      "filePathOriginal": "/rename me 3.md",
 			      "filePathRenamed": "/Basic (5).md",
 			      "status": "renamed",
 			    },
 			    {
-			      "filePathOriginal": "/rename me 3.md",
+			      "filePathOriginal": "/rename me 4.md",
 			      "filePathRenamed": "/Basic (6).md",
 			      "status": "renamed",
 			    },
 			    {
-			      "filePathOriginal": "/rename me 4.md",
+			      "filePathOriginal": "/rename me 5.md",
 			      "filePathRenamed": "/Basic (7).md",
 			      "status": "renamed",
 			    },
 			    {
-			      "filePathOriginal": "/rename me 5.md",
+			      "filePathOriginal": "/rename me 6.md",
 			      "filePathRenamed": "/Basic (8).md",
 			      "status": "renamed",
 			    },
 			    {
-			      "filePathOriginal": "/rename me 6.md",
+			      "filePathOriginal": "/rename me 7.md",
 			      "filePathRenamed": "/Basic (9).md",
 			      "status": "renamed",
 			    },
 			    {
-			      "filePathOriginal": "/rename me 7.md",
+			      "filePathOriginal": "/Basic (10).md",
 			      "filePathRenamed": "/Basic (10).md",
-			      "status": "renamed",
+			      "status": "unchanged",
 			    },
 			    {
 			      "filePathOriginal": "/rename me 8.md",

@@ -250,8 +250,7 @@ export async function renameFiles(
 	const duplicateGroups: FileRenameTask[][] = []
 	for (const [index, task] of fileRenamePlan.entries()) {
 		const duplicateGroup = [task]
-		console.log('----------------------------------')
-		console.log(task.filePathOriginal)
+
 		// Look forward for duplicates, we're trusting in the sort
 		for (let i = index + 1; i < fileRenamePlan.length; i++) {
 			const nextTask = fileRenamePlan[i]
@@ -260,7 +259,6 @@ export async function renameFiles(
 				// Skip this file if it's already been identified as a duplicate earlier
 
 				let alreadyInDuplicateGroup = false
-				console.log(`Next Task: ${nextTask.filePathOriginal} ${alreadyInDuplicateGroup}`)
 				for (const group of duplicateGroups) {
 					if (group.includes(nextTask)) {
 						alreadyInDuplicateGroup = true
@@ -274,41 +272,56 @@ export async function renameFiles(
 		}
 
 		if (duplicateGroup.length > 1) {
-			// Try to preserve original increments
-			for (let index = 0; index < duplicateGroup.length; index++) {
-				const task = duplicateGroup[index]
-				// Console.log(`Task: ${task.filePathOriginal}`)
+			// First, identify items with increments and their target positions
+			const incrementedItems = []
 
-				// Get the original increment (1-based index)
+			for (let i = 0; i < duplicateGroup.length; i++) {
+				const task = duplicateGroup[i]
 				const originalIncrement = getIncrement(path.parse(task.filePathOriginal).name)
 
-				// If it has an increment and that position is available in our array (0-based index)
 				if (originalIncrement !== undefined && originalIncrement - 1 < duplicateGroup.length) {
-					// Try to move this file to the position matching its increment - 1
-					const targetIndex = originalIncrement - 1
+					incrementedItems.push({
+						originalIndex: i,
+						targetIndex: originalIncrement - 1,
+						task,
+					})
+				}
+			}
 
-					// If current position is different from target position
-					if (index !== targetIndex) {
-						// Remove from current position
-						const movedTask = duplicateGroup.splice(index, 1)[0]
+			// Create a new array to hold the reordered items
+			const reorderedGroup: Array<FileRenameTask | undefined> = Array.from({
+				length: duplicateGroup.length,
+			})
 
-						// Insert at target position, shifting other items if needed
-						duplicateGroup.splice(targetIndex, 0, movedTask)
+			// First place all the incremented items at their target positions
+			for (const item of incrementedItems) {
+				reorderedGroup[item.targetIndex] = item.task
+			}
 
-						// Adjust current position if we moved the item earlier in the array
-						if (targetIndex < index) {
-							index--
+			// Then fill in the remaining positions with unused items
+			let nextUnusedItem = 0
+			for (let i = 0; i < reorderedGroup.length; i++) {
+				if (reorderedGroup[i] === undefined) {
+					// Find the next unused item
+					while (nextUnusedItem < duplicateGroup.length) {
+						const candidate = duplicateGroup[nextUnusedItem++]
+						const increment = getIncrement(path.parse(candidate.filePathOriginal).name)
+
+						// Skip items that already have increments and were placed
+						if (increment === undefined || increment - 1 >= duplicateGroup.length) {
+							reorderedGroup[i] = candidate
+							break
 						}
 					}
 				}
 			}
 
-			duplicateGroups.push(duplicateGroup)
+			// Remove any undefined entries (should not happen, but just in case)
+			const finalGroup = reorderedGroup.filter((item) => item !== undefined)
+
+			duplicateGroups.push(finalGroup)
 		}
 	}
-
-	console.log('----------------------------------')
-	console.log(duplicateGroups)
 
 	// Increment duplicates, truncating first to make room for the increment
 	for (const group of duplicateGroups) {
