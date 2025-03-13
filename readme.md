@@ -47,6 +47,10 @@
 
 ### Implementation notes
 
+Case sensitivity...
+
+- Will change case as requested, but doesn't allow identically named but differently-cased files.
+
 Renaming...
 
 - <https://github.com/vfile/vfile-rename>

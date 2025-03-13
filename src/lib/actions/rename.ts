@@ -10,15 +10,15 @@ import {
 } from '../transforms/core'
 import { exists, type FileAdapter, getDefaultFileAdapter } from '../utilities/file'
 import log from '../utilities/log'
-import { isAbsolute, normalize, type PathObject } from '../utilities/path'
+import { isAbsolute, normalize, type PathObject, pathObjectToString } from '../utilities/path'
 import { FILENAME_MAX_LENGTH } from '../utilities/platform'
-import { appendIncrement } from '../utilities/string'
+import { appendIncrement, type CaseType, convertCase } from '../utilities/string'
 
 function localeSort(a: PathObject, b: PathObject): number {
-	return path.format(a).localeCompare(path.format(b))
+	return pathObjectToString(a).localeCompare(pathObjectToString(b))
 }
 
-const defaultRenameOptions: RenameOptions = {
+export const defaultRenameOptions: RenameOptions = {
 	caseType: 'preserve',
 	defaultName: 'Untitled',
 	dryRun: false,
@@ -27,19 +27,12 @@ const defaultRenameOptions: RenameOptions = {
 	sort: undefined, // Must be passed in later, deepmerge will not work?
 	truncateOnWordBoundary: true,
 	truncationString: '...',
+	validateInput: true,
 	verbose: false,
 }
 
-type RenameOptions = {
-	caseType:
-		| 'camel'
-		| 'kebab'
-		| 'lowercase'
-		| 'pascal'
-		| 'preserve'
-		| 'snake'
-		| 'title'
-		| 'uppercase'
+export type RenameOptions = {
+	caseType: CaseType
 	defaultName: string
 	dryRun: boolean
 	fileAdapter: FileAdapter | undefined
@@ -47,6 +40,7 @@ type RenameOptions = {
 	sort: ((a: PathObject, b: PathObject, fileAdapter?: FileAdapter) => number) | undefined
 	truncateOnWordBoundary: boolean
 	truncationString: string
+	validateInput: boolean
 	verbose: boolean
 }
 
@@ -57,7 +51,7 @@ type FileRenameTask = {
 	status: 'conflict' | 'error' | 'renamed' | 'scheduled' | 'unchanged'
 }
 
-type FileRenameReport = {
+export type FileRenameReport = {
 	dryRun: boolean
 	duration: number
 	files: Array<Omit<FileRenameTask, 'filePathIntermediate'>>
@@ -92,11 +86,62 @@ async function validateFilePath(
 		return 'not-absolute'
 	}
 
-	if (await exists(filePath, fileAdapter)) {
+	if (!(await exists(filePath, fileAdapter))) {
 		return 'nonexistent'
 	}
 
 	return 'valid'
+}
+
+function validationStatusMessage(status: FilePathValidationStatus): string {
+	switch (status) {
+		case 'empty': {
+			return 'Empty file path'
+		}
+		case 'nonexistent': {
+			return 'File does not exist'
+		}
+		case 'not-absolute': {
+			return 'File path is not absolute'
+		}
+		case 'not-normalized': {
+			return 'File path is not normalized'
+		}
+		case 'not-string': {
+			return 'File path is not a string'
+		}
+		case 'valid': {
+			return 'Valid file path'
+		}
+	}
+}
+
+async function validateFiles(filePaths: string[], fileAdapter: FileAdapter): Promise<void> {
+	const statuses = await Promise.all(
+		filePaths.map(async (filePath) => validateFilePath(filePath, fileAdapter)),
+	)
+
+	let invalidFilesFound = false
+	const validFiles: string[] = []
+
+	for (const [index, filePath] of filePaths.entries()) {
+		const status = statuses[index]
+		if (status === 'valid') {
+			if (validFiles.includes(filePath.toLowerCase())) {
+				log.error(`Duplicate file: "${filePath}"`)
+				invalidFilesFound = true
+			} else {
+				validFiles.push(filePath.toLowerCase())
+			}
+		} else {
+			log.error(`${validationStatusMessage(status)}: "${filePath}"`)
+			invalidFilesFound = true
+		}
+	}
+
+	if (invalidFilesFound) {
+		throw new Error('Invalid file paths found, no files renamed.')
+	}
 }
 
 /**
@@ -120,42 +165,24 @@ export async function renameFiles(
 		sort = localeSort,
 		truncateOnWordBoundary,
 		truncationString,
+		validateInput,
 	} = deepmerge(defaultRenameOptions, options ?? {})
 
+	// Validate, throws if any file is invalid
+	if (validateInput) {
+		await validateFiles(filePaths, fileAdapter)
+	}
+
+	// Build the rename plan
 	const fileRenamePlan: FileRenameTask[] = []
 
-	// Validate and build the rename plan
-	let invalidFilesFound = false
 	for (const filePath of filePaths) {
-		const validationStatus = await validateFilePath(filePath, fileAdapter)
-
-		if (validationStatus === 'valid') {
-			fileRenamePlan.push({
-				filePathIntermediate: undefined,
-				filePathOriginal: filePath,
-				filePathRenamed: undefined,
-				status: 'scheduled', // Will be tested for later once we know the final file name
-			})
-		} else {
-			invalidFilesFound = true
-			// TODO better error names based on type
-			log.error(`Invalid file path: ${filePath}`)
-		}
-	}
-
-	// Check for duplicate entries among the valid paths
-	const filePathMap = new Map<string, number>()
-	for (const task of fileRenamePlan) {
-		const count = filePathMap.get(task.filePathOriginal) ?? 0
-		if (count > 0) {
-			log.error(`Duplicate file path: ${task.filePathOriginal}`)
-			invalidFilesFound = true
-		}
-		filePathMap.set(task.filePathOriginal, count + 1)
-	}
-
-	if (invalidFilesFound) {
-		throw new Error('Invalid file paths found')
+		fileRenamePlan.push({
+			filePathIntermediate: undefined,
+			filePathOriginal: filePath,
+			filePathRenamed: undefined,
+			status: 'scheduled', // Will be tested for later once we know the final file name
+		})
 	}
 
 	// Sort the paths based on original file names
@@ -199,7 +226,7 @@ export async function renameFiles(
 			truncationString,
 		})
 
-		task.filePathRenamed = path.format(pathObject)
+		task.filePathRenamed = pathObjectToString(pathObject)
 	}
 
 	// Sort the paths again based on the new file names
@@ -219,7 +246,7 @@ export async function renameFiles(
 		// Look forward for duplicates, we're trusting in the sort
 		for (let i = index + 1; i < fileRenamePlan.length; i++) {
 			const nextTask = fileRenamePlan[i]
-			if (nextTask.filePathRenamed === task.filePathRenamed) {
+			if (nextTask.filePathRenamed?.toLowerCase() === task.filePathRenamed.toLowerCase()) {
 				duplicateGroup.push(nextTask)
 			}
 		}
@@ -256,10 +283,10 @@ export async function renameFiles(
 				continue
 			}
 
-			if (task.filePathRenamed === otherTask.filePathOriginal) {
-				const tempPathObject = path.parse(task.filePathRenamed)
+			if (task.filePathRenamed!.toLowerCase() === otherTask.filePathOriginal.toLowerCase()) {
+				const tempPathObject = path.parse(task.filePathRenamed!)
 				tempPathObject.name = nanoid()
-				task.filePathIntermediate = path.format(tempPathObject)
+				task.filePathIntermediate = pathObjectToString(tempPathObject)
 				break
 			}
 		}
@@ -277,7 +304,14 @@ export async function renameFiles(
 			continue
 		}
 
-		if (await exists(task.filePathRenamed!, fileAdapter)) {
+		// Transform case for accurate comparison, since the fileAdapter functions are not case sensitive!
+		const originalPathObject = path.parse(task.filePathOriginal)
+		originalPathObject.name = convertCase(originalPathObject.name, caseType)
+
+		if (
+			pathObjectToString(originalPathObject) !== task.filePathRenamed &&
+			(await exists(task.filePathRenamed!, fileAdapter))
+		) {
 			task.status = 'conflict'
 		}
 	}

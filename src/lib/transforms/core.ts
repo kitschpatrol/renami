@@ -80,5 +80,6 @@ export async function caseTransform(
 ): Promise<string> {
 	const { name } = filePath
 	const { caseType } = options
+
 	return convertCase(name, caseType)
 }

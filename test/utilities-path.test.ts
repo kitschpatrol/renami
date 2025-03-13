@@ -1,4 +1,5 @@
-import { expect, it } from 'vitest'
+import { stripVTControlCharacters } from 'node:util'
+import { expect, it, vi } from 'vitest'
 import { isAbsolute, normalize, resolveWithBasePath } from '../src/lib/utilities/path'
 
 const testPathsRaw = [
@@ -38,7 +39,9 @@ const testPathsRaw = [
 	String.raw`./Bla bla bla?query=yes`,
 ]
 
+const spyWarn = vi.spyOn(console, 'warn').mockReturnValue()
 const testPathsNormalized = testPathsRaw.map((path) => normalize(path))
+spyWarn.mockRestore()
 
 it('detects absolute paths', () => {
 	const results = testPathsNormalized.map(
@@ -86,6 +89,9 @@ it('detects absolute paths', () => {
 })
 
 it('normalizes paths', () => {
+	// Mock console.warn
+	const spyWarn = vi.spyOn(console, 'warn').mockReturnValue()
+
 	const results = testPathsRaw.map((path) => `${path} --> ${normalize(path)}`)
 	expect(results).toMatchInlineSnapshot(`
 		[
@@ -125,6 +131,14 @@ it('normalizes paths', () => {
 		  "./Bla bla bla?query=yes --> ./Bla bla bla?query=yes",
 		]
 	`)
+
+	// Check if console.warn was called with the expected message
+	expect(stripVTControlCharacters(String(spyWarn.mock.calls))).toMatchInlineSnapshot(
+		`"[Warning],Unsupported extended length path detected: \\\\?\\Volume{abc123-abc123-abc123}\\\\"`,
+	)
+
+	// Restore the original console.warn
+	spyWarn.mockRestore()
 })
 
 it('resolves with base path', () => {

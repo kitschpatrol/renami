@@ -1,4 +1,9 @@
-export { renameFiles } from './actions/rename'
+export {
+	defaultRenameOptions,
+	type FileRenameReport,
+	renameFiles,
+	type RenameOptions,
+} from './actions/rename'
 export { default as log } from './utilities/log'
 
 // Thinking about config

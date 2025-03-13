@@ -1,6 +1,7 @@
 import isAbsolutePath from '@stdlib/assert-is-absolute-path'
 import path from 'path-browserify-esm'
 import slash from 'slash'
+import log from './log'
 
 export type PathObject = path.PathObject
 
@@ -26,12 +27,12 @@ const RE_WINDOWS_EXTENDED_LENGTH_PATH = /^\\\\\?\\.+/
  */
 export function normalize(filePath: string): string {
 	if (RE_WINDOWS_EXTENDED_LENGTH_PATH.test(filePath)) {
-		console.warn(`Unsupported extended length path detected: ${filePath}`)
+		log.warn(`Unsupported extended length path detected: ${filePath}`)
 		return filePath
 	}
 
 	// If (RE_WINDOWS_UNC_PATH.test(filePath)) {
-	// 	console.warn(`Unsupported UNC path detected: ${filePath}`)
+	// 	log.warn(`Unsupported UNC path detected: ${filePath}`)
 	// 	return path.normalize(filePath)
 	// }
 
@@ -75,16 +76,16 @@ export function resolveWithBasePath(
 	// Validation
 	if (basePath !== undefined) {
 		if (!isAbsolute(basePath)) {
-			console.warn(`Base path "${basePath}" is not absolute`)
+			log.warn(`Base path "${basePath}" is not absolute`)
 		}
 
 		if (!cwd.startsWith(basePath)) {
-			console.warn(`CWD "${cwd}" does not start with base path "${basePath}"`)
+			log.warn(`CWD "${cwd}" does not start with base path "${basePath}"`)
 		}
 	}
 
 	if (!isAbsolute(cwd)) {
-		console.warn(`CWD "${cwd}" is not absolute`)
+		log.warn(`CWD "${cwd}" is not absolute`)
 	}
 
 	// Absolute
@@ -104,4 +105,12 @@ export function resolveWithBasePath(
 
 	// Relative
 	return path.join(cwd, filePath)
+}
+
+/**
+ * Works around base not updating when changing the name or extension.
+ */
+export function pathObjectToString(pathObject: PathObject): string {
+	pathObject.base = `${pathObject.name}${pathObject.ext}`
+	return path.format(pathObject)
 }
