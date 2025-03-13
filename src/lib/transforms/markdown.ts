@@ -1,5 +1,7 @@
 import { type Root as MarkdownAst } from 'mdast'
+import { toString } from 'mdast-util-to-string'
 import pupa from 'pupa'
+import { select } from 'unist-util-select'
 import { getMarkdown } from '../utilities/markdown'
 import { pathObjectToString } from '../utilities/path'
 import { type Transform } from './core'
@@ -35,6 +37,24 @@ export function frontmatterTemplate(template: string): Transform {
 					return ''
 				}
 				return value
+			},
+		}),
+	)
+}
+
+/**
+ * Compose a filename from a Unified Markdown AST using a template string with `unist-util-select` selectors
+ * @param template Template string with {placeholders} for `unist-util-select` selectors (Uses the Pupa micro-template library)
+ * @returns renami transform function
+ */
+export function markdownTemplate(template: string): Transform {
+	return markdown(({ ast }) =>
+		pupa(template, ast, {
+			ignoreMissing: true,
+			transform({ key }) {
+				// Ignore values, and just pass Keys to the selector
+				const selected = select(key, ast)
+				return selected === undefined ? '' : toString(selected)
 			},
 		}),
 	)

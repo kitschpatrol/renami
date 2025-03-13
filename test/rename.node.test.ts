@@ -1,7 +1,7 @@
 /* eslint-disable ts/require-await */
 import { describe, expect, it } from 'vitest'
 import { type FileRenameReport, renameFiles, type RenameOptions } from '../src/lib'
-import { frontmatterTemplate, markdown } from '../src/lib/transforms/markdown'
+import { frontmatterTemplate, markdown, markdownTemplate } from '../src/lib/transforms/markdown'
 import { useTempFiles } from './fixtures/file-fixture'
 
 function sanitizeOutput(report: FileRenameReport, tempPath: string): FileRenameReport {
@@ -354,7 +354,7 @@ describe('increment duplicate tests', () => {
 	})
 })
 
-describe('frontmatter template tests', () => {
+describe('markdown template tests', () => {
 	// Setup the temp files fixture with source files from './test-files'
 	const tempFiles = useTempFiles({
 		cleanup: true, // Will clean up after each test
@@ -417,6 +417,35 @@ describe('frontmatter template tests', () => {
 			    {
 			      "filePathOriginal": "/frontmatter-2.md",
 			      "filePathRenamed": "/Some Title.md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+
+	it('should handle unist-util-select templates', async () => {
+		const files = await tempFiles.getFiles()
+
+		const result = await renameFiles(files, [markdownTemplate('Heading - {heading}')], {
+			dryRun: true,
+		})
+
+		expect(result.duration).toBeLessThan(20)
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/frontmatter-1.md",
+			      "filePathRenamed": "/Heading - Hello, world!.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/frontmatter-2.md",
+			      "filePathRenamed": "/Heading - Some other headline!.md",
 			      "status": "renamed",
 			    },
 			  ],
