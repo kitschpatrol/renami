@@ -58,6 +58,7 @@ Markdown body selection...
 
 ### Similar projects
 
+- <https://f2.freshman.tech/> Great! Just
 - <https://github.com/75lb/renamer> (Close! Depends on Node. JS instead of TS. No config file.)
 
 ## The future

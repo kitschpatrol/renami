@@ -15,7 +15,22 @@ export type FileAdapter = {
 }
 
 /**
- * Get the default file adapter for the current environment. Non-node environments will have to provide their own implementations.
+ * Wrapper around the file system stat function to check if a file exists.
+ */
+export async function exists(filePath: string, fileAdapter: FileAdapter): Promise<boolean> {
+	try {
+		await fileAdapter.stat(filePath)
+		return true
+	} catch {
+		return false
+	}
+}
+
+/**
+ * Get the default file adapter for the current environment. Non-node
+ * environments will have to provide their own implementations.
+ *
+ * This is done mostly for ease of implementation with Obsidian's plugin API.
  */
 export async function getDefaultFileAdapter(): Promise<FileAdapter> {
 	if (ENVIRONMENT === 'node') {

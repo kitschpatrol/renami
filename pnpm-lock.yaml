@@ -18,6 +18,9 @@ importers:
       '@kitschpatrol/shared-config':
         specifier: ^5.3.1
         version: 5.3.1(@types/estree@1.0.6)(@types/node@20.17.24)(@typescript-eslint/utils@8.26.1(eslint@9.22.0(jiti@2.4.2))(typescript@5.7.3))(jiti@2.4.2)(postcss-html@1.8.0)(svelte@5.23.0)(ts-api-utils@2.0.1(typescript@5.7.3))(typescript@5.7.3)(vitest@3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@2.4.2)(yaml@2.7.0))
+      '@stdlib/assert-is-absolute-path':
+        specifier: ^0.2.2
+        version: 0.2.2
       '@types/node':
         specifier: ^20.17.23
         version: 20.17.24
@@ -30,12 +33,24 @@ importers:
       deepmerge-ts:
         specifier: ^7.1.5
         version: 7.1.5
+      filenamify:
+        specifier: ^6.0.0
+        version: 6.0.0
+      nanoid:
+        specifier: ^5.1.3
+        version: 5.1.3
+      path-browserify-esm:
+        specifier: ^1.0.6
+        version: 1.0.6
       pkgroll:
         specifier: ^2.11.2
         version: 2.11.2(typescript@5.7.3)
       pretty-ms:
         specifier: ^9.2.0
         version: 9.2.0
+      slash:
+        specifier: ^5.1.0
+        version: 5.1.0
       typescript:
         specifier: ~5.7.3
         version: 5.7.3
@@ -1081,6 +1096,81 @@ packages:
     resolution: {integrity: sha512-lGFf08pbkEac0NYgVf4hdANpAgApRjNByLXB+WBip3qj1iendOIyAwP2GKkKbQMNVy2r1xxDf0ssfWscoiC+Vw==}
     engines: {node: '>=8.10'}
     hasBin: true
+
+  '@stdlib/assert-has-own-property@0.2.2':
+    resolution: {integrity: sha512-m5rV4Z2/iNkwx2vRsNheM6sQZMzc8rQQOo90LieICXovXZy8wA5jNld4kRKjMNcRt/TjrNP7i2Rhh8hruRDlHg==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/assert-has-symbol-support@0.2.2':
+    resolution: {integrity: sha512-vCsGGmDZz5dikGgdF26rIL0y0nHvH7qaVf89HLLTybceuZijAqFSJEqcB3Gpl5uaeueLNAWExHi2EkoUVqKHGg==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/assert-has-tostringtag-support@0.2.2':
+    resolution: {integrity: sha512-bSHGqku11VH0swPEzO4Y2Dr+lTYEtjSWjamwqCTC8udOiOIOHKoxuU4uaMGKJjVfXG1L+XefLHqzuO5azxdRaA==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/assert-is-absolute-path@0.2.2':
+    resolution: {integrity: sha512-NScjmHmRAE0HeMKHloJhgXeAjJv0QFuK4mVFRv92E3UX9M01oWOPPwrMqJ0lswVeg7Mp8GTJnavjX7hOzmz/Tg==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/assert-is-string@0.2.2':
+    resolution: {integrity: sha512-SOkFg4Hq443hkadM4tzcwTHWvTyKP9ULOZ8MSnnqmU0nBX1zLVFLFGY8jnF6Cary0dL0V7QQBCfuxqKFM6u2PQ==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/assert-is-windows@0.2.2':
+    resolution: {integrity: sha512-4vL6loRIMZZgDqlZN5Ptq/GKn706rVbIIAr88seFiIdtcTcnZbwApOCYOyQh5fkOA7tazH0TRj9winthQfXv6A==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/error-tools-fmtprodmsg@0.2.2':
+    resolution: {integrity: sha512-2IliQfTes4WV5odPidZFGD5eYDswZrPXob7oOu95Q69ERqImo8WzSwnG2EDbHPyOyYCewuMfM5Ha6Ggf+u944Q==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/os-platform@0.2.2':
+    resolution: {integrity: sha512-1nZe7AbZMicxbBVPlEvaUNHOJX7TD5e/dzEqgpT3aZqDtXRolrkre16g76pjkJqMox16Qj+PWf4JDQajSOVJnA==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/string-base-format-interpolate@0.2.2':
+    resolution: {integrity: sha512-i9nU9rAB2+o/RR66TS9iQ8x+YzeUDL1SGiAo6GY3hP6Umz5Dx9Qp/v8T69gWVsb4a1YSclz5+YeCWaFgwvPjKA==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/string-base-format-tokenize@0.2.2':
+    resolution: {integrity: sha512-kXq2015i+LJjqth5dN+hYnvJXBSzRm8w0ABWB5tYAsIuQTpQK+mSo2muM8JBEFEnqUHAwpUsu2qNTK/9o8lsJg==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/string-format@0.2.2':
+    resolution: {integrity: sha512-GUa50uxgMAtoItsxTbMmwkyhIwrCxCrsjzk3nAbLnt/1Kt1EWOWMwsALqZdD6K4V/xSJ4ns6PZur3W6w+vKk9g==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/symbol-ctor@0.2.2':
+    resolution: {integrity: sha512-XsmiTfHnTb9jSPf2SoK3O0wrNOXMxqzukvDvtzVur1XBKfim9+seaAS4akmV1H3+AroAXQWVtde885e1B6jz1w==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/utils-define-nonenumerable-read-only-property@0.2.2':
+    resolution: {integrity: sha512-V3mpAesJemLYDKG376CsmoczWPE/4LKsp8xBvUxCt5CLNAx3J/1W39iZQyA5q6nY1RStGinGn1/dYZwa8ig0Uw==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/utils-define-property@0.2.4':
+    resolution: {integrity: sha512-XlMdz7xwuw/sqXc9LbsV8XunCzZXjbZPC+OAdf4t4PBw4ZRwGzlTI6WED+f4PYR5Tp9F1cHgLPyMYCIBfA2zRg==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/utils-native-class@0.2.2':
+    resolution: {integrity: sha512-cSn/FozbEpfR/FlJAoceQtZ8yUJFhZ8RFkbEsxW/7+H4o09yln3lBS0HSfUJISYNtpTNN/2/Fup88vmvwspvwA==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
 
   '@sveltejs/acorn-typescript@1.0.5':
     resolution: {integrity: sha512-IwQk4yfwLdibDlrXVE04jTZYlLnwsTT2PIOQQGNLWfjavGifnk1JD1LcZjZaBTRcxZu2FfPfNLOE04DSu9lqtQ==}
@@ -2436,6 +2526,14 @@ packages:
     resolution: {integrity: sha512-/pqPFG+FdxWQj+/WSuzXSDaNzxgTLr/OrR1QuqfEZzDakpdYE70PwUxL7BPUa8hpjbvY1+qvCl8k+8Tq34xJgg==}
     engines: {node: '>=18'}
 
+  filename-reserved-regex@3.0.0:
+    resolution: {integrity: sha512-hn4cQfU6GOT/7cFHXBqeBg2TbrMBgdD0kcjLhvSQYYwm3s4B6cjvBfb7nBALJLAXqmU5xajSa7X2NnUud/VCdw==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
+  filenamify@6.0.0:
+    resolution: {integrity: sha512-vqIlNogKeyD3yzrm0yhRMQg8hOVwYcYRfjEoODd49iCprMn4HL85gK3HcykQE53EPIpX3HcAbGA5ELQv216dAQ==}
+    engines: {node: '>=16'}
+
   fill-range@7.1.1:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
     engines: {node: '>=8'}
@@ -3373,6 +3471,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@5.1.3:
+    resolution: {integrity: sha512-zAbEOEr7u2CbxwoMRlz/pNSpRP0FdAU4pRaYunCdEezWohXFs+a0Xw7RfkKaezMsmSM1vttcLthJtwRnVtOfHQ==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
@@ -3543,6 +3646,9 @@ packages:
   parseurl@1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
     engines: {node: '>= 0.8'}
+
+  path-browserify-esm@1.0.6:
+    resolution: {integrity: sha512-9nUwYvvu/yq1PYrUyYCihNWmpzacaRYF6gGbjLWErrZ4MRDWyfPN7RpE8E7tsw8eqBU/rr7mcoTXbS+Vih8uUA==}
 
   path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
@@ -6050,6 +6156,60 @@ snapshots:
       ignore: 5.3.2
       p-map: 4.0.0
 
+  '@stdlib/assert-has-own-property@0.2.2': {}
+
+  '@stdlib/assert-has-symbol-support@0.2.2': {}
+
+  '@stdlib/assert-has-tostringtag-support@0.2.2':
+    dependencies:
+      '@stdlib/assert-has-symbol-support': 0.2.2
+
+  '@stdlib/assert-is-absolute-path@0.2.2':
+    dependencies:
+      '@stdlib/assert-is-string': 0.2.2
+      '@stdlib/assert-is-windows': 0.2.2
+      '@stdlib/utils-define-nonenumerable-read-only-property': 0.2.2
+
+  '@stdlib/assert-is-string@0.2.2':
+    dependencies:
+      '@stdlib/assert-has-tostringtag-support': 0.2.2
+      '@stdlib/utils-define-nonenumerable-read-only-property': 0.2.2
+      '@stdlib/utils-native-class': 0.2.2
+
+  '@stdlib/assert-is-windows@0.2.2':
+    dependencies:
+      '@stdlib/os-platform': 0.2.2
+
+  '@stdlib/error-tools-fmtprodmsg@0.2.2': {}
+
+  '@stdlib/os-platform@0.2.2': {}
+
+  '@stdlib/string-base-format-interpolate@0.2.2': {}
+
+  '@stdlib/string-base-format-tokenize@0.2.2': {}
+
+  '@stdlib/string-format@0.2.2':
+    dependencies:
+      '@stdlib/string-base-format-interpolate': 0.2.2
+      '@stdlib/string-base-format-tokenize': 0.2.2
+
+  '@stdlib/symbol-ctor@0.2.2': {}
+
+  '@stdlib/utils-define-nonenumerable-read-only-property@0.2.2':
+    dependencies:
+      '@stdlib/utils-define-property': 0.2.4
+
+  '@stdlib/utils-define-property@0.2.4':
+    dependencies:
+      '@stdlib/error-tools-fmtprodmsg': 0.2.2
+      '@stdlib/string-format': 0.2.2
+
+  '@stdlib/utils-native-class@0.2.2':
+    dependencies:
+      '@stdlib/assert-has-own-property': 0.2.2
+      '@stdlib/assert-has-tostringtag-support': 0.2.2
+      '@stdlib/symbol-ctor': 0.2.2
+
   '@sveltejs/acorn-typescript@1.0.5(acorn@8.14.1)':
     dependencies:
       acorn: 8.14.1
@@ -7804,6 +7964,12 @@ snapshots:
     dependencies:
       flat-cache: 5.0.0
 
+  filename-reserved-regex@3.0.0: {}
+
+  filenamify@6.0.0:
+    dependencies:
+      filename-reserved-regex: 3.0.0
+
   fill-range@7.1.1:
     dependencies:
       to-regex-range: 5.0.1
@@ -9040,6 +9206,8 @@ snapshots:
 
   nanoid@3.3.9: {}
 
+  nanoid@5.1.3: {}
+
   natural-compare@1.4.0: {}
 
   natural-orderby@5.0.0: {}
@@ -9248,6 +9416,8 @@ snapshots:
   parse-ms@4.0.0: {}
 
   parseurl@1.3.3: {}
+
+  path-browserify-esm@1.0.6: {}
 
   path-exists@4.0.0: {}
 
