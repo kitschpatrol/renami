@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/node':
         specifier: ^20.17.24
         version: 20.17.24
@@ -57,12 +60,21 @@ importers:
       pupa:
         specifier: ^3.1.0
         version: 3.1.0
+      remark-frontmatter:
+        specifier: ^5.0.0
+        version: 5.0.0
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1
       slash:
         specifier: ^5.1.0
         version: 5.1.0
       typescript:
         specifier: ~5.8.2
         version: 5.8.2
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
       untildify:
         specifier: ^5.0.0
         version: 5.0.0

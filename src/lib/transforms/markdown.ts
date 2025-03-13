@@ -1,20 +1,22 @@
+import { type Root as MarkdownAst } from 'mdast'
 import pupa from 'pupa'
-import { getFrontmatter } from '../utilities/markdown'
+import { getMarkdown } from '../utilities/markdown'
 import { pathObjectToString } from '../utilities/path'
 import { type Transform } from './core'
 
 /**
- * Compose a filename from frontmatter using a callback function
- * @param callback Function that takes frontmatter object and returns a string
+ * Compose a filename from a Unified Markdown AST and / or frontmatter object using a callback function
+ * @param callback Function that takes the Markdown object (AST + frontmatter) and returns a string
  * @returns renami transform function
  */
-export function frontmatter(callback: (frontmatter: Record<string, unknown>) => string): Transform {
+export function markdown(
+	callback: (markdown: { ast: MarkdownAst; frontmatter: Record<string, unknown> }) => string,
+): Transform {
 	return async (filePath, options) => {
 		const { fileAdapter } = options
 		const fullPath = pathObjectToString(filePath)
 		const contents = await fileAdapter.readFile(fullPath)
-		const frontmatter = getFrontmatter(contents)
-		return callback(frontmatter)
+		return callback(getMarkdown(contents))
 	}
 }
 
@@ -25,7 +27,7 @@ export function frontmatter(callback: (frontmatter: Record<string, unknown>) => 
  * @example `frontmatterTemplate('Note-{title}')`
  */
 export function frontmatterTemplate(template: string): Transform {
-	return frontmatter((frontmatter) =>
+	return markdown(({ frontmatter }) =>
 		pupa(template, frontmatter, {
 			ignoreMissing: true,
 			transform({ value }) {

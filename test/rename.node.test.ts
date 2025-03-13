@@ -1,11 +1,7 @@
 /* eslint-disable ts/require-await */
 import { describe, expect, it } from 'vitest'
 import { type FileRenameReport, renameFiles, type RenameOptions } from '../src/lib'
-import {
-	frontmatter,
-	frontmatterTemplate,
-	frontmatterTransform,
-} from '../src/lib/transforms/frontmatter'
+import { frontmatterTemplate, markdown } from '../src/lib/transforms/markdown'
 import { useTempFiles } from './fixtures/file-fixture'
 
 function sanitizeOutput(report: FileRenameReport, tempPath: string): FileRenameReport {
@@ -366,12 +362,12 @@ describe('frontmatter template tests', () => {
 		sourcePath: './test/assets/test-frontmatter',
 	})
 
-	it('should handle frontmatter callback', async () => {
+	it('should handle markdown callback', async () => {
 		const files = await tempFiles.getFiles()
 
 		const result = await renameFiles(
 			files,
-			[frontmatter((data) => String(data.title) || 'Untitled')],
+			[markdown(({ frontmatter }) => String(frontmatter.title) || 'Untitled')],
 			{
 				dryRun: true,
 			},
