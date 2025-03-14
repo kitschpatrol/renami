@@ -1,13 +1,13 @@
 /* eslint-disable ts/require-await */
 
 import { describe, expect, it } from 'vitest'
-import { type FileRenameReport, renameFiles, type RenameOptions } from '../src/lib'
-import { fileCallback } from '../src/lib/helpers/file'
+import { type FileRenameReport, renameFiles, type Options } from '../src/lib'
+import { fileCallback } from '../src/lib/actions/file'
 import {
 	frontmatterTemplate,
 	markdownCallback,
 	markdownTemplate,
-} from '../src/lib/helpers/markdown'
+} from '../src/lib/actions/markdown'
 import { useTempFiles } from './fixtures/file-fixture'
 
 function sanitizeOutput(report: FileRenameReport, tempPath: string): FileRenameReport {
@@ -81,7 +81,7 @@ describe('basic rename tests', () => {
 	it('should set the case appropriately', async () => {
 		const files = await tempFiles.getFiles()
 
-		const cases: Array<RenameOptions['caseType']> = [
+		const cases: Array<Options['caseType']> = [
 			'camel',
 			'kebab',
 			'lowercase',

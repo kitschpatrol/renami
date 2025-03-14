@@ -16,7 +16,7 @@ import { isAbsolute, normalize, pathObjectToString } from './utilities/path'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
 import { appendIncrement, type CaseType, convertCase, getIncrement } from './utilities/string'
 
-export const defaultRenameOptions: RenameOptions = {
+export const defaultOptions: Options = {
 	caseType: 'preserve',
 	defaultName: 'Untitled',
 	dryRun: false,
@@ -28,7 +28,7 @@ export const defaultRenameOptions: RenameOptions = {
 	validateOutput: true,
 }
 
-export type RenameOptions = {
+export type Options = {
 	/** Enforce a specific letter casing on the final file names. */
 	caseType: CaseType
 	/** In rare cases a path that's all unsave characters will become zero-length... this default is used in such cases. */
@@ -157,7 +157,7 @@ export async function renameFiles(
 	/** Expects unique, normalized, absolute paths! */
 	filePaths: string[],
 	transforms: Transform[],
-	options?: Partial<RenameOptions>,
+	options?: Partial<Options>,
 ): Promise<FileRenameReport> {
 	const startTime = performance.now()
 
@@ -171,7 +171,7 @@ export async function renameFiles(
 		truncationString,
 		validateInput,
 		validateOutput,
-	} = deepmerge(defaultRenameOptions, options ?? {})
+	} = deepmerge(defaultOptions, options ?? {})
 
 	// Validate, throws if any file is invalid
 	if (validateInput) {
