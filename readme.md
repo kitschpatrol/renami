@@ -63,7 +63,7 @@ The point is to write config that focuses on the _semantic_ aspects of the name 
 
 ### Dependencies
 
-The `renami` CLI tool requires Node 18+. The exported APIs are isomorphic, and should work in any relatively recent runtime environment. Renami is implemented in TypeScript and bundles a complete set of type definitions.
+The `renami` CLI tool requires Node 20+. The exported APIs are isomorphic, and should work in any relatively recent runtime environment. Renami is implemented in TypeScript and bundles a complete set of type definitions.
 
 ### Installation
 
