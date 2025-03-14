@@ -1,3 +1,5 @@
+/* eslint-disable ts/require-await */
+
 import { type Root as MarkdownAst } from 'mdast'
 import { toString } from 'mdast-util-to-string'
 import pupa from 'pupa'
@@ -9,7 +11,7 @@ import { select } from 'unist-util-select'
 import { VFile } from 'vfile'
 import { matter } from 'vfile-matter'
 import { type Transform } from '../transform'
-import { pathObjectToString } from '../utilities/path'
+import { type PathObject, pathObjectToString } from '../utilities/path'
 
 /**
  * Internal helper to extract AST from a Markdown string
@@ -48,14 +50,19 @@ function getMarkdown(content: string): {
  * @param callback Function that takes the Markdown object (AST + frontmatter) and returns a string
  * @returns renami transform function
  */
-export function markdown(
-	callback: (markdown: { ast: MarkdownAst; frontmatter: Record<string, unknown> }) => string,
+export function markdownCallback(
+	callback: (
+		filePath: PathObject,
+		frontmatter: Record<string, unknown>,
+		ast: MarkdownAst,
+	) => Promise<string | undefined>,
 ): Transform {
 	return async (filePath, options) => {
 		const { fileAdapter } = options
 		const fullPath = pathObjectToString(filePath)
 		const contents = await fileAdapter.readFile(fullPath)
-		return callback(getMarkdown(contents))
+		const { ast, frontmatter } = getMarkdown(contents)
+		return callback(filePath, frontmatter, ast)
 	}
 }
 
@@ -66,7 +73,7 @@ export function markdown(
  * @example `frontmatterTemplate('Note-{title}')`
  */
 export function frontmatterTemplate(template: string): Transform {
-	return markdown(({ frontmatter }) =>
+	return markdownCallback(async (_, frontmatter) =>
 		pupa(template, frontmatter, {
 			ignoreMissing: true,
 			transform({ value }) {
@@ -85,7 +92,7 @@ export function frontmatterTemplate(template: string): Transform {
  * @returns renami transform function
  */
 export function markdownTemplate(template: string): Transform {
-	return markdown(({ ast }) =>
+	return markdownCallback(async (_, __, ast) =>
 		pupa(template, ast, {
 			ignoreMissing: true,
 			transform({ key }) {
