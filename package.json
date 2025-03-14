@@ -75,7 +75,6 @@
 		"slash": "^5.1.0",
 		"typescript": "~5.8.2",
 		"unified": "^11.0.5",
-		"untildify": "^5.0.0",
 		"vfile": "^6.0.3",
 		"vfile-matter": "^5.0.0",
 		"vitest": "^3.0.8"

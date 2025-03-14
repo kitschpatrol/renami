@@ -6,6 +6,9 @@ export const FILENAME_MAX_LENGTH = 255
 export const ENVIRONMENT =
 	typeof window === 'undefined' ? (typeof process === 'undefined' ? 'other' : 'node') : 'browser'
 
+/**
+ * @public
+ */
 export const PLATFORM =
 	ENVIRONMENT === 'browser'
 		? /windows/i.test(navigator.userAgent)
