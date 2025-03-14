@@ -14,7 +14,7 @@ export type RenamiConfig = {
 }
 
 export type Rule = {
-	options?: Options
+	options?: Partial<Options>
 	pattern: string
 	transforms?: Transform | Transform[]
 }

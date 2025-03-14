@@ -1,0 +1,430 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`basic rename tests > should set the case appropriately 1`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/basic.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/camelCaseFile.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/kebabCaseFile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/miXedCAseFIle.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/sentenceCaseFile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/snakeCaseFile.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 2`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/basic.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/camel-case-file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/kebab-case-file.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/mi-xed-c-ase-f-ile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/sentence-case-file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/snake-case-file.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 3`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/basic.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/camelcasefile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/kebab-case-file.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/mixedc_asef-ile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/sentence case file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/snake_case_file.md",
+      "status": "unchanged",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 4`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/Basic.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/CamelCaseFile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/KebabCaseFile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/MiXedCAseFIle.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/SentenceCaseFile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/SnakeCaseFile.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 5`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/basic.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/camelCaseFile.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/kebab-case-file.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/miXedC_aseF-ile.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/Sentence case file.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/snake_case_file.md",
+      "status": "unchanged",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 6`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/BASIC.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/CAMEL-CASE-FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/KEBAB-CASE-FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/MI-XED-C-ASE-F-ILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/SENTENCE-CASE-FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/SNAKE-CASE-FILE.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 7`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/BASIC.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/CAMEL_CASE_FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/KEBAB_CASE_FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/MI_XED_C_ASE_F_ILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/SENTENCE_CASE_FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/SNAKE_CASE_FILE.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 8`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/Basic.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/Camel case file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/Kebab case file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/Mi xed c ase f ile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/Sentence case file.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/Snake case file.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 9`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/basic.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/camel_case_file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/kebab_case_file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/mi_xed_c_ase_f_ile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/sentence_case_file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/snake_case_file.md",
+      "status": "unchanged",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 10`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/Basic.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/Camel Case File.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/Kebab Case File.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/Mi Xed C Ase F Ile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/Sentence Case File.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/Snake Case File.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 11`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/BASIC.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/CAMELCASEFILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/KEBAB-CASE-FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/MIXEDC_ASEF-ILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/SENTENCE CASE FILE.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/SNAKE_CASE_FILE.md",
+      "status": "renamed",
+    },
+  ],
+}
+`;

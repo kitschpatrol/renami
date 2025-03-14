@@ -1,7 +1,7 @@
 import { fileCallback } from './file'
 import { frontmatterTemplate, markdownCallback, markdownTemplate } from './markdown'
 
-export default {
+export const transformHelper = {
 	fileCallback,
 	frontmatterTemplate,
 	markdownCallback,

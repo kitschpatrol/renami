@@ -37,7 +37,7 @@
 		"dist/*"
 	],
 	"scripts": {
-		"build": "pkgroll --clean-dist --tsconfig tsconfig.build.json",
+		"build": "pkgroll --clean-dist --minify --tsconfig tsconfig.build.json",
 		"clean": "git rm -f pnpm-lock.yaml ; git clean -fdX",
 		"coverage": "vitest run --coverage",
 		"fix": "kpi fix",
@@ -52,6 +52,8 @@
 		"chalk": "^5.4.1",
 		"cosmiconfig": "^9.0.0",
 		"cosmiconfig-typescript-loader": "^6.1.0",
+		"globby": "^14.1.0",
+		"unist-util-select": "^5.1.0",
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
@@ -60,7 +62,6 @@
 		"bumpp": "^10.1.0",
 		"deepmerge-ts": "^7.1.5",
 		"filenamify": "^6.0.0",
-		"globby": "^14.1.0",
 		"mdast-util-to-string": "^4.0.0",
 		"nanoid": "^5.1.3",
 		"natural-orderby": "^5.0.0",
@@ -70,10 +71,10 @@
 		"pupa": "^3.1.0",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
+		"remark-parse": "^11.0.0",
 		"slash": "^5.1.0",
 		"typescript": "~5.8.2",
 		"unified": "^11.0.5",
-		"unist-util-select": "^5.1.0",
 		"untildify": "^5.0.0",
 		"vfile": "^6.0.3",
 		"vfile-matter": "^5.0.0",
