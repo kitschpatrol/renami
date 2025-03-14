@@ -15,7 +15,7 @@
 
 <!-- short-description -->
 
-**A CLI tool and TypeScript library for config-driven automatic filename management.**
+**A CLI tool and TypeScript library for config-driven and content-aware automatic filename management.**
 
 <!-- /short-description -->
 
@@ -25,21 +25,48 @@
 
 ### Dependencies
 
+The `renami` CLI tool requires Node 18+. The exported APIs are isomorphic, and should run in any relatively recent runtime environment. `renami` is implemented in TypeScript and bundles a complete set of type definitions.
+
 ### Installation
+
+Install locally to access the CLI commands in a single project or to import the provided APIs:
+
+```sh
+npm install renami
+```
+
+Or, install globally for access across your system:
+
+```sh
+npm install --global renami
+```
 
 ## Usage
 
 ### Library
 
-#### API
-
-#### Examples
-
 ### CLI
 
-#### Commands
+<!-- cli-help -->
 
-#### Examples
+#### Command: `renami`
+
+Rename files using config. Searches for a config file if not provided, failing if none is found.
+
+Usage:
+
+```txt
+renami [options]
+```
+
+| Option              | Description                                                                             | Type      | Default |
+| ------------------- | --------------------------------------------------------------------------------------- | --------- | ------- |
+| `--config`<br>`-c`  | Path to config file. If not provided, a config file will be searched for automatically. | `string`  |         |
+| `--verbose`         | Enable verbose logging.                                                                 | `boolean` | `false` |
+| `--help`<br>`-h`    | Show help                                                                               | `boolean` |         |
+| `--version`<br>`-v` | Show version number                                                                     | `boolean` |         |
+
+<!-- /cli-help -->
 
 ## Background
 
@@ -72,15 +99,9 @@ Markdown body selection...
 - <https://f2.freshman.tech/> Great! Just
 - <https://github.com/75lb/renamer> (Close! Depends on Node. JS instead of TS. No config file.)
 
-## The future
-
 ## Maintainers
 
-_List maintainer(s) for a repository, along with one way of contacting them (e.g. GitHub link or email)._
-
-## Acknowledgments
-
-_State anyone or anything that significantly helped with the development of your project. State public contact hyper-links if applicable._
+@kitschpatrol
 
 <!-- contributing -->
 

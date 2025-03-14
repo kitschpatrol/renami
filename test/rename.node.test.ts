@@ -28,6 +28,13 @@ describe('recursive rename tests', () => {
 		})
 
 		expect(renameReport).toBeDefined()
-		expect(sanitizeRenameReport(renameReport!, tempFiles.getTempPath())).toMatchSnapshot()
+		expect(sanitizeRenameReport(renameReport, tempFiles.getTempPath())).toMatchSnapshot()
+	})
+
+	it('should use the config file', async () => {
+		const renameReport = await rename({ config: './test/fixtures/test-config.ts' })
+
+		expect(renameReport).toBeDefined()
+		expect(sanitizeRenameReport(renameReport, process.cwd())).toMatchSnapshot()
 	})
 })

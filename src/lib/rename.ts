@@ -25,16 +25,28 @@ export async function rename(options: {
 	configSearchFrom?: string
 	/** File adapter to use for file operations in non-Node environments. */
 	fileAdapter?: FileAdapter
-}): Promise<RenameReport | undefined> {
+}): Promise<RenameReport> {
 	const startTime = performance.now()
 	const { config, configSearchFrom, fileAdapter = await getDefaultFileAdapter() } = options
 
-	const { options: defaultTransformOptions, rules } = await loadConfig(config, configSearchFrom)
+	const loadedConfig = await loadConfig(config, configSearchFrom)
+
+	if (loadedConfig === undefined) {
+		log.warn('No config found, nothing to do.')
+		return {
+			duration: performance.now() - startTime,
+			rules: [],
+		}
+	}
+
+	const { options: defaultTransformOptions, rules } = loadedConfig
 
 	if (rules === undefined || rules.length === 0) {
-		// TODO run default rules in default location?
 		log.warn('No rules found, nothing to do.')
-		return undefined
+		return {
+			duration: performance.now() - startTime,
+			rules: [],
+		}
 	}
 
 	const renameReport: RenameReport = {

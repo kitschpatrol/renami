@@ -8,7 +8,7 @@ import { type CaseType } from './utilities/string'
 
 export type RenamiConfig = {
 	/** Default options for all tasks, may be overridden per-task */
-	options: Options
+	options: Partial<Options>
 	/** List of tasks to perform */
 	rules?: Rule[]
 }
@@ -95,7 +95,7 @@ function isRenamiConfig(config: unknown): config is RenamiConfig {
 export async function loadConfig(
 	config?: Partial<RenamiConfig> | string,
 	searchFrom?: string,
-): Promise<RenamiConfig> {
+): Promise<RenamiConfig | undefined> {
 	// Load config from passed object
 	if (isRenamiConfig(config)) {
 		// Set defaults and return
@@ -130,7 +130,10 @@ export async function loadConfig(
 		return renamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>)
 	}
 
+	// Give up
+	return undefined
+
 	// Failing everything, use bare defaults
-	log.warn('No config found, using defaults')
-	return defaultRenamiConfig
+	// log.warn('No config found, using defaults')
+	// return defaultRenamiConfig
 }
