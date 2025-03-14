@@ -46,7 +46,7 @@ The point is to write config that focuses on the _semantic_ aspects of the name 
 - Automatically set file names based on file content on a per-directory basis
   - Set Markdown file names from frontmatter fields via easy string-based templates
   - Set Markdown file name from content with [CSS-like selectors](https://github.com/syntax-tree/unist-util-select)
-  - Set file names from file metadata like creation and modiciation dates
+  - Set file names from file metadata like creation and modification dates
 - Change file extensions
 - Unicode normalization
 - Max-length name truncation with configurable `...` and support for detecting word breaks
@@ -129,12 +129,11 @@ export default renamiConfig({
       pattern: './test/assets/test-basic/**/*',
       // Transform functions take info about a file and return a filename `string`,
       // or `undefined` if no valid transform is possible.
-      // Multiple functions can be passed to `transform`, and are evaluated left to right.
-      // The first function to return a `string` instead of `undefined` determines the new file name.
-      //
+      // Multiple functions can be passed to `transform`, and are evaluated left to right, with the output
+      // of one transform passed to the next, unless it returns `undefined`, in which case it's skipped.
       // Additional changes might be made to the file name afterwards depending on 'options'.
-      // This one set filename to ctime
-      transform: fileCallback((_, __, fileInfo) => String(fileInfo.ctimeMs)),
+      // This one sets the filename to ctime
+      transform: fileCallback(({ fileInfo }) => String(fileInfo.ctimeMs)),
     },
     {
       options: {
@@ -220,27 +219,27 @@ renami [options]
 Case sensitivity...
 
 - Will change case as requested, but doesn't allow identically named but differently-cased files.
-- <https://unjs.io/packages/scule>
+- https://unjs.io/packages/scule
 
 Template expansion...
 
-- <https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914>
-- <https://github.com/josh-hemphill/subslate>
-- <https://github.com/sindresorhus/pupa>
+- https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914
+- https://github.com/josh-hemphill/subslate
+- https://github.com/sindresorhus/pupa
 
 Renaming...
 
-- <https://github.com/vfile/vfile-rename>
+- https://github.com/vfile/vfile-rename
 
 Markdown body selection...
 
-- <https://github.com/syntax-tree/unist-util-select>
-- <https://github.com/yshavit/mdq>
+- https://github.com/syntax-tree/unist-util-select
+- https://github.com/yshavit/mdq
 
 ### Similar projects
 
-- <https://f2.freshman.tech/> Great! Just
-- <https://github.com/75lb/renamer> (Close! Depends on Node. JS instead of TS. No config file.)
+- https://f2.freshman.tech/ Great! Just
+- https://github.com/75lb/renamer (Close! Depends on Node. JS instead of TS. No config file.)
 
 ## The future
 

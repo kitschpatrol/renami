@@ -1,6 +1,7 @@
+import path from 'path-browserify-esm'
 import { type Transform } from '../transform'
 import { type FileAdapter } from '../utilities/file'
-import { type PathObject, pathObjectToString } from '../utilities/path'
+import { type PathObject } from '../utilities/path'
 
 /**
  * Generic callback function with access to the file being renamed
@@ -12,11 +13,10 @@ export function fileCallback(
 		filePath: PathObject,
 		fileBuffer: Uint8Array,
 		fileInfo: Awaited<ReturnType<FileAdapter['stat']>>,
-	) => Promise<string | undefined> | string | undefined,
+	) => PathObject | Promise<PathObject | string | undefined> | string | undefined,
 ): Transform {
-	return async (filePath, options) => {
-		const { fileAdapter } = options
-		const fullPath = pathObjectToString(filePath)
+	return async ({ fileAdapter, filePath }) => {
+		const fullPath = path.format(filePath)
 
 		const [buffer, stat] = await Promise.all([
 			fileAdapter.readFileBuffer(fullPath),

@@ -108,9 +108,22 @@ export function resolveWithBasePath(
 }
 
 /**
+ * Sets the name of the path object and updates the base property.
  * Works around base not updating when changing the name or extension.
+ * DO NOT SET NAME DIRECTLY
  */
-export function pathObjectToString(pathObject: PathObject): string {
+export function pathObjectSetName(pathObject: PathObject, name: string): void {
+	pathObject.name = name
 	pathObject.base = `${pathObject.name}${pathObject.ext}`
-	return path.format(pathObject)
+}
+
+/**
+ * Sets one path object's properties to another.
+ */
+export function pathObjectSetAll(source: PathObject, target: PathObject): void {
+	target.dir = source.dir
+	target.base = source.base
+	target.name = source.name
+	target.ext = source.ext
+	target.root = source.root
 }

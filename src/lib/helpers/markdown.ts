@@ -1,5 +1,6 @@
 import { type Root as MarkdownAst } from 'mdast'
 import { toString } from 'mdast-util-to-string'
+import path from 'path-browserify-esm'
 import pupa from 'pupa'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
@@ -9,7 +10,7 @@ import { select } from 'unist-util-select'
 import { VFile } from 'vfile'
 import { matter } from 'vfile-matter'
 import { type Transform } from '../transform'
-import { type PathObject, pathObjectToString } from '../utilities/path'
+import { type PathObject } from '../utilities/path'
 import { emptyIsUndefined } from '../utilities/string'
 
 /**
@@ -50,18 +51,17 @@ function getMarkdown(content: string): {
  * @returns renami transform function
  */
 export function markdownCallback(
-	callback: (
-		filePath: PathObject,
-		frontmatter: Record<string, unknown>,
-		ast: MarkdownAst,
-	) => Promise<string | undefined> | string | undefined,
+	callback: (markdown: {
+		ast: MarkdownAst
+		filePath: PathObject
+		frontmatter: Record<string, unknown>
+	}) => PathObject | Promise<PathObject | string | undefined> | string | undefined,
 ): Transform {
-	return async (filePath, options) => {
-		const { fileAdapter } = options
-		const fullPath = pathObjectToString(filePath)
-		const contents = await fileAdapter.readFile(fullPath)
+	return async (context) => {
+		const fullPath = path.format(context.filePath)
+		const contents = await context.fileAdapter.readFile(fullPath)
 		const { ast, frontmatter } = getMarkdown(contents)
-		const result = callback(filePath, frontmatter, ast)
+		const result = callback({ ast, filePath: context.filePath, frontmatter })
 		return result instanceof Promise ? result : result
 	}
 }
@@ -73,7 +73,7 @@ export function markdownCallback(
  * @example `frontmatterTemplate('Note-{title}')`
  */
 export function frontmatterTemplate(template: string): Transform {
-	return markdownCallback((_, frontmatter) => {
+	return markdownCallback(({ frontmatter }) => {
 		const result = pupa(template, frontmatter, {
 			ignoreMissing: true,
 			transform({ value }) {
@@ -94,7 +94,7 @@ export function frontmatterTemplate(template: string): Transform {
  * @returns renami transform function
  */
 export function markdownTemplate(template: string): Transform {
-	return markdownCallback((_, __, ast) => {
+	return markdownCallback(({ ast }) => {
 		const result = pupa(template, ast, {
 			ignoreMissing: true,
 			transform({ key }) {

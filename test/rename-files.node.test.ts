@@ -154,7 +154,7 @@ describe('basic rename tests', () => {
 				dryRun: false,
 			},
 			transform: [
-				async ({ name }) => {
+				async ({ filePath: { name } }) => {
 					if (name === 'basic') {
 						return 'camelCaseFile'
 					}
@@ -273,7 +273,7 @@ describe('increment duplicate tests', () => {
 				dryRun: true,
 			},
 			transform: [
-				async ({ name }) => {
+				async ({ filePath: { name } }) => {
 					if (name.startsWith('rename')) {
 						return 'Basic'
 					}
@@ -375,7 +375,7 @@ describe('markdown template tests', () => {
 				dryRun: true,
 			},
 			transform: [
-				markdownCallback(async (_, frontmatter) => String(frontmatter.title) || 'Untitled'),
+				markdownCallback(async ({ frontmatter }) => String(frontmatter.title) || 'Untitled'),
 			],
 		})
 

@@ -14,7 +14,7 @@ import {
 import { ensureArray } from './utilities/array'
 import { exists, type FileAdapter, getDefaultFileAdapter } from './utilities/file'
 import log from './utilities/log'
-import { isAbsolute, normalize, pathObjectToString } from './utilities/path'
+import { isAbsolute, normalize, pathObjectSetAll, pathObjectSetName } from './utilities/path'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
 import { appendIncrement, convertCase, getIncrement } from './utilities/string'
 
@@ -171,43 +171,43 @@ export async function renameFiles(options: {
 
 	// Run the action function on each valid file and update its file path renamed value
 	for (const task of fileRenamePlan) {
+		const transformArray = [
+			// User-provided transforms
+			...ensureArray(transform),
+			// Standard transforms
+			safeTransform(defaultName),
+			stripIncrementTransform(),
+			caseTransform(caseType),
+			truncateTransform({
+				fileSystemMaxLength: FILENAME_MAX_LENGTH,
+				maxLength,
+				truncateOnWordBoundary,
+				truncationString,
+			}),
+		]
+
 		// May contain trailing increments, like (1)!
 		const pathObject = path.parse(task.filePathOriginal)
-		let newName: string | undefined
 
-		const transformArray = ensureArray(transform)
-
-		// Run user-provided actions, in order, until one returns a new file name
+		// Run actions, in order, passing along transformed output, skipping any that return undefined
 		for (const transform of transformArray) {
-			newName = await transform(pathObject, { fileAdapter })
-			if (newName !== undefined) {
-				break
+			const result = await transform({ fileAdapter, filePath: pathObject })
+
+			if (result === undefined) {
+				continue
+			}
+
+			if (typeof result === 'string') {
+				// Ensure whole object is updated to reflect name
+				pathObjectSetName(pathObject, result)
+			} else {
+				// Use the whole returned path object
+				// TODO validate, and warn about messing with directories?
+				pathObjectSetAll(result, pathObject)
 			}
 		}
 
-		// Default to the original file name if no action returned a new name
-		newName ??= pathObject.name
-		pathObject.name = newName
-
-		// Run the built in actions
-		pathObject.name = await safeTransform(pathObject, {
-			defaultEmptyFilename: defaultName,
-		})
-
-		pathObject.name = await stripIncrementTransform(pathObject)
-
-		pathObject.name = await caseTransform(pathObject, {
-			caseType,
-		})
-
-		pathObject.name = await truncateTransform(pathObject, {
-			fileSystemMaxLength: FILENAME_MAX_LENGTH,
-			maxLength,
-			truncateOnWordBoundary,
-			truncationString,
-		})
-
-		task.filePathRenamed = pathObjectToString(pathObject)
+		task.filePathRenamed = path.format(pathObject)
 	}
 
 	// Sort the paths again based on the new file names
@@ -290,22 +290,27 @@ export async function renameFiles(options: {
 		}
 	}
 
-	// Increment duplicates, truncating first to make room for the increment
+	// Increment duplicates, truncating first to make room for the max increment width
 	for (const group of duplicateGroups) {
 		const maxLengthWithIncrement = maxLength - ` (${group.length.toString().length})`.length
 		for (const [index, task] of group.entries()) {
 			const pathObject = path.parse(task.filePathRenamed!)
 
 			// Truncate to make room for the increment
-			pathObject.name = await truncateTransform(pathObject, {
+			// Use the transform instead of the bare function to ensure the same options are used
+			const name = await truncateTransform({
 				fileSystemMaxLength: FILENAME_MAX_LENGTH,
 				maxLength: maxLengthWithIncrement,
 				truncateOnWordBoundary,
 				truncationString,
-			})
+			})({ fileAdapter, filePath: pathObject })
 
-			pathObject.name = appendIncrement(pathObject.name, index + 1)
-			task.filePathRenamed = pathObjectToString(pathObject)
+			if (name === undefined || typeof name !== 'string') {
+				throw new Error('Truncation failed')
+			}
+
+			pathObjectSetName(pathObject, appendIncrement(name, index + 1))
+			task.filePathRenamed = path.format(pathObject)
 		}
 	}
 
@@ -318,8 +323,8 @@ export async function renameFiles(options: {
 
 			if (task.filePathRenamed!.toLowerCase() === otherTask.filePathOriginal.toLowerCase()) {
 				const tempPathObject = path.parse(task.filePathRenamed!)
-				tempPathObject.name = nanoid()
-				task.filePathIntermediate = pathObjectToString(tempPathObject)
+				pathObjectSetName(tempPathObject, nanoid())
+				task.filePathIntermediate = path.format(tempPathObject)
 				break
 			}
 		}
@@ -342,10 +347,10 @@ export async function renameFiles(options: {
 
 			// Transform case for accurate comparison, since the fileAdapter functions are not case sensitive!
 			const originalPathObject = path.parse(task.filePathOriginal)
-			originalPathObject.name = convertCase(originalPathObject.name, caseType)
+			pathObjectSetName(originalPathObject, convertCase(originalPathObject.name, caseType))
 
 			if (
-				pathObjectToString(originalPathObject) !== task.filePathRenamed &&
+				path.format(originalPathObject) !== task.filePathRenamed &&
 				(await exists(task.filePathRenamed!, fileAdapter))
 			) {
 				task.status = 'conflict'
