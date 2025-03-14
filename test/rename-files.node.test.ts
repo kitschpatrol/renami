@@ -153,7 +153,7 @@ describe('basic rename tests', () => {
 			options: {
 				dryRun: false,
 			},
-			transforms: [
+			transform: [
 				async ({ name }) => {
 					if (name === 'basic') {
 						return 'camelCaseFile'
@@ -212,7 +212,7 @@ describe('basic rename tests', () => {
 			options: {
 				dryRun: false,
 			},
-			transforms: [async () => 'basic'],
+			transform: [async () => 'basic'],
 		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
@@ -272,7 +272,7 @@ describe('increment duplicate tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transforms: [
+			transform: [
 				async ({ name }) => {
 					if (name.startsWith('rename')) {
 						return 'Basic'
@@ -374,7 +374,7 @@ describe('markdown template tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transforms: [
+			transform: [
 				markdownCallback(async (_, frontmatter) => String(frontmatter.title) || 'Untitled'),
 			],
 		})
@@ -409,7 +409,7 @@ describe('markdown template tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transforms: [frontmatterTemplate('{title}')],
+			transform: [frontmatterTemplate('{title}')],
 		})
 
 		expect(result.duration).toBeLessThan(20)
@@ -442,7 +442,7 @@ describe('markdown template tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transforms: [markdownTemplate('Heading - {heading}')],
+			transform: [markdownTemplate('Heading - {heading}')],
 		})
 
 		expect(result.duration).toBeLessThan(20)
@@ -486,7 +486,7 @@ describe('generic file helper tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transforms: [
+			transform: [
 				fileCallback((path, fileBuffer, FileInfo) => {
 					callbackAccumulator.push({ fileBuffer, FileInfo, path })
 					// eslint-disable-next-line unicorn/no-useless-undefined

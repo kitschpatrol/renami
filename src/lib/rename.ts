@@ -99,7 +99,7 @@ export async function rename(options: {
 	// Get masked matched files for all rules (files exclusive to each rule)
 	const maskedMatches = await getMaskedMatchedFiles(rules)
 
-	for (const [index, { options: transformOptions, pattern, transforms }] of rules.entries()) {
+	for (const [index, { options: transformOptions, pattern, transform }] of rules.entries()) {
 		// TODO hmm gitignore breaks testing with "path is not in CWD"
 		// Since 2019... https://github.com/sindresorhus/globby/issues/133
 		const filePaths = maskedMatches[index]
@@ -109,7 +109,7 @@ export async function rename(options: {
 			fileAdapter,
 			filePaths,
 			options,
-			transforms,
+			transform,
 		})
 
 		renameReport.rules.push({

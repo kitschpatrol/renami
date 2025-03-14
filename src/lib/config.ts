@@ -19,7 +19,7 @@ export type Rule = {
 	/** Glob pattern(s) of files to match relative to the config file location */
 	pattern: string | string[]
 	/** Transform(s) for the filenames */
-	transforms?: Transform | Transform[]
+	transform?: Transform | Transform[]
 }
 
 export type Options = {

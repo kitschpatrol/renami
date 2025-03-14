@@ -104,7 +104,7 @@ export default renamiConfig({
     {
       pattern: './test/assets/test-basic/**/*',
       // Set filename to ctime
-      transforms: fileCallback((_, __, fileInfo) => String(fileInfo.ctimeMs)),
+      transform: fileCallback((_, __, fileInfo) => String(fileInfo.ctimeMs)),
     },
     {
       options: {
@@ -112,7 +112,7 @@ export default renamiConfig({
       },
       pattern: './test/assets/test-frontmatter/**/*',
       // Set filename from frontmatter
-      transforms: frontmatterTemplate('Note-{title}'),
+      transform: frontmatterTemplate('Note-{title}'),
     },
     {
       options: {
@@ -122,7 +122,7 @@ export default renamiConfig({
       },
       pattern: './test/assets/test-increment/**/*',
       // Example of a simple custom transform function
-      transforms: async () => 'wow what a long name this is',
+      transform: async () => 'wow what a long name this is',
     },
   ],
 })
@@ -144,7 +144,7 @@ const report = await rename()
 const filesReport = await renameFiles({
   // BYO glob expansion to get a list  of files to rename
   filePaths: ['./posts/some-file.md', './posts/some-other-file.md'],
-  // Global options for the rename operation, applied after transforms
+  // Global options for the rename operation, applied after transform
   options: {
     caseType: 'screaming-kebab',
     dryRun: true,
@@ -152,7 +152,7 @@ const filesReport = await renameFiles({
   // Transforms do things to filenames
   // This transform parses and passes Markdown frontmatter into the template string,
   // renaming each file to the value of the frontmatter title
-  transforms: transformHelper.frontmatterTemplate('Note-{title}'),
+  transform: transformHelper.frontmatterTemplate('Note-{title}'),
 })
 
 console.log(filesReport)

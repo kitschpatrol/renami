@@ -21,7 +21,7 @@ describe('rename tests', () => {
 							dryRun: true,
 						},
 						pattern: `${tempFiles.getTempPath()}/**/*`,
-						transforms: [async () => 'bla'],
+						transform: [async () => 'bla'],
 					},
 				],
 			},
@@ -44,19 +44,19 @@ describe('rename tests', () => {
 				rules: [
 					{
 						pattern: `${tempFiles.getTempPath()}/**/*`,
-						transforms: [async () => 'foo'],
+						transform: [async () => 'foo'],
 					},
 					{
 						pattern: `${tempFiles.getTempPath()}/test-frontmatter/**/*`,
-						transforms: [async () => 'nope'],
+						transform: [async () => 'nope'],
 					},
 					{
 						pattern: `${tempFiles.getTempPath()}/**/*`,
-						transforms: [async () => 'bar'],
+						transform: [async () => 'bar'],
 					},
 					{
 						pattern: `${tempFiles.getTempPath()}/test-frontmatter/**/*`,
-						transforms: [async () => 'baz'],
+						transform: [async () => 'baz'],
 					},
 				],
 			},
@@ -75,7 +75,7 @@ describe('rename tests', () => {
 							`${tempFiles.getTempPath()}/test-frontmatter/**/*`,
 							`${tempFiles.getTempPath()}/test-basic/**/*`,
 						],
-						transforms: [async () => 'glob'],
+						transform: [async () => 'glob'],
 					},
 				],
 			},

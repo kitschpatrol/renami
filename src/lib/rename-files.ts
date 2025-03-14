@@ -127,7 +127,7 @@ export async function renameFiles(options: {
 	/** Expects unique, normalized, absolute paths! */
 	filePaths: string[]
 	options?: Partial<Options>
-	transforms?: Transform | Transform[]
+	transform?: Transform | Transform[]
 }): Promise<FileRenameReport> {
 	const startTime = performance.now()
 
@@ -135,7 +135,7 @@ export async function renameFiles(options: {
 		fileAdapter = await getDefaultFileAdapter(),
 		filePaths,
 		options: transformOptions,
-		transforms = [],
+		transform = [],
 	} = options
 
 	const {
@@ -175,10 +175,10 @@ export async function renameFiles(options: {
 		const pathObject = path.parse(task.filePathOriginal)
 		let newName: string | undefined
 
-		const transformsArray = ensureArray(transforms)
+		const transformArray = ensureArray(transform)
 
 		// Run user-provided actions, in order, until one returns a new file name
-		for (const transform of transformsArray) {
+		for (const transform of transformArray) {
 			newName = await transform(pathObject, { fileAdapter })
 			if (newName !== undefined) {
 				break
