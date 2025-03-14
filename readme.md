@@ -15,7 +15,7 @@
 
 <!-- short-description -->
 
-**A CLI tool and TypeScript library for automatically renaming Markdown files based on their frontmatter.**
+**A CLI tool and TypeScript library for config-driven automatic filename management.**
 
 <!-- /short-description -->
 

@@ -1,7 +1,7 @@
 {
 	"name": "renami",
 	"version": "1.0.0",
-	"description": "A CLI tool and TypeScript library for config-driven automatic filename management.",
+	"description": "A CLI tool and TypeScript library for config-driven and content-aware automatic filename management.",
 	"keywords": [
 		"rename",
 		"filename",
