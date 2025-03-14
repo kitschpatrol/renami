@@ -1,9 +1,10 @@
+/* eslint-disable ts/require-await */
 import { describe, expect, it } from 'vitest'
 import { rename } from '../src/lib'
 import { useTempFiles } from './fixtures/file-fixture'
 import { sanitizeRenameReport } from './utilities/sanitize'
 
-describe('recursive rename tests', () => {
+describe('rename tests', () => {
 	// Setup the temp files fixture with source files from './test-files'
 	const tempFiles = useTempFiles({
 		cleanup: true, // Will clean up after each test
@@ -20,7 +21,6 @@ describe('recursive rename tests', () => {
 							dryRun: true,
 						},
 						pattern: `${tempFiles.getTempPath()}/**/*`,
-						// eslint-disable-next-line ts/require-await
 						transforms: [async () => 'bla'],
 					},
 				],
@@ -36,5 +36,33 @@ describe('recursive rename tests', () => {
 
 		expect(renameReport).toBeDefined()
 		expect(sanitizeRenameReport(renameReport, process.cwd())).toMatchSnapshot()
+	})
+
+	it('should apply only the last matching rule in an array if a file matches multiple rules', async () => {
+		const renameReport = await rename({
+			config: {
+				rules: [
+					{
+						pattern: `${tempFiles.getTempPath()}/**/*`,
+						transforms: [async () => 'foo'],
+					},
+					{
+						pattern: `${tempFiles.getTempPath()}/test-frontmatter/**/*`,
+						transforms: [async () => 'nope'],
+					},
+					{
+						pattern: `${tempFiles.getTempPath()}/**/*`,
+						transforms: [async () => 'bar'],
+					},
+					{
+						pattern: `${tempFiles.getTempPath()}/test-frontmatter/**/*`,
+						transforms: [async () => 'baz'],
+					},
+				],
+			},
+		})
+
+		expect(renameReport).toBeDefined()
+		expect(sanitizeRenameReport(renameReport, tempFiles.getTempPath())).toMatchSnapshot()
 	})
 })

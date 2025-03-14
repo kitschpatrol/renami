@@ -121,3 +121,150 @@ exports[`recursive rename tests > should rename recursively with per-directory i
   ],
 }
 `;
+
+exports[`rename tests > should apply only the last matching rule in an array if a file matches multiple rules 1`] = `
+{
+  "duration": 0,
+  "rules": [
+    {
+      "pattern": "/**/*",
+      "report": {
+        "dryRun": false,
+        "duration": 0,
+        "files": [],
+      },
+    },
+    {
+      "pattern": "/test-frontmatter/**/*",
+      "report": {
+        "dryRun": false,
+        "duration": 0,
+        "files": [],
+      },
+    },
+    {
+      "pattern": "/**/*",
+      "report": {
+        "dryRun": false,
+        "duration": 0,
+        "files": [
+          {
+            "filePathOriginal": "/test-basic/basic.md",
+            "filePathRenamed": "/test-basic/bar (1).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-basic/camelCaseFile.md",
+            "filePathRenamed": "/test-basic/bar (2).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-basic/kebab-case-file.md",
+            "filePathRenamed": "/test-basic/bar (3).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-basic/miXedC_aseF-ile.md",
+            "filePathRenamed": "/test-basic/bar (4).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-basic/Sentence case file.md",
+            "filePathRenamed": "/test-basic/bar (5).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-basic/snake_case_file.md",
+            "filePathRenamed": "/test-basic/bar (6).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/Basic (1).md",
+            "filePathRenamed": "/test-increment/bar (1).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 1.md",
+            "filePathRenamed": "/test-increment/bar (2).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/Basic (3).md",
+            "filePathRenamed": "/test-increment/bar (3).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 2.md",
+            "filePathRenamed": "/test-increment/bar (4).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 3.md",
+            "filePathRenamed": "/test-increment/bar (5).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 4.md",
+            "filePathRenamed": "/test-increment/bar (6).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 5.md",
+            "filePathRenamed": "/test-increment/bar (7).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 6.md",
+            "filePathRenamed": "/test-increment/bar (8).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 7.md",
+            "filePathRenamed": "/test-increment/bar (9).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/Basic (10).md",
+            "filePathRenamed": "/test-increment/bar (10).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 8.md",
+            "filePathRenamed": "/test-increment/bar (11).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 9.md",
+            "filePathRenamed": "/test-increment/bar (12).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-increment/rename me 10.md",
+            "filePathRenamed": "/test-increment/bar (13).md",
+            "status": "renamed",
+          },
+        ],
+      },
+    },
+    {
+      "pattern": "/test-frontmatter/**/*",
+      "report": {
+        "dryRun": false,
+        "duration": 0,
+        "files": [
+          {
+            "filePathOriginal": "/test-frontmatter/frontmatter-1.md",
+            "filePathRenamed": "/test-frontmatter/baz (1).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-frontmatter/frontmatter-2.md",
+            "filePathRenamed": "/test-frontmatter/baz (2).md",
+            "status": "renamed",
+          },
+        ],
+      },
+    },
+  ],
+}
+`;

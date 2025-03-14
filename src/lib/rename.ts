@@ -14,6 +14,47 @@ export type RenameReport = {
 }
 
 /**
+ * Gets all files matching the patterns in the rules and ensures each file
+ * is only processed by the last rule that matches it.
+ * @param rules - The rules from the Renami configuration
+ * @returns A 2D array where each inner array contains the files exclusively matched by a rule
+ */
+async function getMaskedMatchedFiles(rules: RenamiConfig['rules']): Promise<string[][]> {
+	if (!rules || rules.length === 0) {
+		return []
+	}
+
+	// Keep track of all matched files to avoid processing them again
+	const processedFiles = new Set<string>()
+
+	// Process rules in reverse order (last to first)
+	const reversedRules = [...rules].reverse()
+	const reversedResults: string[][] = []
+
+	for (const rule of reversedRules) {
+		// Match files for the current rule
+		const matchedFiles = await globby(rule.pattern, {
+			absolute: true,
+			onlyFiles: true,
+		})
+
+		// Filter out files that have already been matched by later rules
+		const exclusivelyMatchedFiles = matchedFiles.filter((file) => !processedFiles.has(file))
+
+		// Add these files to the processed set so they won't be processed by earlier rules
+		for (const file of exclusivelyMatchedFiles) {
+			processedFiles.add(file)
+		}
+
+		// Add the exclusively matched files to the result
+		reversedResults.push(exclusivelyMatchedFiles)
+	}
+
+	// Reverse the results back to original rule order
+	return reversedResults.reverse()
+}
+
+/**
  * Rename files according to the provided configuration.
  * If a string is provided, it will be used as the config file path.
  * @returns A report of the renaming process
@@ -54,10 +95,13 @@ export async function rename(options: {
 		rules: [],
 	}
 
-	for (const { options: transformOptions, pattern, transforms } of rules) {
-		// TODO hmm gitignore breaks testing with "path is now in CWD"
+	// Get masked matched files for all rules (files exclusive to each rule)
+	const maskedMatches = await getMaskedMatchedFiles(rules)
+
+	for (const [index, { options: transformOptions, pattern, transforms }] of rules.entries()) {
+		// TODO hmm gitignore breaks testing with "path is not in CWD"
 		// Since 2019... https://github.com/sindresorhus/globby/issues/133
-		const filePaths = await globby(pattern, { absolute: true, gitignore: false, onlyFiles: true })
+		const filePaths = maskedMatches[index]
 		const options = deepmerge(defaultTransformOptions, transformOptions ?? {})
 
 		const report = await renameFiles({
