@@ -19,13 +19,16 @@
 
 <!-- /short-description -->
 
+> [!IMPORTANT]
+> Renami is in early development and will remain zero-versioned until it's fit for general purposes. To borrow a phrase, this project falls under [FYI-style open source](https://github.com/andymatuschak/note-link-janitor?tab=readme-ov-file#this-is-fyi-style-open-source).
+
 ## Overview
 
 ## Getting started
 
 ### Dependencies
 
-The `renami` CLI tool requires Node 18+. The exported APIs are isomorphic, and should run in any relatively recent runtime environment. `renami` is implemented in TypeScript and bundles a complete set of type definitions.
+The `renami` CLI tool requires Node 18+. The exported APIs are isomorphic, and should work in any relatively recent runtime environment. Renami is implemented in TypeScript and bundles a complete set of type definitions.
 
 ### Installation
 
@@ -43,7 +46,104 @@ npm install --global renami
 
 ## Usage
 
+### Configuration
+
+Renami depends almost entirely on a configuration file to describe how it should rename files when its run.
+
+To facilitate this, Renami uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration, and also provies a typed configuration factory function to simplify authoring configurations.
+
+A trivial configuration might look thike this:
+
+```ts
+// File: "renami.config.ts"
+import { renamiConfig } from 'renami'
+
+// Typed config factory...
+export default renamiConfig({
+  rules: [
+    {
+      // Make all Markdown files kebab case
+      options: {
+        caseType: 'kebab',
+      },
+      pattern: './**/*.md',
+    },
+  ],
+})
+```
+
+A more complex configuration file might look like this:
+
+```ts
+import { renamiConfig, transformHelper } from 'renami'
+const { fileCallback, frontmatterTemplate } = transformHelper
+
+export default renamiConfig({
+  // Global options become the default for all "rules"
+  // below, but may be overridden on a per-rule basis
+  options: {
+    dryRun: true,
+    maxLength: 50,
+  },
+  // Each rule describes a group of files with a glob
+  // pattern, and specifies how matching filenames should be managed
+  rules: [
+    {
+      pattern: './test/assets/test-basic/**/*',
+      // Set filename to ctime
+      transforms: fileCallback((_, __, fileInfo) => String(fileInfo.ctimeMs)),
+    },
+    {
+      options: {
+        caseType: 'kebab',
+      },
+      pattern: './test/assets/test-frontmatter/**/*',
+      // Set filename from frontmatter
+      transforms: frontmatterTemplate('Note-{title}'),
+    },
+    {
+      options: {
+        caseType: 'kebab',
+        maxLength: 15,
+        truncateOnWordBoundary: false,
+      },
+      pattern: './test/assets/test-increment/**/*',
+      // Example of a simple custom transform function
+      transforms: async () => 'wow what a long name this is',
+    },
+  ],
+})
+```
+
+Once you have a configuration file, call `renami` from the command line or
+invoke the `rename()` function in the API to automatically discover and execute
+the renaming rules.
+
 ### Library
+
+```ts
+import { rename, renameFiles } from 'renami'
+
+// Rename files based on local `renami.config.ts` or similar
+const report = await rename()
+
+// Or, rename specific sets of files
+const filesReport = await renameFiles({
+  // BYO glob expansion to get a list  of files to rename
+  filePaths: ['./posts/some-file.md', './posts/some-other-file.md'],
+  // Global options for the rename operation, applied after transforms
+  options: {
+    caseType: 'screaming-kebab',
+    dryRun: true,
+  },
+  // Transforms do things to filenames
+  // This transform parses and passes Markdown frontmatter into the template string,
+  // renaming each file to the value of the frontmatter title
+  transforms: transformHelper.frontmatterTemplate('Note-{title}'),
+})
+
+console.log(filesReport)
+```
 
 ### CLI
 
@@ -99,17 +199,11 @@ Markdown body selection...
 - <https://f2.freshman.tech/> Great! Just
 - <https://github.com/75lb/renamer> (Close! Depends on Node. JS instead of TS. No config file.)
 
+## The future
+
 ## Maintainers
 
 @kitschpatrol
-
-<!-- contributing -->
-
-## Contributing
-
-[Issues](https://github.com/kitschpatrol/renami/issues) and pull requests are welcome.
-
-<!-- /contributing -->
 
 <!-- license -->
 
