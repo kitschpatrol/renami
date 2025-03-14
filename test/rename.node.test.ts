@@ -1,7 +1,7 @@
 /* eslint-disable ts/require-await */
 import { describe, expect, it } from 'vitest'
 import { type FileRenameReport, renameFiles, type RenameOptions } from '../src/lib'
-import { frontmatterTemplate, markdown, markdownTemplate } from '../src/lib/transforms/markdown'
+import { frontmatterTemplate, markdown, markdownTemplate } from '../src/lib/helpers/markdown'
 import { useTempFiles } from './fixtures/file-fixture'
 
 function sanitizeOutput(report: FileRenameReport, tempPath: string): FileRenameReport {

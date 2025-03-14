@@ -9,12 +9,12 @@ import {
 	stripIncrementTransform,
 	type Transform,
 	truncateTransform,
-} from '../transforms/core'
-import { exists, type FileAdapter, getDefaultFileAdapter } from '../utilities/file'
-import log from '../utilities/log'
-import { isAbsolute, normalize, pathObjectToString } from '../utilities/path'
-import { FILENAME_MAX_LENGTH } from '../utilities/platform'
-import { appendIncrement, type CaseType, convertCase, getIncrement } from '../utilities/string'
+} from './transform'
+import { exists, type FileAdapter, getDefaultFileAdapter } from './utilities/file'
+import log from './utilities/log'
+import { isAbsolute, normalize, pathObjectToString } from './utilities/path'
+import { FILENAME_MAX_LENGTH } from './utilities/platform'
+import { appendIncrement, type CaseType, convertCase, getIncrement } from './utilities/string'
 
 export const defaultRenameOptions: RenameOptions = {
 	caseType: 'preserve',

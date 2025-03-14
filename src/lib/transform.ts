@@ -1,14 +1,14 @@
 /* eslint-disable ts/require-await */
 
-import { type FileAdapter } from '../utilities/file'
-import { type PathObject } from '../utilities/path'
+import { type FileAdapter } from './utilities/file'
+import { type PathObject } from './utilities/path'
 import {
 	type CaseType,
 	convertCase,
 	getSafeFilename,
 	stripIncrement,
 	truncate,
-} from '../utilities/string'
+} from './utilities/string'
 
 /**
  * Must return JUST the file name, no path or extension

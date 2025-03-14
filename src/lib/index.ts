@@ -3,7 +3,7 @@ export {
 	type FileRenameReport,
 	renameFiles,
 	type RenameOptions,
-} from './actions/rename'
+} from './rename'
 export { default as log } from './utilities/log'
 
 // Thinking about config
