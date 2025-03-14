@@ -29,13 +29,35 @@
 
 Renami provides a configuration-driven approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
 
-The configuration-based approach makes it easy to pull metadata from a file's content and pass it to a...
+The configuration-based approach makes it easy to pull metadata from a file's content and pass it into simple templates to rename files.
 
 Think of it as a linter + fixer for file names.
 
 I use it to maintain consistent, content-driven filenames for a large collection of Markdown notes.
 
 Renami provides an application-agnostic foundation for the "Renami Obsidian" plugin.
+
+Despite being configuration-driven, Renami aspires to use convention over configuration wherever possible. Basic filename hygiene like invalid character removal, Unicode normalization, deduplication, truncation, and (optionally) case transformation are all handled automatically and implicitly.
+
+The point is to write config that focuses on the _semantic_ aspects of the name change, not the syntactic ones.
+
+### Features
+
+- Automatically set file names based on file content on a per-directory basis
+  - Set Markdown file names from frontmatter fields via easy string-based templates
+  - Set Markdown file name from content with [CSS-like selectors](https://github.com/syntax-tree/unist-util-select)
+  - Set file names from file metadata like creation and modiciation dates
+- Change file extensions
+- Unicode normalization
+- Max-length name truncation with configurable `...` and support for detecting word breaks
+- Automatic deduplication with numeric increments
+- All kinds of text case transformations
+- Easily extensible / customizable
+
+### Non-Features
+
+- Directory renaming
+- File relocation
 
 ## Getting started
 
@@ -61,9 +83,9 @@ npm install --global renami
 
 ### Configuration
 
-Renami depends almost entirely on a configuration file to describe how it should rename files when its run.
+Renami depends almost entirely on configuration to describe how it should rename files when its run. It uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration.
 
-To facilitate this, Renami uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration, and also provides a typed configuration factory function to simplify authoring configurations.
+The library also exports a typed configuration factory function to simplify authoring configurations.
 
 A trivial configuration might look like this:
 
@@ -100,10 +122,18 @@ export default renamiConfig({
   },
   // Each rule describes a group of files with a glob pattern,
   // and specifies how matching filenames should be managed
+  // If a file matches multiple rules, only the LAST rule in
+  // the array is applied to the file.
   rules: [
     {
       pattern: './test/assets/test-basic/**/*',
-      // Set filename to ctime
+      // Transform functions take info about a file and return a filename `string`,
+      // or `undefined` if no valid transform is possible.
+      // Multiple functions can be passed to `transform`, and are evaluated left to right.
+      // The first function to return a `string` instead of `undefined` determines the new file name.
+      //
+      // Additional changes might be made to the file name afterwards depending on 'options'.
+      // This one set filename to ctime
       transform: fileCallback((_, __, fileInfo) => String(fileInfo.ctimeMs)),
     },
     {
