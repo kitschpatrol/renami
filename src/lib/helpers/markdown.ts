@@ -1,5 +1,3 @@
-/* eslint-disable ts/require-await */
-
 import { type Root as MarkdownAst } from 'mdast'
 import { toString } from 'mdast-util-to-string'
 import pupa from 'pupa'
@@ -12,6 +10,7 @@ import { VFile } from 'vfile'
 import { matter } from 'vfile-matter'
 import { type Transform } from '../transform'
 import { type PathObject, pathObjectToString } from '../utilities/path'
+import { emptyIsUndefined } from '../utilities/string'
 
 /**
  * Internal helper to extract AST from a Markdown string
@@ -47,7 +46,7 @@ function getMarkdown(content: string): {
 
 /**
  * Compose a filename from a Unified Markdown AST and / or frontmatter object using a callback function
- * @param callback Function that takes the Markdown object (AST + frontmatter) and returns a string
+ * @param callback Function that takes the Markdown object (AST + frontmatter) and returns a string or undefined if no transform is possible. Can be sync or async.
  * @returns renami transform function
  */
 export function markdownCallback(
@@ -55,14 +54,15 @@ export function markdownCallback(
 		filePath: PathObject,
 		frontmatter: Record<string, unknown>,
 		ast: MarkdownAst,
-	) => Promise<string | undefined>,
+	) => Promise<string | undefined> | string | undefined,
 ): Transform {
 	return async (filePath, options) => {
 		const { fileAdapter } = options
 		const fullPath = pathObjectToString(filePath)
 		const contents = await fileAdapter.readFile(fullPath)
 		const { ast, frontmatter } = getMarkdown(contents)
-		return callback(filePath, frontmatter, ast)
+		const result = callback(filePath, frontmatter, ast)
+		return result instanceof Promise ? result : result
 	}
 }
 
@@ -73,8 +73,8 @@ export function markdownCallback(
  * @example `frontmatterTemplate('Note-{title}')`
  */
 export function frontmatterTemplate(template: string): Transform {
-	return markdownCallback(async (_, frontmatter) =>
-		pupa(template, frontmatter, {
+	return markdownCallback((_, frontmatter) => {
+		const result = pupa(template, frontmatter, {
 			ignoreMissing: true,
 			transform({ value }) {
 				if (value === undefined) {
@@ -82,8 +82,10 @@ export function frontmatterTemplate(template: string): Transform {
 				}
 				return value
 			},
-		}),
-	)
+		})
+
+		return emptyIsUndefined(result)
+	})
 }
 
 /**
@@ -92,14 +94,16 @@ export function frontmatterTemplate(template: string): Transform {
  * @returns renami transform function
  */
 export function markdownTemplate(template: string): Transform {
-	return markdownCallback(async (_, __, ast) =>
-		pupa(template, ast, {
+	return markdownCallback((_, __, ast) => {
+		const result = pupa(template, ast, {
 			ignoreMissing: true,
 			transform({ key }) {
 				// Ignore values, and just pass Keys to the selector
 				const selected = select(key, ast)
 				return selected === undefined ? '' : toString(selected)
 			},
-		}),
-	)
+		})
+
+		return emptyIsUndefined(result)
+	})
 }

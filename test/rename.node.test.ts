@@ -1,6 +1,8 @@
 /* eslint-disable ts/require-await */
+
 import { describe, expect, it } from 'vitest'
 import { type FileRenameReport, renameFiles, type RenameOptions } from '../src/lib'
+import { fileCallback } from '../src/lib/helpers/file'
 import {
 	frontmatterTemplate,
 	markdownCallback,
@@ -371,7 +373,7 @@ describe('markdown template tests', () => {
 
 		const result = await renameFiles(
 			files,
-			[markdownCallback((_, frontmatter) => String(frontmatter.title) || 'Untitled')],
+			[markdownCallback(async (_, frontmatter) => String(frontmatter.title) || 'Untitled')],
 			{
 				dryRun: true,
 			},
@@ -455,5 +457,41 @@ describe('markdown template tests', () => {
 			  ],
 			}
 		`)
+	})
+})
+
+describe('generic file helper tests', () => {
+	// Setup the temp files fixture with source files from './test-files'
+	const tempFiles = useTempFiles({
+		cleanup: true, // Will clean up after each test
+		prefix: 'renami-test-',
+		sourcePath: './test/assets/test-frontmatter',
+	})
+
+	it('should read all the file info', async () => {
+		const files = await tempFiles.getFiles()
+
+		const callbackAccumulator: unknown[] = []
+
+		const result = await renameFiles(
+			files,
+			[
+				fileCallback((path, fileBuffer, FileInfo) => {
+					callbackAccumulator.push({ fileBuffer, FileInfo, path })
+					// eslint-disable-next-line unicorn/no-useless-undefined
+					return undefined
+				}),
+			],
+			{
+				dryRun: true,
+			},
+		)
+
+		expect(result.duration).toBeLessThan(20)
+		// Complex object is a pain to verify
+
+		console.log(callbackAccumulator)
+
+		expect(callbackAccumulator).toHaveLength(2)
 	})
 })
