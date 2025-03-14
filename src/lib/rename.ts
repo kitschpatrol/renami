@@ -1,8 +1,10 @@
 /* eslint-disable max-depth */
 import { deepmerge } from 'deepmerge-ts'
+import { globby } from 'globby'
 import { nanoid } from 'nanoid'
 import { orderBy } from 'natural-orderby'
 import path from 'path-browserify-esm'
+import { defaultOptions, loadConfig, type Options, type RenamiConfig } from './config'
 import {
 	caseTransform,
 	safeTransform,
@@ -14,40 +16,7 @@ import { exists, type FileAdapter, getDefaultFileAdapter } from './utilities/fil
 import log from './utilities/log'
 import { isAbsolute, normalize, pathObjectToString } from './utilities/path'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
-import { appendIncrement, type CaseType, convertCase, getIncrement } from './utilities/string'
-
-export const defaultOptions: Options = {
-	caseType: 'preserve',
-	defaultName: 'Untitled',
-	dryRun: false,
-	fileAdapter: undefined, // Must be passed in later, deepmerge will not work
-	maxLength: FILENAME_MAX_LENGTH,
-	truncateOnWordBoundary: true,
-	truncationString: '...',
-	validateInput: true,
-	validateOutput: true,
-}
-
-export type Options = {
-	/** Enforce a specific letter casing on the final file names. */
-	caseType: CaseType
-	/** In rare cases a path that's all unsave characters will become zero-length... this default is used in such cases. */
-	defaultName: string
-	/** Don't actually rename any files */
-	dryRun: boolean
-	/** Filesystem access implementation for isomorphism  */
-	fileAdapter: FileAdapter | undefined
-	/** Maximum number of characters in the file, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum. */
-	maxLength: number
-	/** Try to truncate the file on a word boundary, might result in files shorter than the maxLength target. */
-	truncateOnWordBoundary: boolean
-	/** String like '...' to use when truncation is needed */
-	truncationString: string
-	/** Run some checks to make sure the input file list is sane */
-	validateInput: boolean
-	/** Make sure we're not overwriting a file that wasn't included in the files argument */
-	validateOutput: boolean
-}
+import { appendIncrement, convertCase, getIncrement } from './utilities/string'
 
 type FileRenameTask = {
 	filePathIntermediate: string | undefined
@@ -149,29 +118,94 @@ async function validateFiles(filePaths: string[], fileAdapter: FileAdapter): Pro
 	}
 }
 
+type RenameReport = {
+	duration: number
+	rules: Array<{
+		pattern: string
+		report: FileRenameReport
+	}>
+}
+
+/**
+ * Rename files according to the provided configuration.
+ * If a string is provided, it will be used as the config file path.
+ * @returns A report of the renaming process
+ */
+export async function rename(options: {
+	/** Can be a path to config file, a config object, or undefined to attempt config discovery in accordance with Cosmiconfig's resolution strategy. */
+	config?: RenamiConfig | string
+	/** Path to search for config file from. Defaults to the current working directory. */
+	configSearchFrom?: string
+	/** File adapter to use for file operations in non-Node environments. */
+	fileAdapter?: FileAdapter
+}): Promise<RenameReport | undefined> {
+	const startTime = performance.now()
+	const { config, configSearchFrom, fileAdapter = await getDefaultFileAdapter() } = options
+
+	const { options: defaultTransformOptions, rules } = await loadConfig(config, configSearchFrom)
+
+	if (rules === undefined || rules.length === 0) {
+		// TODO run default rules in default location?
+		log.warn('No rules found, nothing to do.')
+		return undefined
+	}
+
+	const renameReport: RenameReport = {
+		duration: 0,
+		rules: [],
+	}
+
+	for (const { options: transformOptions, pattern, transforms } of rules) {
+		const filePaths = await globby(pattern, { absolute: true, gitignore: true, onlyFiles: true })
+		const options = deepmerge(defaultTransformOptions, transformOptions ?? {})
+
+		const report = await renameFiles({
+			fileAdapter,
+			filePaths,
+			options,
+			transforms,
+		})
+
+		renameReport.rules.push({
+			pattern,
+			report,
+		})
+	}
+
+	renameReport.duration = performance.now() - startTime
+	return renameReport
+}
+
 /**
  * Rename files based on the provided options.
  */
 // eslint-disable-next-line complexity
-export async function renameFiles(
+export async function renameFiles(options: {
+	fileAdapter?: FileAdapter
 	/** Expects unique, normalized, absolute paths! */
-	filePaths: string[],
-	transforms: Transform[],
-	options?: Partial<Options>,
-): Promise<FileRenameReport> {
+	filePaths: string[]
+	options?: Partial<Options>
+	transforms?: Transform | Transform[]
+}): Promise<FileRenameReport> {
 	const startTime = performance.now()
+
+	const {
+		fileAdapter = await getDefaultFileAdapter(),
+		filePaths,
+		options: transformOptions,
+		transforms = [],
+	} = options
 
 	const {
 		caseType,
 		defaultName,
 		dryRun,
-		fileAdapter = await getDefaultFileAdapter(),
 		maxLength,
 		truncateOnWordBoundary,
 		truncationString,
 		validateInput,
 		validateOutput,
-	} = deepmerge(defaultOptions, options ?? {})
+	} = deepmerge(defaultOptions, transformOptions ?? {})
 
 	// Validate, throws if any file is invalid
 	if (validateInput) {
@@ -199,8 +233,10 @@ export async function renameFiles(
 		const pathObject = path.parse(task.filePathOriginal)
 		let newName: string | undefined
 
+		const transformsArray = Array.isArray(transforms) ? transforms : [transforms]
+
 		// Run user-provided actions, in order, until one returns a new file name
-		for (const transform of transforms) {
+		for (const transform of transformsArray) {
 			newName = await transform(pathObject, { fileAdapter })
 			if (newName !== undefined) {
 				break

@@ -1,7 +1,7 @@
 /* eslint-disable ts/require-await */
 
 import { describe, expect, it } from 'vitest'
-import { type FileRenameReport, renameFiles, type Options } from '../src/lib'
+import { type FileRenameReport, type Options, renameFiles } from '../src/lib'
 import { fileCallback } from '../src/lib/actions/file'
 import {
 	frontmatterTemplate,
@@ -31,10 +31,13 @@ describe('basic rename tests', () => {
 	})
 
 	it('should do nothing if files are compliant', async () => {
-		const files = await tempFiles.getFiles()
+		const filePaths = await tempFiles.getFiles()
 
-		const result = await renameFiles(files, [], {
-			dryRun: true,
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: true,
+			},
 		})
 
 		expect(result.duration).toBeLessThan(10)
@@ -79,7 +82,7 @@ describe('basic rename tests', () => {
 	})
 
 	it('should set the case appropriately', async () => {
-		const files = await tempFiles.getFiles()
+		const filePaths = await tempFiles.getFiles()
 
 		const cases: Array<Options['caseType']> = [
 			'camel',
@@ -96,9 +99,12 @@ describe('basic rename tests', () => {
 		]
 
 		for (const caseType of cases) {
-			const result = await renameFiles(files, [], {
-				caseType,
-				dryRun: true,
+			const result = await renameFiles({
+				filePaths,
+				options: {
+					caseType,
+					dryRun: true,
+				},
 			})
 
 			expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchSnapshot()
@@ -106,10 +112,13 @@ describe('basic rename tests', () => {
 	})
 
 	it('should truncate on word boundary requested', async () => {
-		const files = await tempFiles.getFiles()
-		const result = await renameFiles(files, [], {
-			dryRun: false,
-			maxLength: 15,
+		const filePaths = await tempFiles.getFiles()
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: false,
+				maxLength: 15,
+			},
 		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
@@ -153,10 +162,13 @@ describe('basic rename tests', () => {
 	})
 
 	it('should use intermediate files as needed', async () => {
-		const files = await tempFiles.getFiles()
-		const result = await renameFiles(
-			files,
-			[
+		const filePaths = await tempFiles.getFiles()
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: false,
+			},
+			transforms: [
 				async ({ name }) => {
 					if (name === 'basic') {
 						return 'camelCaseFile'
@@ -166,10 +178,7 @@ describe('basic rename tests', () => {
 					}
 				},
 			],
-			{
-				dryRun: false,
-			},
-		)
+		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
@@ -212,9 +221,13 @@ describe('basic rename tests', () => {
 	})
 
 	it('should increment duplicate files as needed', async () => {
-		const files = await tempFiles.getFiles()
-		const result = await renameFiles(files, [async () => 'basic'], {
-			dryRun: false,
+		const filePaths = await tempFiles.getFiles()
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: false,
+			},
+			transforms: [async () => 'basic'],
 		})
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
@@ -267,21 +280,21 @@ describe('increment duplicate tests', () => {
 	})
 
 	it('should preserve original increments suffixes', async () => {
-		const files = await tempFiles.getFiles()
+		const filePaths = await tempFiles.getFiles()
 
-		const result = await renameFiles(
-			files,
-			[
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: true,
+			},
+			transforms: [
 				async ({ name }) => {
 					if (name.startsWith('rename')) {
 						return 'Basic'
 					}
 				},
 			],
-			{
-				dryRun: true,
-			},
-		)
+		})
 
 		expect(result.duration).toBeLessThan(20)
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
@@ -369,15 +382,17 @@ describe('markdown template tests', () => {
 	})
 
 	it('should handle markdown callback', async () => {
-		const files = await tempFiles.getFiles()
+		const filePaths = await tempFiles.getFiles()
 
-		const result = await renameFiles(
-			files,
-			[markdownCallback(async (_, frontmatter) => String(frontmatter.title) || 'Untitled')],
-			{
+		const result = await renameFiles({
+			filePaths,
+			options: {
 				dryRun: true,
 			},
-		)
+			transforms: [
+				markdownCallback(async (_, frontmatter) => String(frontmatter.title) || 'Untitled'),
+			],
+		})
 
 		expect(result.duration).toBeLessThan(20)
 
@@ -402,10 +417,14 @@ describe('markdown template tests', () => {
 	})
 
 	it('should handle frontmatter templates', async () => {
-		const files = await tempFiles.getFiles()
+		const filePaths = await tempFiles.getFiles()
 
-		const result = await renameFiles(files, [frontmatterTemplate('{title}')], {
-			dryRun: true,
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: true,
+			},
+			transforms: [frontmatterTemplate('{title}')],
 		})
 
 		expect(result.duration).toBeLessThan(20)
@@ -431,10 +450,14 @@ describe('markdown template tests', () => {
 	})
 
 	it('should handle unist-util-select templates', async () => {
-		const files = await tempFiles.getFiles()
+		const filePaths = await tempFiles.getFiles()
 
-		const result = await renameFiles(files, [markdownTemplate('Heading - {heading}')], {
-			dryRun: true,
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: true,
+			},
+			transforms: [markdownTemplate('Heading - {heading}')],
 		})
 
 		expect(result.duration).toBeLessThan(20)
@@ -469,23 +492,23 @@ describe('generic file helper tests', () => {
 	})
 
 	it('should read all the file info', async () => {
-		const files = await tempFiles.getFiles()
+		const filePaths = await tempFiles.getFiles()
 
 		const callbackAccumulator: unknown[] = []
 
-		const result = await renameFiles(
-			files,
-			[
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: true,
+			},
+			transforms: [
 				fileCallback((path, fileBuffer, FileInfo) => {
 					callbackAccumulator.push({ fileBuffer, FileInfo, path })
 					// eslint-disable-next-line unicorn/no-useless-undefined
 					return undefined
 				}),
 			],
-			{
-				dryRun: true,
-			},
-		)
+		})
 
 		expect(result.duration).toBeLessThan(20)
 		// Complex object is a pain to verify

@@ -20,6 +20,12 @@ importers:
       chalk:
         specifier: ^5.4.1
         version: 5.4.1
+      cosmiconfig:
+        specifier: ^9.0.0
+        version: 9.0.0(typescript@5.8.2)
+      cosmiconfig-typescript-loader:
+        specifier: ^6.1.0
+        version: 6.1.0(@types/node@20.17.24)(cosmiconfig@9.0.0(typescript@5.8.2))(typescript@5.8.2)
       yargs:
         specifier: ^17.7.2
         version: 17.7.2

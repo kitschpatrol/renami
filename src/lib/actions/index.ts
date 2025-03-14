@@ -8,7 +8,7 @@ export default {
 	markdownTemplate,
 }
 
-export type Action =
+export type TransformHelper =
 	| typeof fileCallback
 	| typeof frontmatterTemplate
 	| typeof markdownCallback
