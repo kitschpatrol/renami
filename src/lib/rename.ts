@@ -20,7 +20,10 @@ export type RenameReport = {
  * @param rules - The rules from the Renami configuration
  * @returns A 2D array where each inner array contains the files exclusively matched by a rule
  */
-async function getMaskedMatchedFiles(rules: RenamiConfig['rules']): Promise<string[][]> {
+async function getMaskedMatchedFiles(
+	rules: RenamiConfig['rules'],
+	cwd: string,
+): Promise<string[][]> {
 	if (!rules || rules.length === 0) {
 		return []
 	}
@@ -35,7 +38,10 @@ async function getMaskedMatchedFiles(rules: RenamiConfig['rules']): Promise<stri
 	for (const rule of reversedRules) {
 		// Match files for the current rule
 		const matchedFiles = await globby(rule.pattern, {
+			// Causes test errors...
+			// gitignore: true,
 			absolute: true,
+			cwd,
 			onlyFiles: true,
 		})
 
@@ -81,7 +87,10 @@ export async function rename(options: {
 		}
 	}
 
-	const { options: defaultTransformOptions, rules } = loadedConfig
+	const {
+		config: { options: defaultTransformOptions, rules },
+		configCwd,
+	} = loadedConfig
 
 	if (rules === undefined || rules.length === 0) {
 		log.warn('No rules found, nothing to do.')
@@ -97,7 +106,8 @@ export async function rename(options: {
 	}
 
 	// Get masked matched files for all rules (files exclusive to each rule)
-	const maskedMatches = await getMaskedMatchedFiles(rules)
+
+	const maskedMatches = await getMaskedMatchedFiles(rules, configCwd)
 
 	for (const [index, { options: transformOptions, pattern, transform }] of rules.entries()) {
 		// TODO hmm gitignore breaks testing with "path is not in CWD"

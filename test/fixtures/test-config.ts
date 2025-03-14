@@ -9,14 +9,14 @@ export default renamiConfig({
 	},
 	rules: [
 		{
-			pattern: './test/assets/test-basic/**/*',
+			pattern: '../assets/test-basic/**/*',
 			transform: async () => 'test',
 		},
 		{
 			options: {
 				caseType: 'kebab',
 			},
-			pattern: './test/assets/test-frontmatter/**/*',
+			pattern: '../assets/test-frontmatter/**/*',
 			transform: transformHelper.frontmatterTemplate('Note-{title}'),
 		},
 		{
@@ -25,7 +25,7 @@ export default renamiConfig({
 				maxLength: 15,
 				truncateOnWordBoundary: false,
 			},
-			pattern: './test/assets/test-increment/**/*',
+			pattern: '../assets/test-increment/**/*',
 			transform: async () => 'wow what a long name this is',
 		},
 	],

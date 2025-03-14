@@ -1,6 +1,7 @@
 import { cosmiconfig } from 'cosmiconfig'
 import { TypeScriptLoader as typeScriptLoader } from 'cosmiconfig-typescript-loader'
 import { deepmerge } from 'deepmerge-ts'
+import path from 'path-browserify-esm'
 import { type Transform } from './transform'
 import log from './utilities/log'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
@@ -98,11 +99,20 @@ function isRenamiConfig(config: unknown): config is RenamiConfig {
 export async function loadConfig(
 	config?: Partial<RenamiConfig> | string,
 	searchFrom?: string,
-): Promise<RenamiConfig | undefined> {
+): Promise<
+	| undefined
+	| {
+			config: RenamiConfig
+			configCwd: string
+	  }
+> {
 	// Load config from passed object
 	if (isRenamiConfig(config)) {
 		// Set defaults and return
-		return renamiConfig(config)
+		return {
+			config: renamiConfig(config),
+			configCwd: process.cwd(),
+		}
 	}
 
 	const configExplorer = cosmiconfig('renami', {
@@ -122,7 +132,10 @@ export async function loadConfig(
 
 		if (loadedConfig !== null && !loadedConfig.isEmpty) {
 			log.info(`Loaded config from provided file path: ${loadedConfig.filepath}`)
-			return renamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>)
+			return {
+				config: renamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
+				configCwd: path.dirname(loadedConfig.filepath),
+			}
 		}
 	}
 
@@ -130,7 +143,10 @@ export async function loadConfig(
 	const loadedConfig = await configExplorer.search(searchFrom)
 	if (loadedConfig !== null && !loadedConfig.isEmpty) {
 		log.info(`Found config at location: ${loadedConfig.filepath}`)
-		return renamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>)
+		return {
+			config: renamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
+			configCwd: path.dirname(loadedConfig.filepath),
+		}
 	}
 
 	// Give up

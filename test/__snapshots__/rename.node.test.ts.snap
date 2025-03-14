@@ -345,7 +345,7 @@ exports[`rename tests > should use the config file 1`] = `
   "rules": [
     {
       "pattern": [
-        "./test/assets/test-basic/**/*",
+        "../assets/test-basic/**/*",
       ],
       "report": {
         "dryRun": true,
@@ -386,7 +386,7 @@ exports[`rename tests > should use the config file 1`] = `
     },
     {
       "pattern": [
-        "./test/assets/test-frontmatter/**/*",
+        "../assets/test-frontmatter/**/*",
       ],
       "report": {
         "dryRun": true,
@@ -407,7 +407,7 @@ exports[`rename tests > should use the config file 1`] = `
     },
     {
       "pattern": [
-        "./test/assets/test-increment/**/*",
+        "../assets/test-increment/**/*",
       ],
       "report": {
         "dryRun": true,
