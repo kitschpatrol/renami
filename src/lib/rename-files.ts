@@ -11,6 +11,7 @@ import {
 	type Transform,
 	truncateTransform,
 } from './transform'
+import { ensureArray } from './utilities/array'
 import { exists, type FileAdapter, getDefaultFileAdapter } from './utilities/file'
 import log from './utilities/log'
 import { isAbsolute, normalize, pathObjectToString } from './utilities/path'
@@ -174,7 +175,7 @@ export async function renameFiles(options: {
 		const pathObject = path.parse(task.filePathOriginal)
 		let newName: string | undefined
 
-		const transformsArray = Array.isArray(transforms) ? transforms : [transforms]
+		const transformsArray = ensureArray(transforms)
 
 		// Run user-provided actions, in order, until one returns a new file name
 		for (const transform of transformsArray) {

@@ -14,8 +14,11 @@ export type RenamiConfig = {
 }
 
 export type Rule = {
+	/** Override the top-level options with rule-specific settings */
 	options?: Partial<Options>
-	pattern: string
+	/** Glob pattern(s) of files to match relative to the config file location */
+	pattern: string | string[]
+	/** Transform(s) for the filenames */
 	transforms?: Transform | Transform[]
 }
 

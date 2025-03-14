@@ -65,4 +65,23 @@ describe('rename tests', () => {
 		expect(renameReport).toBeDefined()
 		expect(sanitizeRenameReport(renameReport, tempFiles.getTempPath())).toMatchSnapshot()
 	})
+
+	it('config should handle arrays of patterns', async () => {
+		const renameReport = await rename({
+			config: {
+				rules: [
+					{
+						pattern: [
+							`${tempFiles.getTempPath()}/test-frontmatter/**/*`,
+							`${tempFiles.getTempPath()}/test-basic/**/*`,
+						],
+						transforms: [async () => 'glob'],
+					},
+				],
+			},
+		})
+
+		expect(renameReport).toBeDefined()
+		expect(sanitizeRenameReport(renameReport, tempFiles.getTempPath())).toMatchSnapshot()
+	})
 })

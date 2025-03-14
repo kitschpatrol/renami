@@ -2,20 +2,21 @@ import { deepmerge } from 'deepmerge-ts'
 import { globby } from 'globby'
 import { loadConfig, type RenamiConfig } from './config'
 import { type FileRenameReport, renameFiles } from './rename-files'
+import { ensureArray } from './utilities/array'
 import { type FileAdapter, getDefaultFileAdapter } from './utilities/file'
 import log from './utilities/log'
 
 export type RenameReport = {
 	duration: number
 	rules: Array<{
-		pattern: string
+		pattern: string[]
 		report: FileRenameReport
 	}>
 }
 
 /**
- * Gets all files matching the patterns in the rules and ensures each file
- * is only processed by the last rule that matches it.
+ * Gets all files matching the pattern(s) in the rules and ensures each file
+ * is only processed ONCE by the last rule that matches it.
  * @param rules - The rules from the Renami configuration
  * @returns A 2D array where each inner array contains the files exclusively matched by a rule
  */
@@ -112,7 +113,7 @@ export async function rename(options: {
 		})
 
 		renameReport.rules.push({
-			pattern,
+			pattern: ensureArray(pattern),
 			report,
 		})
 	}

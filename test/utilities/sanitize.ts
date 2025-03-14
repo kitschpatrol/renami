@@ -24,7 +24,7 @@ export function sanitizeRenameReport(report: RenameReport, tempPath: string): Re
 		duration: 0, // Ignore duration
 		rules: report.rules.map((rule) => ({
 			...rule,
-			pattern: rule.pattern.replace(tempPath, ''),
+			pattern: rule.pattern.map((p) => p.replace(tempPath, '')),
 			report: sanitizeOutput(rule.report, tempPath),
 		})),
 	}

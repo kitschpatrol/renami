@@ -20,9 +20,22 @@
 <!-- /short-description -->
 
 > [!IMPORTANT]
-> Renami is in early development and will remain zero-versioned until it's fit for general purposes. To borrow a phrase, this project falls under [FYI-style open source](https://github.com/andymatuschak/note-link-janitor?tab=readme-ov-file#this-is-fyi-style-open-source).
+>
+> Renami is in early development and specifically targets the author's niche
+> use-cases. It will remain zero-versioned until it's reasonably safe and
+> intuitive to use. Caveat emptor.
 
 ## Overview
+
+Renami provides a configuration-driven approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
+
+The configuration-based approach makes it easy to pull metadata from a file's content and pass it to a...
+
+Think of it as a linter + fixer for file names.
+
+I use it to maintain consistent, content-driven filenames for a large collection of Markdown notes.
+
+Renami provides an application-agnostic foundation for the "Renami Obsidian" plugin.
 
 ## Getting started
 
@@ -50,9 +63,9 @@ npm install --global renami
 
 Renami depends almost entirely on a configuration file to describe how it should rename files when its run.
 
-To facilitate this, Renami uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration, and also provies a typed configuration factory function to simplify authoring configurations.
+To facilitate this, Renami uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration, and also provides a typed configuration factory function to simplify authoring configurations.
 
-A trivial configuration might look thike this:
+A trivial configuration might look like this:
 
 ```ts
 // File: "renami.config.ts"
@@ -85,8 +98,8 @@ export default renamiConfig({
     dryRun: true,
     maxLength: 50,
   },
-  // Each rule describes a group of files with a glob
-  // pattern, and specifies how matching filenames should be managed
+  // Each rule describes a group of files with a glob pattern,
+  // and specifies how matching filenames should be managed
   rules: [
     {
       pattern: './test/assets/test-basic/**/*',
