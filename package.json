@@ -37,7 +37,7 @@
 		"dist/*"
 	],
 	"scripts": {
-		"build": "pkgroll --clean-dist --minify --tsconfig tsconfig.build.json",
+		"build": "pkgroll --clean-dist --minify --tsconfig tsconfig.build.json --target=node20.11.0",
 		"clean": "git rm -f pnpm-lock.yaml ; git clean -fdX",
 		"coverage": "vitest run --coverage",
 		"fix": "kpi fix",
@@ -52,7 +52,7 @@
 		"chalk": "^5.4.1",
 		"cosmiconfig": "^9.0.0",
 		"cosmiconfig-typescript-loader": "^6.1.0",
-		"globby": "^14.1.0",
+		"globby": "^13.2.2",
 		"unist-util-select": "^5.1.0",
 		"yargs": "^17.7.2"
 	},

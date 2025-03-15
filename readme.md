@@ -53,6 +53,7 @@ The point is to write config that focuses on the _semantic_ aspects of the name 
 - Automatic deduplication with numeric increments
 - All kinds of text case transformations
 - Easily extensible / customizable
+- Idempotence, stable output over repeated invocations 
 
 ### Non-Features
 
@@ -226,6 +227,12 @@ Template expansion...
 - https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914
 - https://github.com/josh-hemphill/subslate
 - https://github.com/sindresorhus/pupa
+- https://github.com/sevensc/typescript-string-operations
+
+Inline formatting syntax...
+
+- ICU formatting standard (UTS #35)
+- https://formatjs.github.io/
 
 Renaming...
 
@@ -235,6 +242,10 @@ Markdown body selection...
 
 - https://github.com/syntax-tree/unist-util-select
 - https://github.com/yshavit/mdq
+
+Dependencies...
+
+- [`globby`](https://github.com/sindresorhus/globby) is currently restricted to `<14` due to [this issue](https://github.com/sindresorhus/globby/issues/260).
 
 ### Similar projects
 
