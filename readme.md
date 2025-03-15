@@ -234,13 +234,13 @@ Examples:
 
 Rename a Markdown document with its heading, followed by a date value from the Markdown document's frontmatter formatted like 2025-03-15:
 
-```
+```ts
 'My Note about {{heading}} - {date|yyyy-MM-dd}'
 ```
 
 Would yield
 
-```
+```ts
 'My Note about Stuff - 2025-03-15'
 ```
 

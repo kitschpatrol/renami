@@ -1,4 +1,4 @@
-import { NumberFormatter } from '@internationalized/number'
+import { NumberFormat } from '@formatjs/intl-numberformat'
 import { format as formatDate } from 'date-fns'
 import { getProperty } from 'dot-prop'
 import { type Root } from 'mdast'
@@ -12,6 +12,7 @@ import { interpolate, type InterpolationContext } from './core'
  * @param formatString - Optional format string
  * @returns - Formatted string
  */
+// eslint-disable-next-line complexity
 function formatValue(value: unknown, formatString?: string): string {
 	if (!formatString || formatString.trim() === '') {
 		// eslint-disable-next-line ts/no-base-to-string
@@ -28,18 +29,50 @@ function formatValue(value: unknown, formatString?: string): string {
 		// Not a valid date, continue to number formatting
 	}
 
-	// Try to format as a number
+	// TODO this is nutty slop
+	// Try to format as a number using @formatjs/intl
 	try {
 		const numberValue = typeof value === 'string' ? Number.parseFloat(value) : value
-
 		if (typeof numberValue === 'number' && !Number.isNaN(numberValue)) {
-			console.log('----------------------------------')
-			console.log(value)
-			console.log(numberValue)
-			console.log(formatString)
+			// Use @formatjs/intl-numberformat to format numbers according to TR35 skeletons
+			try {
+				// Create a number formatter using the skeleton
+				const numberFormat = new NumberFormat(undefined, {
+					maximumFractionDigits: formatString.startsWith('.')
+						? Number.parseInt(formatString.slice(1), 10)
+						: undefined,
+					// Apply different formatting based on skeleton strings
+					minimumFractionDigits: formatString.startsWith('.')
+						? Number.parseInt(formatString.slice(1), 10)
+						: undefined,
+					notation: formatString.includes('scientific') ? 'scientific' : 'standard',
+					style: 'decimal',
+					useGrouping: !formatString.includes('integer'),
+				})
 
-			const formatter = new NumberFormatter(formatString)
-			return formatter.format(numberValue)
+				return numberFormat.format(numberValue)
+			} catch {
+				// If the NumberFormat constructor fails, fall back to Intl.NumberFormat
+				const options: Intl.NumberFormatOptions = { style: 'decimal' }
+
+				if (formatString === 'integer') {
+					options.maximumFractionDigits = 0
+				} else if (formatString === 'decimal') {
+					options.minimumFractionDigits = 1
+				} else if (formatString.startsWith('.')) {
+					const digits = Number.parseInt(formatString.slice(1), 10)
+					options.minimumFractionDigits = digits
+					options.maximumFractionDigits = digits
+				} else if (formatString.includes('percent') || formatString.includes('%')) {
+					options.style = 'percent'
+				} else if (formatString.includes('currency')) {
+					options.style = 'currency'
+					const currencyMatch = /currency\s*=\s*([A-Z]{3})/i.exec(formatString)
+					options.currency = currencyMatch ? currencyMatch[1] : 'USD'
+				}
+
+				return new Intl.NumberFormat(undefined, options).format(numberValue)
+			}
 		}
 	} catch {
 		// Not a valid number format, return as-is
@@ -86,3 +119,7 @@ export function interpolateDocument(
 		return ''
 	})
 }
+
+// Re-export the core interpolate function
+export { interpolate } from './core'
+export type { InterpolationContext } from './core'

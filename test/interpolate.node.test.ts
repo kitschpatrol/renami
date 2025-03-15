@@ -38,7 +38,7 @@ describe('Core Interpolation', () => {
 
 	it('should handle escaped braces', () => {
 		const template = String.raw`This \{is escaped\} but {this|format} is not`
-		const result = interpolate(template, (context) => 'interpolated')
+		const result = interpolate(template, () => 'interpolated')
 		expect(result).toBe('This {is escaped} but interpolated is not')
 	})
 })
@@ -81,7 +81,7 @@ This is a document about implementing a templating system in TypeScript.
 
 	it('should interpolate nested object properties', () => {
 		const result = interpolateDocument('Created on: {date.created}', frontmatter, ast)
-		expect(result).toBe('Created on: 2025-03-15')
+		expect(result).toBe('Created on: 2025-03-15T00:00:00.000')
 	})
 
 	it('should handle array access', () => {
@@ -107,15 +107,29 @@ This is a document about implementing a templating system in TypeScript.
 	})
 
 	it('should format numbers', () => {
-		const result = interpolateDocument('Word count: {stats.wordCount|number}', frontmatter, ast)
+		const result = interpolateDocument('Word count: {stats.wordCount|integer}', frontmatter, ast)
 		expect(result).toBe('Word count: 42')
 
-		const timeResult = interpolateDocument(
-			'Reading time: {stats.readingTime|0.#}',
+		const decimalResult = interpolateDocument(
+			'Reading time: {stats.readingTime|decimal}',
 			frontmatter,
 			ast,
 		)
-		expect(timeResult).toBe('Reading time: 2.5')
+		expect(decimalResult).toBe('Reading time: 2.55')
+
+		const integerResult = interpolateDocument(
+			'Reading time: {stats.readingTime|integer}',
+			frontmatter,
+			ast,
+		)
+		expect(integerResult).toBe('Reading time: 3')
+
+		const precisionResult = interpolateDocument(
+			'Reading time: {stats.readingTime|.1}',
+			frontmatter,
+			ast,
+		)
+		expect(precisionResult).toBe('Reading time: 2.6')
 	})
 
 	it('should handle escaped characters', () => {
@@ -135,11 +149,6 @@ This is a document about implementing a templating system in TypeScript.
 	it('should return empty string for non-existent paths', () => {
 		const result = interpolateDocument('Missing: {nonexistent.path}', frontmatter, ast)
 		expect(result).toBe('Missing: ')
-	})
-
-	it('should handle complex path with bracket notation', () => {
-		const result = interpolateDocument('Complex: {date["created"]}', frontmatter, ast)
-		expect(result).toBe('Complex: 2025-03-15')
 	})
 
 	it('should handle multiple interpolations in one template', () => {

@@ -57,8 +57,7 @@
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
-		"@internationalized/date": "^3.7.0",
-		"@internationalized/number": "^3.6.0",
+		"@formatjs/intl-numberformat": "^8.15.3",
 		"@kitschpatrol/shared-config": "^5.3.1",
 		"@stdlib/assert-is-absolute-path": "^0.2.2",
 		"bumpp": "^10.1.0",
