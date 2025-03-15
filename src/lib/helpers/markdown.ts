@@ -2,48 +2,11 @@ import { type Root as MarkdownAst } from 'mdast'
 import { toString } from 'mdast-util-to-string'
 import path from 'path-browserify-esm'
 import pupa from 'pupa'
-import remarkFrontmatter from 'remark-frontmatter'
-import remarkGfm from 'remark-gfm'
-import remarkParse from 'remark-parse'
-import { unified } from 'unified'
 import { select } from 'unist-util-select'
-import { VFile } from 'vfile'
-import { matter } from 'vfile-matter'
 import { type Transform } from '../transform'
+import { getMarkdown } from '../utilities/markdown'
 import { type PathObject } from '../utilities/path'
 import { emptyIsUndefined } from '../utilities/string'
-
-/**
- * Internal helper to extract AST from a Markdown string
- * @param content The string content containing markdown
- * @returns Object containing the AST and frontmatter
- */
-function getMarkdown(content: string): {
-	ast: MarkdownAst
-	frontmatter: Record<string, unknown>
-} {
-	// Create a VFile from the string
-	const file = new VFile({ value: content })
-
-	// Process with unified/remark to get the AST
-	const processor = unified()
-		.use(remarkParse) // Parse markdown to AST
-		.use(remarkGfm) // Support GitHub Flavored Markdown
-		.use(remarkFrontmatter) // Parse frontmatter syntax
-
-	// Parse the content into an AST
-	const ast = processor.parse(file)
-
-	// Extract frontmatter data
-	matter(file, {
-		strip: false,
-	})
-
-	return {
-		ast,
-		frontmatter: (file.data.matter ?? {}) as Record<string, unknown>,
-	}
-}
 
 /**
  * Compose a filename from a Unified Markdown AST and / or frontmatter object using a callback function
@@ -60,6 +23,7 @@ export function markdownCallback(
 	return async (context) => {
 		const fullPath = path.format(context.filePath)
 		const contents = await context.fileAdapter.readFile(fullPath)
+
 		const { ast, frontmatter } = getMarkdown(contents)
 		const result = callback({ ast, filePath: context.filePath, frontmatter })
 		return result instanceof Promise ? result : result

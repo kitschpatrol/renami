@@ -53,7 +53,7 @@ The point is to write config that focuses on the _semantic_ aspects of the name 
 - Automatic deduplication with numeric increments
 - All kinds of text case transformations
 - Easily extensible / customizable
-- Idempotence, stable output over repeated invocations 
+- Idempotence, stable output over repeated invocations
 
 ### Non-Features
 
@@ -211,6 +211,39 @@ renami [options]
 
 <!-- /cli-help -->
 
+## Templates
+
+Constants associated with all files:
+
+Braces, `{` and `}`, surround accessors to a metadata object about the file, e.g. `File - {date.created}` or `Meeting about {tags[0]}`.
+Double braces, `{{` and `}}`, surround selector queries to an AST associated with the file, e.g. `{{heading}}`.
+
+If no object or selection path can be resolved, then an empty string `''` is returned.
+
+Within either singe or double braces, an optional single `|` character may be followed with a string to direct formatting of numbers or dates. The interpolator will make a best-effort attempt to either the resolved value preceding the `|` with the skeleton template string provided after the `|`.
+
+It will attempt to parse the resolved value as a date and format it as a string, using the approach described in [Unicode Technical Standards #35](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns). (See [here](https://toolboxpro.app/blog/unicode-cheatsheet) for a nice reference.)
+
+It will then attempt to parse the resolved value as a number and format it as a string, using the approach described in the [Unicode Technical Standards #35](https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns) / [ICU 67 number format concise skeleton support document](https://github.com/unicode-org/icu/blob/main/docs/userguide/format_parse/numbers/skeletons.md).
+
+Both of these are locale-agnostic.
+
+If both fail, then the resolved value is returned as-is.
+
+Examples:
+
+Rename a Markdown document with its heading, followed by a date value from the Markdown document's frontmatter formatted like 2025-03-15:
+
+```
+'My Note about {{heading}} - {date|yyyy-MM-dd}'
+```
+
+Would yield
+
+```
+'My Note about Stuff - 2025-03-15'
+```
+
 ## Background
 
 ### Motivation
@@ -220,28 +253,28 @@ renami [options]
 Case sensitivity...
 
 - Will change case as requested, but doesn't allow identically named but differently-cased files.
-- https://unjs.io/packages/scule
+- <https://unjs.io/packages/scule>
 
 Template expansion...
 
-- https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914
-- https://github.com/josh-hemphill/subslate
-- https://github.com/sindresorhus/pupa
-- https://github.com/sevensc/typescript-string-operations
+- <https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914>
+- <https://github.com/josh-hemphill/subslate>
+- <https://github.com/sindresorhus/pupa>
+- <https://github.com/sevensc/typescript-string-operations>
 
 Inline formatting syntax...
 
 - ICU formatting standard (UTS #35)
-- https://formatjs.github.io/
+- <https://formatjs.github.io/>
 
 Renaming...
 
-- https://github.com/vfile/vfile-rename
+- <https://github.com/vfile/vfile-rename>
 
 Markdown body selection...
 
-- https://github.com/syntax-tree/unist-util-select
-- https://github.com/yshavit/mdq
+- <https://github.com/syntax-tree/unist-util-select>
+- <https://github.com/yshavit/mdq>
 
 Dependencies...
 
@@ -249,8 +282,8 @@ Dependencies...
 
 ### Similar projects
 
-- https://f2.freshman.tech/ Great! Just
-- https://github.com/75lb/renamer (Close! Depends on Node. JS instead of TS. No config file.)
+- <https://f2.freshman.tech/> Great! Just
+- <https://github.com/75lb/renamer> (Close! Depends on Node. JS instead of TS. No config file.)
 
 ## The future
 

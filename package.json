@@ -57,10 +57,15 @@
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
+		"@internationalized/date": "^3.7.0",
+		"@internationalized/number": "^3.6.0",
 		"@kitschpatrol/shared-config": "^5.3.1",
 		"@stdlib/assert-is-absolute-path": "^0.2.2",
 		"bumpp": "^10.1.0",
+		"chevrotain": "^11.0.3",
+		"date-fns": "^4.1.0",
 		"deepmerge-ts": "^7.1.5",
+		"dot-prop": "^9.0.0",
 		"filenamify": "^6.0.0",
 		"mdast-util-to-string": "^4.0.0",
 		"nanoid": "^5.1.3",
