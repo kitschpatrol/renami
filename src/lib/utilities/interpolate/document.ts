@@ -1,8 +1,9 @@
-import { NumberFormat } from '@formatjs/intl-numberformat'
+import is from '@sindresorhus/is'
 import { format as formatDate } from 'date-fns'
-import { getProperty } from 'dot-prop'
 import { type Root } from 'mdast'
 import { toString } from 'mdast-util-to-string'
+import { format as formatNumber } from 'numerable'
+import propertyExpr from 'property-expr'
 import { select } from 'unist-util-select'
 import { interpolate, type InterpolationContext } from './core'
 
@@ -12,15 +13,13 @@ import { interpolate, type InterpolationContext } from './core'
  * @returns - Empty string for arrays/objects, string representation for primitives
  */
 function emptyCollectionToString(value: unknown): string {
-	if (value === null || value === undefined) {
-		return ''
-	}
-
-	if (Array.isArray(value) && value.length === 0) {
-		return ''
-	}
-
-	if (typeof value === 'object' && Object.keys(value).length === 0) {
+	if (
+		is.nullOrUndefined(value) ||
+		is.emptyArray(value) ||
+		is.emptyObject(value) ||
+		is.symbol(value)
+	) {
+		// Return empty string for null, undefined, empty array, empty object, or symbol
 		return ''
 	}
 
@@ -40,77 +39,27 @@ function formatValue(value: unknown, formatString?: string): string {
 		return emptyCollectionToString(value)
 	}
 
-	// Try to format as a date
-	try {
-		const dateValue = value instanceof Date ? value : new Date(String(value))
-		if (!Number.isNaN(dateValue.getTime())) {
-			return formatDate(dateValue, formatString)
+	// Try to format as a number using numerable
+	if (is.number(value) || is.numericString(value)) {
+		// Convert to number
+		const numberValue = is.string(value) ? Number.parseFloat(value) : value
+
+		if (!is.nan(numberValue)) {
+			// TODO what if invalid?
+			return formatNumber(numberValue, formatString)
 		}
-	} catch {
-		// Not a valid date, continue to number formatting
 	}
 
-	// Try to format as a number using @formatjs/intl-numberformat
-	try {
-		const numberValue = typeof value === 'string' ? Number.parseFloat(value) : value
-		if (typeof numberValue === 'number' && !Number.isNaN(numberValue)) {
-			// Use @formatjs/intl-numberformat to format numbers according to TR35 skeletons
-			try {
-				// Create a number formatter with the appropriate options
-				const numberFormat = new NumberFormat(undefined, {
-					maximumFractionDigits:
-						formatString === 'integer'
-							? 0
-							: formatString.startsWith('.')
-								? Number.parseInt(formatString.slice(1), 10)
-								: undefined,
-					minimumFractionDigits:
-						formatString === 'decimal'
-							? 1
-							: formatString.startsWith('.')
-								? Number.parseInt(formatString.slice(1), 10)
-								: undefined,
-					notation: formatString === 'scientific' ? 'scientific' : 'standard',
-					style: 'decimal',
-				})
-				return numberFormat.format(numberValue)
-			} catch {
-				// If NumberFormat fails, fall back to built-in Intl.NumberFormat
-				return new Intl.NumberFormat().format(numberValue)
-			}
-		}
-	} catch {
-		// Not a valid number format, return as-is
+	// Try to format as a date
+	const dateValue = is.date(value) ? value : new Date(String(value))
+	if (is.validDate(dateValue)) {
+		return formatDate(dateValue, formatString)
 	}
+
+	// TODO other formatting treats?
 
 	// Return as-is if no formatting succeeded
 	return emptyCollectionToString(value)
-}
-
-/**
- * Custom property getter that handles bracket notation with quotes
- * @param object - Object to get property from
- * @param path - Property path with possible quoted segments
- * @returns - The value at the path or empty string if not found
- */
-function customPropertyGetter(object: Record<string, unknown>, path: string): unknown {
-	// Check if we're using bracket notation with quotes
-	const doubleBracketMatch = /^(.+?)\["(.+?)"\]$/.exec(path)
-	const singleBracketMatch = /^(.+?)\['(.+?)'\]$/.exec(path)
-
-	if (doubleBracketMatch ?? singleBracketMatch) {
-		const bracketMatch = doubleBracketMatch ?? singleBracketMatch
-		if (!bracketMatch) return ''
-
-		const [, objectPath, propName] = bracketMatch
-
-		// eslint-disable-next-line ts/no-confusing-void-expression
-		const targetObject = objectPath ? getProperty(object, objectPath) : object
-		return targetObject && typeof targetObject === 'object' ? targetObject[propName] : ''
-	}
-
-	// Regular dot-prop getter
-	return getProperty(object, path, '')
 }
 
 /**
@@ -130,14 +79,12 @@ export function interpolateDocument(
 
 		// Handle different brace counts
 		if (braceCount === 1) {
-			// Single braces: object accessor using dot-prop or custom property getter
-			try {
-				const resolvedValue = customPropertyGetter(metadata, value)
-				return formatValue(resolvedValue, pipeValue)
-			} catch {
-				// Return empty string if property access fails
-				return ''
-			}
+			// Single braces: object accessor using object-path
+			// This is the only library that seems to handle everything correctly
+			const getter = propertyExpr.getter(value, true)
+			const resolvedValue = getter(metadata) as unknown
+
+			return formatValue(resolvedValue, pipeValue)
 		}
 		if (braceCount === 2) {
 			// Double braces: AST selector using mdast-util-to-string

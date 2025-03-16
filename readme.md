@@ -267,6 +267,12 @@ Inline formatting syntax...
 - ICU formatting standard (UTS #35)
 - <https://formatjs.github.io/>
 
+Number formatting...
+
+- https://zuji-ts.vercel.app/
+- https://numbrojs.com/
+- https://github.com/gastonmesseri/numerable
+
 Renaming...
 
 - <https://github.com/vfile/vfile-rename>
