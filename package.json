@@ -73,7 +73,6 @@
 		"pkgroll": "^2.11.2",
 		"pretty-ms": "^9.2.0",
 		"property-expr": "^2.0.6",
-		"pupa": "^3.1.0",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
 		"remark-parse": "^11.0.0",

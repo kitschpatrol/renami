@@ -17,7 +17,7 @@ export default renamiConfig({
 				caseType: 'kebab',
 			},
 			pattern: '../assets/test-frontmatter/**/*',
-			transform: transformHelper.frontmatterTemplate('Note-{title}'),
+			transform: transformHelper.markdownTemplate('Note-{title}'),
 		},
 		{
 			options: {

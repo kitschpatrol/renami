@@ -1,16 +1,14 @@
 import { fileCallback } from './file'
-import { frontmatterTemplate, markdownCallback, markdownTemplate } from './markdown'
+import { markdownCallback, markdownTemplate } from './markdown'
 
 export const transformHelper = {
 	fileCallback,
-	frontmatterTemplate,
 	markdownCallback,
 	markdownTemplate,
 }
 
 export type TransformHelper =
 	| typeof fileCallback
-	| typeof frontmatterTemplate
 	| typeof markdownCallback
 	| typeof markdownTemplate
 
