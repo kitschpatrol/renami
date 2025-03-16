@@ -1,4 +1,5 @@
 import filenamify from 'filenamify'
+import { slug } from 'github-slugger'
 
 /**
  * Determines if a position in a string is a word boundary.
@@ -179,6 +180,7 @@ export type CaseType =
 	| 'screaming-kebab'
 	| 'screaming-snake'
 	| 'sentence'
+	| 'slug'
 	| 'snake'
 	| 'title'
 	| 'uppercase'
@@ -256,6 +258,10 @@ export function convertCase(text: string, caseType: CaseType): string {
 					return word.toLowerCase()
 				})
 				.join(' ')
+		}
+
+		case 'slug': {
+			return slug(text, false)
 		}
 
 		case 'snake': {

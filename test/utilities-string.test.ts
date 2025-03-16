@@ -319,6 +319,28 @@ describe('convertCase', () => {
 			'The Quick Brown Fox Jumps Over the Lazy Dog',
 		)
 	})
+
+	test('converts to slug format', () => {
+		expect(convertCase(testString, 'slug')).toBe('hello-world-example_string')
+	})
+
+	test('handles special characters in slug conversion', () => {
+		expect(convertCase('Hello World! Special & Characters?', 'slug')).toBe(
+			'hello-world-special--characters',
+		)
+	})
+
+	test('handles multiple adjacent special characters in slug conversion', () => {
+		expect(convertCase('Hello!!!World???', 'slug')).toBe('helloworld')
+	})
+
+	test('handles accented characters in slug conversion', () => {
+		expect(convertCase('Café Français', 'slug')).toBe('café-français')
+	})
+
+	test('handles emojis in slug conversion', () => {
+		expect(convertCase('Product Review ✌️😅', 'slug')).toBe('product-review-️')
+	})
 })
 
 describe('getUnicodeCodePoints', () => {
