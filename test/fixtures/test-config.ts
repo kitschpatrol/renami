@@ -10,7 +10,7 @@ export default renamiConfig({
 	rules: [
 		{
 			pattern: '../assets/test-basic/**/*',
-			transform: transformHelper.fileCallback(({ name }) => `${name}-test`),
+			transform: transformHelper.fileCallback(({ fileInfo }) => `${fileInfo.size}-test`),
 		},
 		{
 			options: {

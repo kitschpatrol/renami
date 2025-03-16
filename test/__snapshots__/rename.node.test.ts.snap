@@ -353,32 +353,32 @@ exports[`rename tests > should use the config file 1`] = `
         "files": [
           {
             "filePathOriginal": "/test/assets/test-basic/basic.md",
-            "filePathRenamed": "/test/assets/test-basic/basic-test.md",
+            "filePathRenamed": "/test/assets/test-basic/17-test.md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/camelCaseFile.md",
-            "filePathRenamed": "/test/assets/test-basic/camelCaseFile-test.md",
+            "filePathRenamed": "/test/assets/test-basic/18-test (1).md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/kebab-case-file.md",
-            "filePathRenamed": "/test/assets/test-basic/kebab-case-file-test.md",
-            "status": "renamed",
-          },
-          {
-            "filePathOriginal": "/test/assets/test-basic/miXedC_aseF-ile.md",
-            "filePathRenamed": "/test/assets/test-basic/miXedC_aseF-ile-test.md",
-            "status": "renamed",
-          },
-          {
-            "filePathOriginal": "/test/assets/test-basic/Sentence case file.md",
-            "filePathRenamed": "/test/assets/test-basic/Sentence case file-test.md",
+            "filePathRenamed": "/test/assets/test-basic/18-test (2).md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/snake_case_file.md",
-            "filePathRenamed": "/test/assets/test-basic/snake_case_file-test.md",
+            "filePathRenamed": "/test/assets/test-basic/18-test (3).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test/assets/test-basic/Sentence case file.md",
+            "filePathRenamed": "/test/assets/test-basic/21-test.md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test/assets/test-basic/miXedC_aseF-ile.md",
+            "filePathRenamed": "/test/assets/test-basic/24-test.md",
             "status": "renamed",
           },
         ],

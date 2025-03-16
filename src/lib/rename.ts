@@ -66,7 +66,7 @@ async function getMaskedMatchedFiles(
  * If a string is provided, it will be used as the config file path.
  * @returns A report of the renaming process
  */
-export async function rename(options: {
+export async function rename(options?: {
 	/** Can be a path to config file, a config object, or undefined to attempt config discovery in accordance with Cosmiconfig's resolution strategy. */
 	config?: Partial<RenamiConfig> | string
 	/** Path to search for config file from. Defaults to the current working directory. */
@@ -75,7 +75,7 @@ export async function rename(options: {
 	fileAdapter?: FileAdapter
 }): Promise<RenameReport> {
 	const startTime = performance.now()
-	const { config, configSearchFrom, fileAdapter = await getDefaultFileAdapter() } = options
+	const { config, configSearchFrom, fileAdapter = await getDefaultFileAdapter() } = options ?? {}
 
 	const loadedConfig = await loadConfig(config, configSearchFrom)
 
