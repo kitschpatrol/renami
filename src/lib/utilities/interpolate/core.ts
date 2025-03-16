@@ -58,7 +58,7 @@ allTokens.push(
 // Interface for the interpolation handler
 export type InterpolationContext = {
 	braceCount: number // 1, 2, or 3 depending on brace quantity
-	pipeValue?: string // Raw string of content after the pipe, or undefined if no pipe
+	pipeValues: string[] // Array of string content from each pipe after the value, or an empty array if no pipe
 	value: string // Raw string from inside the braces
 }
 
@@ -156,8 +156,8 @@ export function interpolate(
 				// Extract content between braces
 				const fullContent = template.slice(i + 3, closingBraceIndex)
 
-				// Find pipe character (but not escaped pipe)
-				let pipeIndex = -1
+				// Find all pipe characters (but not escaped pipes)
+				const pipeIndices = []
 				let j = 0
 				while (j < fullContent.length) {
 					if (fullContent[j] === '\\' && j + 1 < fullContent.length) {
@@ -165,32 +165,36 @@ export function interpolate(
 						continue
 					}
 					if (fullContent[j] === '|') {
-						pipeIndex = j
-						break
+						pipeIndices.push(j)
 					}
 					j++
 				}
 
-				// Process value and pipeValue
-				let pipeValue
+				// Process value and pipeValues
 				let value
-				if (pipeIndex === -1) {
+				const pipeValues = []
+
+				if (pipeIndices.length === 0) {
 					value = fullContent
 				} else {
-					value = fullContent.slice(0, pipeIndex)
-					pipeValue = fullContent.slice(pipeIndex + 1)
+					value = fullContent.slice(0, pipeIndices[0])
+
+					// Process each pipe segment
+					for (let k = 0; k < pipeIndices.length; k++) {
+						const startIndex = pipeIndices[k] + 1
+						const endIndex = k < pipeIndices.length - 1 ? pipeIndices[k + 1] : fullContent.length
+						const pipeContent = fullContent.slice(startIndex, endIndex)
+						pipeValues.push(unescapeSpecialChars(pipeContent))
+					}
 				}
 
-				// Unescape special characters in value and pipeValue
+				// Unescape value
 				value = unescapeSpecialChars(value)
-				if (pipeValue !== undefined) {
-					pipeValue = unescapeSpecialChars(pipeValue)
-				}
 
 				// Handle the interpolation
 				result += handler({
 					braceCount: 3,
-					pipeValue,
+					pipeValues,
 					value,
 				})
 
@@ -208,8 +212,8 @@ export function interpolate(
 				// Extract content between braces
 				const fullContent = template.slice(i + 2, closingBraceIndex)
 
-				// Find pipe character (but not escaped pipe)
-				let pipeIndex = -1
+				// Find all pipe characters (but not escaped pipes)
+				const pipeIndices = []
 				let j = 0
 				while (j < fullContent.length) {
 					if (fullContent[j] === '\\' && j + 1 < fullContent.length) {
@@ -217,32 +221,36 @@ export function interpolate(
 						continue
 					}
 					if (fullContent[j] === '|') {
-						pipeIndex = j
-						break
+						pipeIndices.push(j)
 					}
 					j++
 				}
 
-				// Process value and pipeValue
-				let pipeValue
+				// Process value and pipeValues
 				let value
-				if (pipeIndex === -1) {
+				const pipeValues = []
+
+				if (pipeIndices.length === 0) {
 					value = fullContent
 				} else {
-					value = fullContent.slice(0, pipeIndex)
-					pipeValue = fullContent.slice(pipeIndex + 1)
+					value = fullContent.slice(0, pipeIndices[0])
+
+					// Process each pipe segment
+					for (let k = 0; k < pipeIndices.length; k++) {
+						const startIndex = pipeIndices[k] + 1
+						const endIndex = k < pipeIndices.length - 1 ? pipeIndices[k + 1] : fullContent.length
+						const pipeContent = fullContent.slice(startIndex, endIndex)
+						pipeValues.push(unescapeSpecialChars(pipeContent))
+					}
 				}
 
-				// Unescape special characters in value and pipeValue
+				// Unescape value
 				value = unescapeSpecialChars(value)
-				if (pipeValue !== undefined) {
-					pipeValue = unescapeSpecialChars(pipeValue)
-				}
 
 				// Handle the interpolation
 				result += handler({
 					braceCount: 2,
-					pipeValue,
+					pipeValues,
 					value,
 				})
 
@@ -260,8 +268,8 @@ export function interpolate(
 				// Extract content between braces
 				const fullContent = template.slice(i + 1, closingBraceIndex)
 
-				// Find pipe character (but not escaped pipe)
-				let pipeIndex = -1
+				// Find all pipe characters (but not escaped pipes)
+				const pipeIndices = []
 				let j = 0
 				while (j < fullContent.length) {
 					if (fullContent[j] === '\\' && j + 1 < fullContent.length) {
@@ -269,32 +277,36 @@ export function interpolate(
 						continue
 					}
 					if (fullContent[j] === '|') {
-						pipeIndex = j
-						break
+						pipeIndices.push(j)
 					}
 					j++
 				}
 
-				// Process value and pipeValue
-				let pipeValue
+				// Process value and pipeValues
 				let value
-				if (pipeIndex === -1) {
+				const pipeValues = []
+
+				if (pipeIndices.length === 0) {
 					value = fullContent
 				} else {
-					value = fullContent.slice(0, pipeIndex)
-					pipeValue = fullContent.slice(pipeIndex + 1)
+					value = fullContent.slice(0, pipeIndices[0])
+
+					// Process each pipe segment
+					for (let k = 0; k < pipeIndices.length; k++) {
+						const startIndex = pipeIndices[k] + 1
+						const endIndex = k < pipeIndices.length - 1 ? pipeIndices[k + 1] : fullContent.length
+						const pipeContent = fullContent.slice(startIndex, endIndex)
+						pipeValues.push(unescapeSpecialChars(pipeContent))
+					}
 				}
 
-				// Unescape special characters in value and pipeValue
+				// Unescape value
 				value = unescapeSpecialChars(value)
-				if (pipeValue !== undefined) {
-					pipeValue = unescapeSpecialChars(pipeValue)
-				}
 
 				// Handle the interpolation
 				result += handler({
 					braceCount: 1,
-					pipeValue,
+					pipeValues,
 					value,
 				})
 

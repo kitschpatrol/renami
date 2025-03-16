@@ -324,6 +324,45 @@ exports[`basic rename tests > should set the case appropriately 9`] = `
     },
     {
       "filePathOriginal": "/camelCaseFile.md",
+      "filePathRenamed": "/camelcasefile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/kebab-case-file.md",
+      "filePathRenamed": "/kebab-case-file.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/miXedC_aseF-ile.md",
+      "filePathRenamed": "/mixedc_asef-ile.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/Sentence case file.md",
+      "filePathRenamed": "/sentence-case-file.md",
+      "status": "renamed",
+    },
+    {
+      "filePathOriginal": "/snake_case_file.md",
+      "filePathRenamed": "/snake_case_file.md",
+      "status": "unchanged",
+    },
+  ],
+}
+`;
+
+exports[`basic rename tests > should set the case appropriately 10`] = `
+{
+  "dryRun": true,
+  "duration": 0,
+  "files": [
+    {
+      "filePathOriginal": "/basic.md",
+      "filePathRenamed": "/basic.md",
+      "status": "unchanged",
+    },
+    {
+      "filePathOriginal": "/camelCaseFile.md",
       "filePathRenamed": "/camel_case_file.md",
       "status": "renamed",
     },
@@ -351,7 +390,7 @@ exports[`basic rename tests > should set the case appropriately 9`] = `
 }
 `;
 
-exports[`basic rename tests > should set the case appropriately 10`] = `
+exports[`basic rename tests > should set the case appropriately 11`] = `
 {
   "dryRun": true,
   "duration": 0,
@@ -390,7 +429,7 @@ exports[`basic rename tests > should set the case appropriately 10`] = `
 }
 `;
 
-exports[`basic rename tests > should set the case appropriately 11`] = `
+exports[`basic rename tests > should set the case appropriately 12`] = `
 {
   "dryRun": true,
   "duration": 0,

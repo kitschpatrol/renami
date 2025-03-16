@@ -45,9 +45,6 @@ importers:
       '@stdlib/assert-is-absolute-path':
         specifier: ^0.2.2
         version: 0.2.2
-      '@types/object-path':
-        specifier: ^0.11.4
-        version: 0.11.4
       bumpp:
         specifier: ^10.1.0
         version: 10.1.0
@@ -63,6 +60,9 @@ importers:
       filenamify:
         specifier: ^6.0.0
         version: 6.0.0
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
       mdast-util-to-string:
         specifier: ^4.0.0
         version: 4.0.0
@@ -1309,9 +1309,6 @@ packages:
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
-
-  '@types/object-path@0.11.4':
-    resolution: {integrity: sha512-4tgJ1Z3elF/tOMpA8JLVuR9spt9Ynsf7+JjqsQ2IqtiPJtcLoHoXcT6qU4E10cPFqyXX5HDm9QwIzZhBSkLxsw==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -6375,8 +6372,6 @@ snapshots:
       undici-types: 6.20.0
 
   '@types/normalize-package-data@2.4.4': {}
-
-  '@types/object-path@0.11.4': {}
 
   '@types/resolve@1.20.2': {}
 

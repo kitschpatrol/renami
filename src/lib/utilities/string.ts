@@ -171,19 +171,22 @@ export function getUnicodeCodePoints(text: string): string[] {
 	return codePoints
 }
 
-export type CaseType =
-	| 'camel'
-	| 'kebab'
-	| 'lowercase'
-	| 'pascal'
-	| 'preserve'
-	| 'screaming-kebab'
-	| 'screaming-snake'
-	| 'sentence'
-	| 'slug'
-	| 'snake'
-	| 'title'
-	| 'uppercase'
+export const CASE_TYPE_NAMES = [
+	'camel',
+	'kebab',
+	'lowercase',
+	'pascal',
+	'preserve',
+	'screaming-kebab',
+	'screaming-snake',
+	'sentence',
+	'slug',
+	'snake',
+	'title',
+	'uppercase',
+] as const
+
+export type CaseType = (typeof CASE_TYPE_NAMES)[number]
 
 /**
  * Converts a string to the specified case format

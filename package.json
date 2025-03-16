@@ -65,6 +65,7 @@
 		"date-fns": "^4.1.0",
 		"deepmerge-ts": "^7.1.5",
 		"filenamify": "^6.0.0",
+		"github-slugger": "^2.0.0",
 		"mdast-util-to-string": "^4.0.0",
 		"nanoid": "^5.1.4",
 		"natural-orderby": "^5.0.0",

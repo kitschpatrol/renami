@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { type Options, renameFiles, transformHelper } from '../src/lib'
+import { CASE_TYPE_NAMES } from '../src/lib/utilities/string'
 import { useTempFiles } from './fixtures/file-fixture'
 import { sanitizeOutput } from './utilities/sanitize'
 
@@ -69,19 +70,7 @@ describe('basic rename tests', () => {
 	it('should set the case appropriately', async () => {
 		const filePaths = await tempFiles.getFiles()
 
-		const cases: Array<Options['caseType']> = [
-			'camel',
-			'kebab',
-			'lowercase',
-			'pascal',
-			'preserve',
-			'screaming-kebab',
-			'screaming-snake',
-			'sentence',
-			'snake',
-			'title',
-			'uppercase',
-		]
+		const cases = CASE_TYPE_NAMES
 
 		for (const caseType of cases) {
 			const result = await renameFiles({

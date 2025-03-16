@@ -7,7 +7,7 @@ describe('Core Interpolation', () => {
 		const result = interpolate(template, (context) => {
 			expect(context.braceCount).toBe(1)
 			expect(context.value).toBe('name')
-			expect(context.pipeValue).toBeUndefined()
+			expect(context.pipeValues).toBeUndefined()
 			return 'World'
 		})
 		expect(result).toBe('Hello, World!')
@@ -28,7 +28,7 @@ describe('Core Interpolation', () => {
 		const template = '{value|format}'
 		const result = interpolate(template, (context) => {
 			expect(context.value).toBe('value')
-			expect(context.pipeValue).toBe('format')
+			expect(context.pipeValues).toBe('format')
 			return `formatted:${context.value}`
 		})
 		expect(result).toBe('formatted:value')
@@ -102,7 +102,7 @@ describe('Core Interpolation', () => {
 		const template = '{value|}'
 		const result = interpolate(template, (context) => {
 			expect(context.value).toBe('value')
-			expect(context.pipeValue).toBe('')
+			expect(context.pipeValues).toBe([])
 			return 'formatted'
 		})
 		expect(result).toBe('formatted')
@@ -113,7 +113,7 @@ describe('Core Interpolation', () => {
 		const template = '{value|with|pipe|format}'
 		const result = interpolate(template, (context) => {
 			expect(context.value).toBe('value')
-			expect(context.pipeValue).toBe('with|pipe|format')
+			expect(context.pipeValues).toMatchObject(['with', 'pipe', 'format'])
 			return 'processed'
 		})
 		expect(result).toBe('processed')
@@ -123,7 +123,7 @@ describe('Core Interpolation', () => {
 		const template = '{value|format{with}braces}'
 		const result = interpolate(template, (context) => {
 			expect(context.value).toBe('value')
-			expect(context.pipeValue).toBe('format{with}braces')
+			expect(context.pipeValues).toBe('format{with}braces')
 			return 'processed'
 		})
 		expect(result).toBe('processed')
