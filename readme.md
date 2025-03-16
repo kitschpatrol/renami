@@ -29,13 +29,13 @@
 
 Renami provides a configuration-driven approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
 
-The configuration-based approach makes it easy to pull metadata from a file's content and pass it into simple templates to rename files.
+The tool makes it easy to pull specific metadata from a file's content and pass it into simple templates to rename files.
 
 Think of it as a linter + fixer for file names.
 
 I use it to maintain consistent, content-driven filenames for a large collection of Markdown notes.
 
-Renami provides an application-agnostic foundation for the "Renami Obsidian" plugin.
+Renami provides an application-agnostic foundation for the [Renami Obsidian](https://github.com/kitschpatrol/renami-obsidian) plugin.
 
 Despite being configuration-driven, Renami aspires to use convention over configuration wherever possible. Basic filename hygiene like invalid character removal, Unicode normalization, deduplication, truncation, and (optionally) case transformation are all handled automatically and implicitly.
 
@@ -98,7 +98,7 @@ import { renamiConfig } from 'renami'
 export default renamiConfig({
   rules: [
     {
-      // Make all Markdown files kebab case
+      // Make all Markdown files kebab case.
       options: {
         caseType: 'kebab',
       },
@@ -111,48 +111,63 @@ export default renamiConfig({
 A more complex configuration file might look like this:
 
 ```ts
+// File: "renami.config.ts"
 import { renamiConfig, transformHelper } from 'renami'
-const { fileCallback, frontmatterTemplate } = transformHelper
+
+// Renami provides factory function helpers for common transform tasks.
+const { fileCallback } = transformHelper
 
 export default renamiConfig({
-  // Global options become the default for all "rules"
-  // below, but may be overridden on a per-rule basis
+  // Global options become the default for all "rules" below, but may be
+  // overridden on a per-rule basis.
   options: {
     dryRun: true,
     maxLength: 50,
   },
-  // Each rule describes a group of files with a glob pattern,
-  // and specifies how matching filenames should be managed
-  // If a file matches multiple rules, only the LAST rule in
-  // the array is applied to the file.
+  // Each rule targets a group of files with a glob pattern, and specifies how
+  // matching filenames should be managed If a file matches multiple rules, only
+  // the LAST rule in the array is applied to the file.
   rules: [
     {
+      // Patterns are relative to this config file's location
       pattern: './test/assets/test-basic/**/*',
-      // Transform functions take info about a file and return a filename `string`,
-      // or `undefined` if no valid transform is possible.
-      // Multiple functions can be passed to `transform`, and are evaluated left to right, with the output
-      // of one transform passed to the next, unless it returns `undefined`, in which case it's skipped.
-      // Additional changes might be made to the filename afterwards depending on 'options'.
-      // This one sets the filename to ctime
-      transform: fileCallback(({ fileInfo }) => String(fileInfo.ctimeMs)),
+      // Transform functions take info about a file and return a filename
+      // `string`, or `undefined` if no valid transform is possible. Multiple
+      // functions can be passed to `transform`, and are evaluated left to
+      // right, with the output of one transform passed to the next, unless it
+      // returns `undefined`, in which case it's skipped. Additional changes
+      // might be made to the filename afterwards depending on 'options'.
+      // This one sets the filename to ctime:
+      transform: fileCallback(({ fileInfo }) => `I was born at ${fileInfo.ctimeMs}`),
     },
     {
       options: {
         caseType: 'kebab',
       },
       pattern: './test/assets/test-frontmatter/**/*',
-      // Set filename from frontmatter
-      transform: frontmatterTemplate('Note-{title}'),
+      // Transforms can also be simple strings, which are passed into a
+      // universal template transformer which provides different template
+      // variables for different file types.
+      //
+      // This one sets filename from the `title` frontmatter field in a Markdown
+      // file.
+      transform: 'Note-{title}',
     },
     {
       options: {
         caseType: 'kebab',
+        // The final file name will be truncated to 15 characters, including the
+        // extension
         maxLength: 15,
         truncateOnWordBoundary: false,
       },
       pattern: './test/assets/test-increment/**/*',
-      // Example of a simple custom transform function
-      transform: async () => 'wow what a long name this is',
+      // Example of a simple custom transform function, which takes a context
+      // object with info about the file and can do whatever it wants to return
+      // a file name string. This function must always be async even if it
+      // doesn't actually await anything.
+      transform: async (context) =>
+        `My file extension is ${context.filePath.ext} and wow what a long name this is!`,
     },
   ],
 })
@@ -167,10 +182,12 @@ the renaming rules.
 ```ts
 import { rename, renameFiles } from 'renami'
 
-// Rename files based on local `renami.config.ts` or similar
+// Rename files based on local `renami.config.ts`
 const report = await rename()
 
-// Or, rename specific sets of files
+console.log(report)
+
+// Or, rename specific sets of files:
 const filesReport = await renameFiles({
   // BYO glob expansion to get a list  of files to rename
   filePaths: ['./posts/some-file.md', './posts/some-other-file.md'],
@@ -180,9 +197,9 @@ const filesReport = await renameFiles({
     dryRun: true,
   },
   // Transforms do things to filenames
-  // This transform parses and passes Markdown frontmatter into the template string,
-  // renaming each file to the value of the frontmatter title
-  transform: transformHelper.frontmatterTemplate('Note-{title}'),
+  // This one uses the double-bracket `{{selector}}` syntax to access content from
+  // the body of Markdown files, renaming each file to the value of the first heading.
+  transform: 'Note-{{heading}}',
 })
 
 console.log(filesReport)
@@ -296,8 +313,6 @@ Style...
 
 - <https://f2.freshman.tech/> Great! Just
 - <https://github.com/75lb/renamer> (Close! Depends on Node. JS instead of TS. No config file.)
-
-## The future
 
 ## Maintainers
 
