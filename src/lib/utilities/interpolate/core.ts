@@ -1,349 +1,204 @@
 /* eslint-disable max-depth */
-import { createToken } from 'chevrotain'
+/* eslint-disable complexity */
 
-// Define the token types for our template language
-const allTokens = []
-
-// Tokens for single, double, and triple braces
-const OpenTripleBrace = createToken({ name: 'OpenTripleBrace', pattern: /\{\{\{/ })
-const CloseTripleBrace = createToken({ name: 'CloseTripleBrace', pattern: /\}\}\}/ })
-const OpenDoubleBrace = createToken({ name: 'OpenDoubleBrace', pattern: /\{\{/ })
-const CloseDoubleBrace = createToken({ name: 'CloseDoubleBrace', pattern: /\}\}/ })
-const OpenBrace = createToken({ name: 'OpenBrace', pattern: /\{/ })
-const CloseBrace = createToken({ name: 'CloseBrace', pattern: /\}/ })
-
-// Token for format separator
-const Pipe = createToken({ name: 'Pipe', pattern: /\|/ })
-
-// Escape character
-const EscapeChar = createToken({ name: 'EscapeChar', pattern: /\\/ })
-
-// Content inside braces
-const BraceContent = createToken({
-	name: 'BraceContent',
-	pattern: /[^}|]+/,
-})
-
-// Format string after pipe
-const FormatString = createToken({
-	name: 'FormatString',
-	pattern: /[^}]+/,
-})
-
-// Text content outside of braces
-const Text = createToken({
-	name: 'Text',
-	pattern: /[^{\\]+/,
-})
-
-// Add tokens to the array in order of priority
-allTokens.push(
-	OpenTripleBrace, // Order matters! Check for triple braces before double braces
-	CloseTripleBrace,
-	OpenDoubleBrace, // Check for double braces before single braces
-	CloseDoubleBrace,
-	OpenBrace,
-	CloseBrace,
-	Pipe,
-	BraceContent,
-	FormatString,
-	EscapeChar,
-	Text,
-)
-
-// Note: We're keeping Chevrotain and the token definitions in case
-// we want to use them for more complex parsing in the future, but
-// the current implementation uses direct string parsing.
-
-// Interface for the interpolation handler
 export type InterpolationContext = {
-	braceCount: number // 1, 2, or 3 depending on brace quantity
-	pipeValues: string[] // Array of string content from each pipe after the value, or an empty array if no pipe
-	value: string // Raw string from inside the braces
+	braceCount: number
+	pipeValues?: string | string[] | undefined
+	value: string
 }
 
-/**
- * Finds the matching closing brace, accounting for nested braces
- * @param template - The template string
- * @param startIndex - The starting index to search from
- * @param openBrace - The opening brace pattern to match ('{', '{{', or '{{{')
- * @param closeBrace - The closing brace pattern to match ('}', '}}', or '}}}')
- * @returns The index of the matching closing brace, or -1 if not found
- */
-function findMatchingClosingBrace(
-	template: string,
-	startIndex: number,
-	openBrace: string,
-	closeBrace: string,
-): number {
-	let depth = 1
-	let i = startIndex
-
-	while (i < template.length) {
-		// Check for escaped characters
-		if (template[i] === '\\' && i + 1 < template.length) {
-			i += 2
-			continue
-		}
-
-		// Check for opening brace sequence
-		if (
-			i + openBrace.length <= template.length &&
-			template.slice(i, i + openBrace.length) === openBrace
-		) {
-			depth++
-			i += openBrace.length
-			continue
-		}
-
-		// Check for closing brace sequence
-		if (
-			i + closeBrace.length <= template.length &&
-			template.slice(i, i + closeBrace.length) === closeBrace
-		) {
-			depth--
-			if (depth === 0) {
-				return i
-			}
-			i += closeBrace.length
-			continue
-		}
-
-		// Move to next character
-		i++
-	}
-
-	return -1 // No matching closing brace found
-}
+// A constant empty array to ensure reference equality when needed.
+const EMPTY_ARRAY: string[] = []
 
 /**
- * Core interpolation function that processes templates with callback-based handling
- * @param template - The template string to process
- * @param handler - Callback function that processes each interpolation
- * @returns - The processed string with interpolations replaced
+ * Interpolates a template string by replacing tokens with handler‐generated strings.
+ *
+ * A token is defined by an opening sequence of one or more unescaped `{` and a matching closing
+ * sequence of unescaped `}`. The number of consecutive opening braces is stored as `braceCount`.
+ *
+ * If the closing sequence contains more braces than the opening sequence, the “extra” braces are
+ * considered part of the token’s content. For example, in `{outer{inner}}` the single opening brace
+ * is matched by two closing braces so that the token’s raw content becomes `"outer{inner}"`.
+ *
+ * Within a token, a literal pipe character (`|`) can be escaped by a backslash. Tokens may have a
+ * format: the raw content is split on unescaped pipes (`|`), where the first segment is the main
+ * value and subsequent segments (if any) become the pipe values. When there is exactly one format segment
+ * that is empty, the handler receives an empty array.
+ *
+ * Escaped braces, pipes, and backslashes outside tokens are unescaped in the output.
+ *
+ * Detailed Steps:
+ *
+ * 1. Loop through the template one character at a time.
+ * - If a backslash is encountered and the next character is one of `{`, `}`, `|`, or `\`,
+ * output the next character literally and skip the escape.
+ *
+ * 2. When an unescaped `{` is found, start processing a token:
+ * a. Count all consecutive `{` characters; this count is stored as `braceCount`.
+ * b. Mark the start of the token’s content immediately after the opening braces.
+ *
+ * 3. Search for a matching closing delimiter for this token:
+ * - Scan forward (starting at the content) and, while ignoring escaped characters,
+ * look for a sequence of consecutive `}` characters whose count is at least `braceCount`.
+ * - Each time such a candidate is found, update (overwrite) the candidate.
+ * - However, once at least one candidate has been found, if an unescaped `{` is encountered
+ * (indicating the start of a new token), break the scan so that candidates from later tokens
+ * do not “leak” into the current one.
+ *
+ * 4. If a valid closing delimiter candidate was found:
+ * - The token’s raw content is defined as the slice from the content start up to the candidate’s
+ * position plus any extra `}` (i.e. candidateRun – braceCount extra characters are included).
+ * - Update the global index to skip over the entire closing delimiter.
+ *
+ * 5. Process escapes in the raw token content:
+ * - Replace escaped pipes (`\|`) with a unique placeholder (so splitting on literal pipes is safe).
+ * - Also unescape any escaped `{`, `}`, or `\`.
+ *
+ * 6. Split the processed token on literal pipe characters.
+ * - The first segment becomes the token’s main value.
+ * - Any additional segments become the pipe values. If there is exactly one extra segment and it’s empty,
+ * return the constant EMPTY_ARRAY.
+ *
+ * 7. Call the provided handler with an InterpolationContext object and append its return value to the result.
+ *
+ * 8. If no valid closing delimiter is found, output the token’s starting brace(s) and subsequent text literally.
+ * @param template The template string.
+ * @param handler A function that receives the context for each interpolation token and returns the replacement string.
+ * @returns The interpolated string.
  */
-// eslint-disable-next-line complexity
 export function interpolate(
 	template: string,
 	handler: (context: InterpolationContext) => string,
 ): string {
+	// A unique placeholder used to protect escaped pipes during splitting.
+	const ESCAPED_PIPE = '\u0001'
 	let result = ''
 	let i = 0
 
-	// Process the template character by character with a custom approach
+	// Process the template one character at a time.
 	while (i < template.length) {
-		// Check for escape sequences first
-		if (template[i] === '\\' && i + 1 < template.length) {
-			// Only treat backslash as escape for brace characters, pipe, or another backslash
-			const nextChar = template[i + 1]
-			if (nextChar === '{' || nextChar === '}' || nextChar === '\\' || nextChar === '|') {
-				result += nextChar
+		const char = template[i]
+
+		// Handle escape sequences outside tokens.
+		if (char === '\\') {
+			// If the next character is escapable, output it literally.
+			if (i + 1 < template.length && '{}|\\'.includes(template[i + 1])) {
+				result += template[i + 1]
 				i += 2
-				continue
+			} else {
+				result += char
+				i++
 			}
-			// Otherwise, treat the backslash as a regular character
-			result += '\\'
+		} else if (char === '{') {
+			// Beginning of an interpolation token.
+			const tokenStart = i // In case we fail to find a closing delimiter.
+			let braceCount = 0
+
+			// Count consecutive unescaped opening braces.
+			while (i < template.length && template[i] === '{') {
+				braceCount++
+				i++
+			}
+			// Mark where the token’s raw content begins.
+			const contentStart = i
+
+			// ------------------------------------------------------------
+			// Search for the closing delimiter candidate.
+			// We scan from the content start until (a) the end of the template,
+			// or (b) we encounter an unescaped '{' after having found at least one valid candidate.
+			// ------------------------------------------------------------
+			let candidateIndex = -1
+			let candidateRun = 0
+			let pos = i
+			while (pos < template.length) {
+				if (template[pos] === '\\') {
+					// Skip escaped characters.
+					pos += 2
+					continue
+				}
+				if (template[pos] === '}') {
+					// Count the run of consecutive closing braces.
+					let temp = pos
+					let run = 0
+					while (temp < template.length && template[temp] === '}') {
+						run++
+						temp++
+					}
+					// If the run is long enough, record/update the candidate.
+					if (run >= braceCount) {
+						candidateIndex = pos
+						candidateRun = run
+					}
+					pos = temp
+					continue
+				}
+				// If we've already seen a valid candidate and now encounter an unescaped '{',
+				// break to prevent later tokens from interfering.
+				if (candidateIndex !== -1 && template[pos] === '{') {
+					break
+				}
+				pos++
+			}
+
+			// If a valid closing delimiter candidate was found...
+			if (candidateIndex === -1) {
+				// No valid closing delimiter was found; output the text literally.
+				result += template.slice(tokenStart, i)
+			} else {
+				// Compute the end index of the token’s raw content.
+				// Any extra closing braces (beyond what’s needed) are included in the token content.
+				const tokenRaw = template.slice(contentStart, candidateIndex + (candidateRun - braceCount))
+				// Advance the main index past the entire closing delimiter.
+				i = candidateIndex + candidateRun
+
+				// ------------------------------------------------------------
+				// Process escape sequences inside the token content.
+				// Escaped pipes are temporarily replaced with a placeholder.
+				// ------------------------------------------------------------
+				let processedToken = ''
+				let j = 0
+				while (j < tokenRaw.length) {
+					if (tokenRaw[j] === '\\' && j + 1 < tokenRaw.length) {
+						const nextChar = tokenRaw[j + 1]
+						if (nextChar === '|') {
+							processedToken += ESCAPED_PIPE
+							j += 2
+							continue
+						} else if ('{}|\\'.includes(nextChar)) {
+							processedToken += nextChar
+							j += 2
+							continue
+						}
+					}
+					processedToken += tokenRaw[j]
+					j++
+				}
+
+				// Split the processed token on literal pipe characters.
+				let parts = processedToken.split('|')
+				// Restore any escaped pipes.
+				parts = parts.map((part) => part.replaceAll(ESCAPED_PIPE, '|'))
+				const value = parts[0]
+				let pipeValues: string | string[] | undefined
+				if (parts.length > 1) {
+					if (parts.length === 2 && parts[1] === '') {
+						pipeValues = EMPTY_ARRAY
+					} else if (parts.length === 2) {
+						pipeValues = parts[1]
+					} else {
+						pipeValues = parts.slice(1)
+					}
+				}
+
+				// Call the handler with the context and append its output.
+				const replacement = handler({ braceCount, pipeValues, value })
+				result += replacement
+			}
+		} else {
+			// Regular character: simply append.
+			result += char
 			i++
-			continue
 		}
-
-		// Check for triple braces
-		if (template.slice(i, i + 3) === '{{{') {
-			// Find matching closing brace, accounting for nesting
-			const closingBraceIndex = findMatchingClosingBrace(template, i + 3, '{{{', '}}}')
-
-			if (closingBraceIndex !== -1) {
-				// Extract content between braces
-				const fullContent = template.slice(i + 3, closingBraceIndex)
-
-				// Find all pipe characters (but not escaped pipes)
-				const pipeIndices = []
-				let j = 0
-				while (j < fullContent.length) {
-					if (fullContent[j] === '\\' && j + 1 < fullContent.length) {
-						j += 2
-						continue
-					}
-					if (fullContent[j] === '|') {
-						pipeIndices.push(j)
-					}
-					j++
-				}
-
-				// Process value and pipeValues
-				let value
-				const pipeValues = []
-
-				if (pipeIndices.length === 0) {
-					value = fullContent
-				} else {
-					value = fullContent.slice(0, pipeIndices[0])
-
-					// Process each pipe segment
-					for (let k = 0; k < pipeIndices.length; k++) {
-						const startIndex = pipeIndices[k] + 1
-						const endIndex = k < pipeIndices.length - 1 ? pipeIndices[k + 1] : fullContent.length
-						const pipeContent = fullContent.slice(startIndex, endIndex)
-						pipeValues.push(unescapeSpecialChars(pipeContent))
-					}
-				}
-
-				// Unescape value
-				value = unescapeSpecialChars(value)
-
-				// Handle the interpolation
-				result += handler({
-					braceCount: 3,
-					pipeValues,
-					value,
-				})
-
-				i = closingBraceIndex + 3
-				continue
-			}
-		}
-
-		// Check for double braces
-		if (template.slice(i, i + 2) === '{{') {
-			// Find matching closing brace, accounting for nesting
-			const closingBraceIndex = findMatchingClosingBrace(template, i + 2, '{{', '}}')
-
-			if (closingBraceIndex !== -1) {
-				// Extract content between braces
-				const fullContent = template.slice(i + 2, closingBraceIndex)
-
-				// Find all pipe characters (but not escaped pipes)
-				const pipeIndices = []
-				let j = 0
-				while (j < fullContent.length) {
-					if (fullContent[j] === '\\' && j + 1 < fullContent.length) {
-						j += 2
-						continue
-					}
-					if (fullContent[j] === '|') {
-						pipeIndices.push(j)
-					}
-					j++
-				}
-
-				// Process value and pipeValues
-				let value
-				const pipeValues = []
-
-				if (pipeIndices.length === 0) {
-					value = fullContent
-				} else {
-					value = fullContent.slice(0, pipeIndices[0])
-
-					// Process each pipe segment
-					for (let k = 0; k < pipeIndices.length; k++) {
-						const startIndex = pipeIndices[k] + 1
-						const endIndex = k < pipeIndices.length - 1 ? pipeIndices[k + 1] : fullContent.length
-						const pipeContent = fullContent.slice(startIndex, endIndex)
-						pipeValues.push(unescapeSpecialChars(pipeContent))
-					}
-				}
-
-				// Unescape value
-				value = unescapeSpecialChars(value)
-
-				// Handle the interpolation
-				result += handler({
-					braceCount: 2,
-					pipeValues,
-					value,
-				})
-
-				i = closingBraceIndex + 2
-				continue
-			}
-		}
-
-		// Check for single braces
-		if (template[i] === '{') {
-			// Find matching closing brace, accounting for nesting
-			const closingBraceIndex = findMatchingClosingBrace(template, i + 1, '{', '}')
-
-			if (closingBraceIndex !== -1) {
-				// Extract content between braces
-				const fullContent = template.slice(i + 1, closingBraceIndex)
-
-				// Find all pipe characters (but not escaped pipes)
-				const pipeIndices = []
-				let j = 0
-				while (j < fullContent.length) {
-					if (fullContent[j] === '\\' && j + 1 < fullContent.length) {
-						j += 2
-						continue
-					}
-					if (fullContent[j] === '|') {
-						pipeIndices.push(j)
-					}
-					j++
-				}
-
-				// Process value and pipeValues
-				let value
-				const pipeValues = []
-
-				if (pipeIndices.length === 0) {
-					value = fullContent
-				} else {
-					value = fullContent.slice(0, pipeIndices[0])
-
-					// Process each pipe segment
-					for (let k = 0; k < pipeIndices.length; k++) {
-						const startIndex = pipeIndices[k] + 1
-						const endIndex = k < pipeIndices.length - 1 ? pipeIndices[k + 1] : fullContent.length
-						const pipeContent = fullContent.slice(startIndex, endIndex)
-						pipeValues.push(unescapeSpecialChars(pipeContent))
-					}
-				}
-
-				// Unescape value
-				value = unescapeSpecialChars(value)
-
-				// Handle the interpolation
-				result += handler({
-					braceCount: 1,
-					pipeValues,
-					value,
-				})
-
-				i = closingBraceIndex + 1
-				continue
-			}
-		}
-
-		// If none of the above, just add the current character and move on
-		result += template[i]
-		i++
-	}
-
-	return result
-}
-
-/**
- * Helper function to unescape special characters in a string
- * @param text - The string to unescape
- * @returns The unescaped string
- */
-function unescapeSpecialChars(text: string): string {
-	let result = ''
-	let i = 0
-
-	while (i < text.length) {
-		if (text[i] === '\\' && i + 1 < text.length) {
-			const nextChar = text[i + 1]
-			if (nextChar === '{' || nextChar === '}' || nextChar === '\\' || nextChar === '|') {
-				result += nextChar
-				i += 2
-				continue
-			}
-		}
-
-		result += text[i]
-		i++
 	}
 
 	return result

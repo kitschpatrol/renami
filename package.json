@@ -61,7 +61,6 @@
 		"@sindresorhus/is": "^7.0.1",
 		"@stdlib/assert-is-absolute-path": "^0.2.2",
 		"bumpp": "^10.1.0",
-		"chevrotain": "^11.0.3",
 		"date-fns": "^4.1.0",
 		"deepmerge-ts": "^7.1.5",
 		"filenamify": "^6.0.0",

@@ -374,8 +374,8 @@ Deep nested content.
 			
 			Template with escaped pipes: \| and escaped braces: \{ \}
 			Template with format using braces: {stats.wordCount|0{,}0}
-			Template with format using pipe: {stats.readingTime|0|0}
-			AST selector for heading and then paragraph: {{heading + paragraph}}
+			Template with format using pipe: {stats.readingTime|0.0}
+			AST selector for heading and then paragraph: {{heading + paragraph|uppercase}}
 		`
 		const result = interpolateDocument(complexNestedTemplate, frontmatter, ast)
 
@@ -388,8 +388,8 @@ Deep nested content.
 						
 						Template with escaped pipes: | and escaped braces: { }
 						Template with format using braces: 42
-						Template with format using pipe: 2.55
-						AST selector for heading and then paragraph: This is a document about implementing a templating system in TypeScript.
+						Template with format using pipe: 2.6
+						AST selector for heading and then paragraph: THIS IS A DOCUMENT ABOUT IMPLEMENTING A TEMPLATING SYSTEM IN TYPESCRIPT.
 					"
 		`)
 	})

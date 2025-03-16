@@ -102,7 +102,7 @@ describe('Core Interpolation', () => {
 		const template = '{value|}'
 		const result = interpolate(template, (context) => {
 			expect(context.value).toBe('value')
-			expect(context.pipeValues).toBe([])
+			expect(context.pipeValues).toHaveLength(0)
 			return 'formatted'
 		})
 		expect(result).toBe('formatted')
