@@ -7,6 +7,7 @@ import {
 	getSafeFilename,
 	getUnicodeCodePoints,
 	html,
+	isNumerableFormatString,
 	markdown,
 	md,
 	stripIncrement,
@@ -416,5 +417,88 @@ describe('appendIncrement', () => {
 
 	test('handles zero as increment', () => {
 		expect(appendIncrement('document', 0)).toBe('document (0)')
+	})
+})
+
+describe('detect numerable format strings', () => {
+	const validPatterns = [
+		'(0,0.0)',
+		'(0,0.00 $)',
+		'+0,0.00',
+		'$0,0.00',
+		'0 %',
+		'0,0-',
+		'0,0.0',
+		'0,0.00 %',
+		'0,0.00 $',
+		'0,0.00',
+		'0,0.0000',
+		'0,0.X',
+		'0,0',
+		'0,0+',
+		'0.##%',
+		'0.0',
+		'0.0####',
+		'0.00',
+		'0.000',
+		'0.000##',
+		'0.00bb',
+		'0.00bd',
+		'0.0a',
+		'0[.]00',
+		'00:00:00',
+		'00:00',
+		'000.##',
+		'0o',
+		// Additional test cases for updated requirements
+		'(0) [0]', // Both parentheses and brackets
+		'  0  ', // Multiple spaces
+		'[0]   (0)', // Brackets, parentheses and spaces
+	]
+
+	const invalidPatterns = [
+		'abc', // No zeros
+		'(0)(0]', // Mismatched brackets
+		'0,0.00 y', // Invalid character 'y'
+		'(0]', // Unbalanced parentheses/brackets
+		'[0)', // Unbalanced parentheses/brackets
+	]
+
+	test.each(validPatterns)('should validate the pattern: %s', (pattern) => {
+		expect(isNumerableFormatString(pattern)).toBe(true)
+	})
+
+	test.each(invalidPatterns)('should invalidate the pattern: %s', (pattern) => {
+		expect(isNumerableFormatString(pattern)).toBe(false)
+	})
+
+	// Testing specific requirements
+	test('requires at least one zero', () => {
+		expect(isNumerableFormatString('(.,)')).toBe(false)
+		expect(isNumerableFormatString('(0)')).toBe(true)
+	})
+
+	test('validates balanced parentheses and brackets', () => {
+		expect(isNumerableFormatString('(0')).toBe(false)
+		expect(isNumerableFormatString('0)')).toBe(false)
+		expect(isNumerableFormatString('[0')).toBe(false)
+		expect(isNumerableFormatString('0]')).toBe(false)
+		expect(isNumerableFormatString('(0)')).toBe(true)
+		expect(isNumerableFormatString('[0]')).toBe(true)
+		expect(isNumerableFormatString('(0) [0]')).toBe(true)
+	})
+
+	test('validates ending patterns', () => {
+		expect(isNumerableFormatString('0%')).toBe(true)
+		expect(isNumerableFormatString('0bb')).toBe(true)
+		expect(isNumerableFormatString('0bd')).toBe(true)
+		expect(isNumerableFormatString('0o')).toBe(true)
+		expect(isNumerableFormatString('0a')).toBe(true)
+		expect(isNumerableFormatString('0-')).toBe(true)
+		expect(isNumerableFormatString('0+')).toBe(true)
+		expect(isNumerableFormatString('0')).toBe(true)
+		expect(isNumerableFormatString('0 ')).toBe(true)
+		expect(isNumerableFormatString('(0)')).toBe(true)
+		expect(isNumerableFormatString('[0]')).toBe(true)
 	})
 })

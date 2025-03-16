@@ -5,6 +5,7 @@ import { toString } from 'mdast-util-to-string'
 import { format as formatNumber } from 'numerable'
 import propertyExpr from 'property-expr'
 import { select } from 'unist-util-select'
+import { isNumerableFormatString } from '../string'
 import { interpolate, type InterpolationContext } from './core'
 
 /**
@@ -40,8 +41,9 @@ function formatValue(value: unknown, formatString?: string): string {
 	}
 
 	// Try to format as a number using numerable
-	if (is.number(value) || is.numericString(value)) {
+	if ((is.number(value) || is.numericString(value)) && isNumerableFormatString(formatString)) {
 		// Convert to number
+
 		const numberValue = is.string(value) ? Number.parseFloat(value) : value
 
 		if (!is.nan(numberValue)) {
@@ -53,7 +55,11 @@ function formatValue(value: unknown, formatString?: string): string {
 	// Try to format as a date
 	const dateValue = is.date(value) ? value : new Date(String(value))
 	if (is.validDate(dateValue)) {
-		return formatDate(dateValue, formatString)
+		const result = formatDate(dateValue, formatString)
+		// Invalid format strings return themselves...
+		if (result !== formatString) {
+			return result
+		}
 	}
 
 	// TODO other formatting treats?
@@ -81,6 +87,7 @@ export function interpolateDocument(
 		if (braceCount === 1) {
 			// Single braces: object accessor using object-path
 			// This is the only library that seems to handle everything correctly
+			// (except "." characters in the key...)
 			const getter = propertyExpr.getter(value, true)
 			const resolvedValue = getter(metadata) as unknown
 

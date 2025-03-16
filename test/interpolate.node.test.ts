@@ -92,10 +92,10 @@ describe('Core Interpolation', () => {
 	it('should handle nested-looking braces (not actually nested)', () => {
 		const template = '{outer{inner}}'
 		const result = interpolate(template, (context) => {
-			expect(context.value).toBe('outer{inner')
+			expect(context.value).toBe('outer{inner}')
 			return 'replaced'
 		})
-		expect(result).toBe('replaced}')
+		expect(result).toBe('replaced')
 	})
 
 	it('should handle pipe character with empty format string', () => {

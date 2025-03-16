@@ -399,3 +399,54 @@ export function html(strings: TemplateStringsArray, ...values: unknown[]): strin
 export function css(strings: TemplateStringsArray, ...values: unknown[]): string {
 	return trimLeadingIndentation(strings, ...values)
 }
+
+/**
+ * Check if a string is a valid numerable format string
+ */
+// eslint-disable-next-line complexity
+export function isNumerableFormatString(input: string): boolean {
+	// Must contain at least one '0'
+	if (!input.includes('0')) {
+		return false
+	}
+
+	// Check for allowed characters first (early return for better performance)
+	const allowedPattern = /^[0()[\],.+#X$\s:\-%abdo]*$/
+	if (!allowedPattern.test(input)) {
+		return false
+	}
+
+	// Check balanced parentheses/brackets
+	const openParenCount = (input.match(/\(/g) ?? []).length
+	const closeParenCount = (input.match(/\)/g) ?? []).length
+	const openBracketCount = (input.match(/\[/g) ?? []).length
+	const closeBracketCount = (input.match(/\]/g) ?? []).length
+
+	// Must have balanced parentheses and brackets
+	const hasValidParentheses = openParenCount === closeParenCount
+	const hasValidBrackets = openBracketCount === closeBracketCount
+
+	if (!hasValidParentheses || !hasValidBrackets) {
+		return false
+	}
+
+	// Check ending patterns
+	const trimmedInput = input.trim().toLowerCase()
+
+	const endsWithValidPattern =
+		trimmedInput.endsWith('bb') ||
+		trimmedInput.endsWith('bd') ||
+		trimmedInput.endsWith('%') ||
+		trimmedInput.endsWith('o') ||
+		trimmedInput.endsWith('$') ||
+		trimmedInput.endsWith('x') ||
+		trimmedInput.endsWith('#') ||
+		trimmedInput.endsWith('a') ||
+		trimmedInput.endsWith('-') ||
+		trimmedInput.endsWith('+') ||
+		trimmedInput.endsWith('0') ||
+		trimmedInput.endsWith(')') ||
+		trimmedInput.endsWith(']')
+
+	return endsWithValidPattern
+}
