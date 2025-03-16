@@ -6,7 +6,7 @@ import { CASE_TYPE_NAMES } from '../src/lib/utilities/string'
 import { useTempFiles } from './fixtures/file-fixture'
 import { sanitizeOutput } from './utilities/sanitize'
 
-const { fileCallback, markdownCallback, markdownTemplate } = transformHelper
+const { fileCallback, markdownCallback } = transformHelper
 
 describe('basic rename tests', () => {
 	// Setup the temp files fixture with source files
@@ -398,7 +398,7 @@ describe('markdown template tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transform: [markdownTemplate('{title}')],
+			transform: ['{title}'],
 		})
 
 		expect(result.duration).toBeLessThan(20)
@@ -431,7 +431,7 @@ describe('markdown template tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transform: [markdownTemplate('Heading - {{heading}}')],
+			transform: 'Heading - {{heading}}',
 		})
 
 		expect(result.duration).toBeLessThan(20)

@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid'
 import { orderBy } from 'natural-orderby'
 import path from 'path-browserify-esm'
 import { defaultOptions, type Options } from './config'
+import { universalTemplate } from './helpers/universal'
 import {
 	caseTransform,
 	safeTransform,
@@ -127,7 +128,7 @@ export async function renameFiles(options: {
 	/** Expects unique, normalized, absolute paths! */
 	filePaths: string[]
 	options?: Partial<Options>
-	transform?: Transform | Transform[]
+	transform?: string | string[] | Transform | Transform[]
 }): Promise<FileRenameReport> {
 	const startTime = performance.now()
 
@@ -169,23 +170,29 @@ export async function renameFiles(options: {
 		})
 	}
 
+	const transformArray = [
+		// Wrap user-provided transforms in an array if necessary
+		...ensureArray(transform).map((transformItem) => {
+			// Turn and plain string values into Universal Template functions
+			if (typeof transformItem === 'string') {
+				return universalTemplate(transformItem)
+			}
+			return transformItem
+		}),
+		// Standard transforms
+		safeTransform(defaultName),
+		stripIncrementTransform(),
+		caseTransform(caseType),
+		truncateTransform({
+			fileSystemMaxLength: FILENAME_MAX_LENGTH,
+			maxLength,
+			truncateOnWordBoundary,
+			truncationString,
+		}),
+	]
+
 	// Run the action function on each valid file and update its file path renamed value
 	for (const task of fileRenamePlan) {
-		const transformArray = [
-			// User-provided transforms
-			...ensureArray(transform),
-			// Standard transforms
-			safeTransform(defaultName),
-			stripIncrementTransform(),
-			caseTransform(caseType),
-			truncateTransform({
-				fileSystemMaxLength: FILENAME_MAX_LENGTH,
-				maxLength,
-				truncateOnWordBoundary,
-				truncationString,
-			}),
-		]
-
 		// May contain trailing increments, like (1)!
 		const pathObject = path.parse(task.filePathOriginal)
 

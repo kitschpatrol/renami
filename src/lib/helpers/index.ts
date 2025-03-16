@@ -1,16 +1,17 @@
 import { fileCallback } from './file'
-import { markdownCallback, markdownTemplate } from './markdown'
+import { markdownCallback } from './markdown'
+import { universalTemplate } from './universal'
 
 export const transformHelper = {
 	fileCallback,
 	markdownCallback,
-	markdownTemplate,
+	universalTemplate,
 }
 
 export type TransformHelper =
 	| typeof fileCallback
 	| typeof markdownCallback
-	| typeof markdownTemplate
+	| typeof universalTemplate
 
 // TODO explore typed tuples for better config autocomplete...
 // A generic type that produces a tuple of [Name, ArgumentType]

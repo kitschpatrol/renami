@@ -29,7 +29,7 @@ export function markdownCallback(
 
 /**
  * Compose a filename from frontmatter or a Unified Markdown AST using a template string with `unist-util-select` selectors
- * @param template Template string with {placeholders} for `unist-util-select` selectors (Uses the Pupa micro-template library)
+ * @param template Template string with {key} for frontmatter and {{select}} for `unist-util-select` selectors (Uses the Pupa micro-template library)
  * @returns renami transform function
  */
 export function markdownTemplate(template: string): Transform {

@@ -10,14 +10,14 @@ export default renamiConfig({
 	rules: [
 		{
 			pattern: '../assets/test-basic/**/*',
-			transform: async () => 'test',
+			transform: transformHelper.fileCallback(({ name }) => `${name}-test`),
 		},
 		{
 			options: {
 				caseType: 'kebab',
 			},
 			pattern: '../assets/test-frontmatter/**/*',
-			transform: transformHelper.markdownTemplate('Note-{title}'),
+			transform: 'Note-{title}',
 		},
 		{
 			options: {

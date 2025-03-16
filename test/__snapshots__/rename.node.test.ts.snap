@@ -353,32 +353,32 @@ exports[`rename tests > should use the config file 1`] = `
         "files": [
           {
             "filePathOriginal": "/test/assets/test-basic/basic.md",
-            "filePathRenamed": "/test/assets/test-basic/test (1).md",
+            "filePathRenamed": "/test/assets/test-basic/basic-test.md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/camelCaseFile.md",
-            "filePathRenamed": "/test/assets/test-basic/test (2).md",
+            "filePathRenamed": "/test/assets/test-basic/camelCaseFile-test.md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/kebab-case-file.md",
-            "filePathRenamed": "/test/assets/test-basic/test (3).md",
+            "filePathRenamed": "/test/assets/test-basic/kebab-case-file-test.md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/miXedC_aseF-ile.md",
-            "filePathRenamed": "/test/assets/test-basic/test (4).md",
+            "filePathRenamed": "/test/assets/test-basic/miXedC_aseF-ile-test.md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/Sentence case file.md",
-            "filePathRenamed": "/test/assets/test-basic/test (5).md",
+            "filePathRenamed": "/test/assets/test-basic/Sentence case file-test.md",
             "status": "renamed",
           },
           {
             "filePathOriginal": "/test/assets/test-basic/snake_case_file.md",
-            "filePathRenamed": "/test/assets/test-basic/test (6).md",
+            "filePathRenamed": "/test/assets/test-basic/snake_case_file-test.md",
             "status": "renamed",
           },
         ],

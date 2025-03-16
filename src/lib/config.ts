@@ -9,7 +9,7 @@ import { type CaseType } from './utilities/string'
 
 export type RenamiConfig = {
 	/** Default options for all tasks, may be overridden per-task */
-	options: Partial<Options>
+	options?: Partial<Options>
 	/** List of tasks to perform */
 	rules?: Rule[]
 }
@@ -19,8 +19,8 @@ export type Rule = {
 	options?: Partial<Options>
 	/** Glob pattern(s) of files to match relative to the config file location */
 	pattern: string | string[]
-	/** Transform(s) for the filenames */
-	transform?: Transform | Transform[]
+	/** Transform(s) for the filenames, or plain strings(s) to use the Universal Template */
+	transform?: string | string[] | Transform | Transform[]
 }
 
 export type Options = {
