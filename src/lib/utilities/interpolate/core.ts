@@ -78,8 +78,16 @@ export function interpolate(
 	while (i < template.length) {
 		// Check for escape sequences first
 		if (template[i] === '\\' && i + 1 < template.length) {
-			result += template[i + 1]
-			i += 2
+			// Only treat backslash as escape for brace characters or another backslash
+			const nextChar = template[i + 1]
+			if (nextChar === '{' || nextChar === '}' || nextChar === '\\') {
+				result += nextChar
+				i += 2
+				continue
+			}
+			// Otherwise, treat the backslash as a regular character
+			result += '\\'
+			i++
 			continue
 		}
 
