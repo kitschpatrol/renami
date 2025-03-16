@@ -41,6 +41,28 @@ export function isNumerableFormatString(input: string): boolean {
 		return false
 	}
 
+	// Check ending patterns
+	const trimmedInput = input.trim().toLowerCase()
+	if (
+		!(
+			trimmedInput.endsWith('bb') ||
+			trimmedInput.endsWith('bd') ||
+			trimmedInput.endsWith('%') ||
+			trimmedInput.endsWith('o') ||
+			trimmedInput.endsWith('$') ||
+			trimmedInput.endsWith('x') ||
+			trimmedInput.endsWith('#') ||
+			trimmedInput.endsWith('a') ||
+			trimmedInput.endsWith('-') ||
+			trimmedInput.endsWith('+') ||
+			trimmedInput.endsWith('0') ||
+			trimmedInput.endsWith(')') ||
+			trimmedInput.endsWith(']')
+		)
+	) {
+		return false
+	}
+
 	// Check for allowed characters first (early return for better performance)
 	// spell-checker: disable-next-line
 	const allowedPattern = /^[0()[\],.+#X$\s:\-%abdo]*$/
@@ -62,23 +84,5 @@ export function isNumerableFormatString(input: string): boolean {
 		return false
 	}
 
-	// Check ending patterns
-	const trimmedInput = input.trim().toLowerCase()
-
-	const endsWithValidPattern =
-		trimmedInput.endsWith('bb') ||
-		trimmedInput.endsWith('bd') ||
-		trimmedInput.endsWith('%') ||
-		trimmedInput.endsWith('o') ||
-		trimmedInput.endsWith('$') ||
-		trimmedInput.endsWith('x') ||
-		trimmedInput.endsWith('#') ||
-		trimmedInput.endsWith('a') ||
-		trimmedInput.endsWith('-') ||
-		trimmedInput.endsWith('+') ||
-		trimmedInput.endsWith('0') ||
-		trimmedInput.endsWith(')') ||
-		trimmedInput.endsWith(']')
-
-	return endsWithValidPattern
+	return true
 }
