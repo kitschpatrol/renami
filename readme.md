@@ -216,13 +216,14 @@ renami [options]
 Constants associated with all files:
 
 Braces, `{` and `}`, surround accessors to a metadata object about the file, e.g. `File - {date.created}` or `Meeting about {tags[0]}`.
+
 Double braces, `{{` and `}}`, surround selector queries to an AST associated with the file, e.g. `{{heading}}`.
 
 If no object or selection path can be resolved, then an empty string `''` is returned.
 
 Within either singe or double braces, an optional single `|` character may be followed with a string to direct formatting of numbers or dates. The interpolator will make a best-effort attempt to either the resolved value preceding the `|` with the skeleton template string provided after the `|`.
 
-It will attempt to parse the resolved value as a date and format it as a string, using the approach described in [Unicode Technical Standards #35](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns). (See [here](https://toolboxpro.app/blog/unicode-cheatsheet) for a nice reference.)
+It will attempt to parse the resolved value as a date and format it as a string, using [patterns](https://date-fns.org/v4.1.0/docs/format) based on [Unicode Technical Standard #35](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns). (See [here](https://toolboxpro.app/blog/unicode-cheatsheet) for a nice reference.)
 
 It will then attempt to parse the resolved value as a number and format it as a string, using the approach described in the [Unicode Technical Standards #35](https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns) / [ICU 67 number format concise skeleton support document](https://github.com/unicode-org/icu/blob/main/docs/userguide/format_parse/numbers/skeletons.md).
 

@@ -1,11 +1,9 @@
 import is from '@sindresorhus/is'
-import { format as formatDate } from 'date-fns'
-import { type Root } from 'mdast'
 import { toString } from 'mdast-util-to-string'
-import { format as formatNumber } from 'numerable'
 import propertyExpr from 'property-expr'
-import { select } from 'unist-util-select'
-import { isNumerableFormatString } from '../string'
+import { type Node, select } from 'unist-util-select'
+import { formatDate } from '../date'
+import { formatNumber } from '../number'
 import { interpolate, type InterpolationContext } from './core'
 
 /**
@@ -36,30 +34,22 @@ function emptyCollectionToString(value: unknown): string {
  */
 
 function formatValue(value: unknown, formatString?: string): string {
+	// Pass through if there's no format string
 	if (!formatString || formatString.trim() === '') {
 		return emptyCollectionToString(value)
 	}
 
-	// Try to format as a number using numerable
-	if ((is.number(value) || is.numericString(value)) && isNumerableFormatString(formatString)) {
-		// Convert to number
-
-		const numberValue = is.string(value) ? Number.parseFloat(value) : value
-
-		if (!is.nan(numberValue)) {
-			// TODO what if invalid?
-			return formatNumber(numberValue, formatString)
-		}
+	// Try a couple of formats
+	try {
+		return formatNumber(value, formatString)
+	} catch {
+		// Ignore errors and try the next format
 	}
 
-	// Try to format as a date
-	const dateValue = is.date(value) ? value : new Date(String(value))
-	if (is.validDate(dateValue)) {
-		const result = formatDate(dateValue, formatString)
-		// Invalid format strings return themselves...
-		if (result !== formatString) {
-			return result
-		}
+	try {
+		return formatDate(value, formatString)
+	} catch {
+		// Ignore errors and try the next format
 	}
 
 	// TODO other formatting treats?
@@ -78,7 +68,7 @@ function formatValue(value: unknown, formatString?: string): string {
 export function interpolateDocument(
 	template: string,
 	metadata: Record<string, unknown>,
-	tree: Root,
+	tree: Node,
 ): string {
 	return interpolate(template, (context: InterpolationContext) => {
 		const { braceCount, pipeValue, value } = context
@@ -93,6 +83,7 @@ export function interpolateDocument(
 
 			return formatValue(resolvedValue, pipeValue)
 		}
+
 		if (braceCount === 2) {
 			// Double braces: AST selector using mdast-util-to-string
 			try {
@@ -104,16 +95,12 @@ export function interpolateDocument(
 				return ''
 			}
 		}
+
 		if (braceCount === 3) {
 			// Triple braces: Not implemented in this version
-			// Return empty string as specified
 			return ''
 		}
 
 		return ''
 	})
 }
-
-// Re-export the core interpolate function
-export { interpolate } from './core'
-export type { InterpolationContext } from './core'

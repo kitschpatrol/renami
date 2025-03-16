@@ -1,4 +1,6 @@
 import { describe, expect, test } from 'vitest'
+import { isDateFnsFormatString } from '../src/lib/utilities/date'
+import { isNumerableFormatString } from '../src/lib/utilities/number'
 import {
 	appendIncrement,
 	convertCase,
@@ -7,7 +9,6 @@ import {
 	getSafeFilename,
 	getUnicodeCodePoints,
 	html,
-	isNumerableFormatString,
 	markdown,
 	md,
 	stripIncrement,
@@ -420,55 +421,225 @@ describe('appendIncrement', () => {
 	})
 })
 
+const validNumerablePatterns = [
+	'(0,0.0)',
+	'(0,0.00 $)',
+	'+0,0.00',
+	'$0,0.00',
+	'0 %',
+	'0,0-',
+	'0,0.0',
+	'0,0.00 %',
+	'0,0.00 $',
+	'0,0.00',
+	'0,0.0000',
+	'0,0.X',
+	'0,0',
+	'0,0+',
+	'0.##%',
+	'0.0',
+	'0.0####',
+	'0.00',
+	'0.000',
+	'0.000##',
+	'0.00bb',
+	'0.00bd',
+	'0.0a',
+	'0[.]00',
+	'00:00:00',
+	'00:00',
+	'000.##',
+	'0o',
+	// Additional test cases for updated requirements
+	'(0) [0]', // Both parentheses and brackets
+	'  0  ', // Multiple spaces
+	'[0]   (0)', // Brackets, parentheses and spaces
+]
+
+const invalidNumerablePatterns = [
+	'abc', // No zeros
+	'(0)(0]', // Mismatched brackets
+	'0,0.00 y', // Invalid character 'y'
+	'(0]', // Unbalanced parentheses/brackets
+	'[0)', // Unbalanced parentheses/brackets
+]
+
+const validDateFnsPatterns = [
+	'a..aa',
+	'aaa',
+	'aaaa',
+	'aaaaa',
+	'b..bb',
+	'B..BBB',
+	'bbb',
+	'bbbb',
+	'BBBB',
+	'bbbbb',
+	'BBBBB',
+	'c',
+	'cc',
+	'ccc',
+	'cccc',
+	'ccccc',
+	'cccccc',
+	'co',
+	'd',
+	'D',
+	'dd',
+	'DD',
+	'DDD',
+	'DDDD',
+	'do',
+	'Do',
+	'E..EEE',
+	'e',
+	'ee',
+	'eee',
+	'eeee',
+	'EEEE',
+	'eeeee',
+	'EEEEE',
+	'eeeeee',
+	'EEEEEE',
+	'eo',
+	'G..GGG',
+	'GGGG',
+	'GGGGG',
+	'h',
+	'H',
+	'hh',
+	'HH',
+	'ho',
+	'Ho',
+	'i',
+	'I',
+	'ii',
+	'II',
+	'iii',
+	'iiii',
+	'iiiii',
+	'iiiiii',
+	'io',
+	'Io',
+	'k',
+	'K',
+	'kk',
+	'KK',
+	'ko',
+	'Ko',
+	'L',
+	'LL',
+	'LLL',
+	'LLLL',
+	'LLLLL',
+	'Lo',
+	'm',
+	'M',
+	'mm',
+	'MM',
+	'MMM',
+	'MMMM',
+	'MMMMM',
+	'mo',
+	'Mo',
+	'O...OOO',
+	'OOOO',
+	'p',
+	'P',
+	'pp',
+	'Pp',
+	'PP',
+	'ppp',
+	'PPP',
+	'pppp',
+	'PPpp',
+	'PPPP',
+	'PPPppp',
+	'PPPPpppp',
+	'q',
+	'Q',
+	'qo',
+	'Qo',
+	'qq',
+	'QQ',
+	'qqq',
+	'QQQ',
+	'qqqq',
+	'QQQQ',
+	'qqqqq',
+	'QQQQQ',
+	'R',
+	'RR',
+	'RRR',
+	'RRRR',
+	'RRRRR',
+	's',
+	'S',
+	'so',
+	'ss',
+	'SS',
+	'SSS',
+	'SSSS',
+	't',
+	'T',
+	'tt',
+	'TT',
+	'u',
+	'uu',
+	'uuu',
+	'uuuu',
+	'uuuuu',
+	'w',
+	'wo',
+	'ww',
+	'x',
+	'X',
+	'xx',
+	'XX',
+	'xxx',
+	'XXX',
+	'xxxx',
+	'XXXX',
+	'xxxxx',
+	'XXXXX',
+	'y',
+	'Y',
+	'yo',
+	'Yo',
+	'yy',
+	'YY',
+	'yyy',
+	'YYY',
+	'YYYY MM DD HH:mm:ss',
+	'YYYY MM DD',
+	'YYYY MM DDTHH:mm:ssZ',
+	'YYYY-MM-DD HH:mm:ss',
+	'YYYY-MM-DD',
+	'YYYY-MM-DDTHH:mm:ssZ',
+	'YYYY.MM.DD HH:mm:ss',
+	'YYYY.MM.DD',
+	'YYYY.MM.DDTHH:mm:ssZ',
+	'yyyy',
+	'YYYY',
+	'YYYY/MM/DD HH:mm:ss',
+	'YYYY/MM/DD',
+	'YYYY/MM/DDTHH:mm:ssZ',
+	'yyyyy',
+	'YYYYY',
+	'z...zzz',
+	'zzzz',
+]
+
 describe('detect numerable format strings', () => {
-	const validPatterns = [
-		'(0,0.0)',
-		'(0,0.00 $)',
-		'+0,0.00',
-		'$0,0.00',
-		'0 %',
-		'0,0-',
-		'0,0.0',
-		'0,0.00 %',
-		'0,0.00 $',
-		'0,0.00',
-		'0,0.0000',
-		'0,0.X',
-		'0,0',
-		'0,0+',
-		'0.##%',
-		'0.0',
-		'0.0####',
-		'0.00',
-		'0.000',
-		'0.000##',
-		'0.00bb',
-		'0.00bd',
-		'0.0a',
-		'0[.]00',
-		'00:00:00',
-		'00:00',
-		'000.##',
-		'0o',
-		// Additional test cases for updated requirements
-		'(0) [0]', // Both parentheses and brackets
-		'  0  ', // Multiple spaces
-		'[0]   (0)', // Brackets, parentheses and spaces
-	]
-
-	const invalidPatterns = [
-		'abc', // No zeros
-		'(0)(0]', // Mismatched brackets
-		'0,0.00 y', // Invalid character 'y'
-		'(0]', // Unbalanced parentheses/brackets
-		'[0)', // Unbalanced parentheses/brackets
-	]
-
-	test.each(validPatterns)('should validate the pattern: %s', (pattern) => {
+	test.each(validNumerablePatterns)('should validate the pattern: %s', (pattern) => {
 		expect(isNumerableFormatString(pattern)).toBe(true)
 	})
 
-	test.each(invalidPatterns)('should invalidate the pattern: %s', (pattern) => {
+	test.each(invalidNumerablePatterns)('should invalidate the pattern: %s', (pattern) => {
+		expect(isNumerableFormatString(pattern)).toBe(false)
+	})
+
+	test.each(validDateFnsPatterns)('should invalidate the date-fns pattern: %s', (pattern) => {
 		expect(isNumerableFormatString(pattern)).toBe(false)
 	})
 
@@ -500,5 +671,15 @@ describe('detect numerable format strings', () => {
 		expect(isNumerableFormatString('0 ')).toBe(true)
 		expect(isNumerableFormatString('(0)')).toBe(true)
 		expect(isNumerableFormatString('[0]')).toBe(true)
+	})
+})
+
+describe('detect date-fns format strings', () => {
+	test.each(validDateFnsPatterns)('should validate the pattern: %s', (pattern) => {
+		expect(isDateFnsFormatString(pattern)).toBe(true)
+	})
+
+	test.each(validNumerablePatterns)('should invalidate the numerable pattern: %s', (pattern) => {
+		expect(isDateFnsFormatString(pattern)).toBe(false)
 	})
 })
