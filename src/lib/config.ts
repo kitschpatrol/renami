@@ -24,7 +24,7 @@ export type Rule = {
 }
 
 export type Options = {
-	/** Enforce a specific letter casing on the final file names. */
+	/** Enforce a specific letter casing on the final filenames. */
 	caseType: CaseType
 	/** In rare cases a path that's all unsave characters will become zero-length... this default is used in such cases. */
 	defaultName: string

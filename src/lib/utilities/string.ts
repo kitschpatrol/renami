@@ -336,7 +336,7 @@ export function getSafeFilename(text: string, defaultEmptyFilename = 'Untitled')
 
 /**
  * Strip the trailing increment from a filename
- * @param filename File name only, without an extension
+ * @param filename Filename only, without an extension
  * @returns filename without the increment
  */
 export function stripIncrement(filename: string): string {
@@ -345,7 +345,7 @@ export function stripIncrement(filename: string): string {
 
 /**
  * Strip the trailing increment from a filename
- * @param filename File name only, without an extension
+ * @param filename Filename only, without an extension
  * @returns filename with the increment
  */
 export function appendIncrement(filename: string, index: number): string {
@@ -354,7 +354,7 @@ export function appendIncrement(filename: string, index: number): string {
 
 /**
  * Get the increment from a filename as a number
- * @param filename File name only, without an extension
+ * @param filename Filename only, without an extension
  * @returns The increment as a number, or undefined if there is no increment
  */
 export function getIncrement(filename: string): number | undefined {

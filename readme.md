@@ -132,7 +132,7 @@ export default renamiConfig({
       // or `undefined` if no valid transform is possible.
       // Multiple functions can be passed to `transform`, and are evaluated left to right, with the output
       // of one transform passed to the next, unless it returns `undefined`, in which case it's skipped.
-      // Additional changes might be made to the file name afterwards depending on 'options'.
+      // Additional changes might be made to the filename afterwards depending on 'options'.
       // This one sets the filename to ctime
       transform: fileCallback(({ fileInfo }) => String(fileInfo.ctimeMs)),
     },
@@ -270,9 +270,9 @@ Inline formatting syntax...
 
 Number formatting...
 
-- https://zuji-ts.vercel.app/
-- https://numbrojs.com/
-- https://github.com/gastonmesseri/numerable
+- <https://zuji-ts.vercel.app/>
+- <https://numbrojs.com/>
+- <https://github.com/gastonmesseri/numerable>
 
 Renaming...
 
@@ -286,6 +286,11 @@ Markdown body selection...
 Dependencies...
 
 - [`globby`](https://github.com/sindresorhus/globby) is currently restricted to `<14` due to [this issue](https://github.com/sindresorhus/globby/issues/260).
+
+Style...
+
+- Should we use "file name" or "filename"? Usually prefer "filename".
+- <https://english.stackexchange.com/questions/5366/which-is-correct-filename-file-name-or-filename>
 
 ### Similar projects
 

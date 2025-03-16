@@ -11,7 +11,7 @@ import {
 } from './utilities/string'
 
 /**
- * Can return either JUST the file name, with no path or extension, OR a PathObject...
+ * Can return either JUST the filename, with no path or extension, OR a PathObject...
  * If it returns undefined, the next action will be used
  */
 export type Transform = (context: {

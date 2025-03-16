@@ -158,7 +158,7 @@ export async function renameFiles(options: {
 	// Build the rename plan
 	let fileRenamePlan: FileRenameTask[] = []
 
-	// Sort the paths based on original file names
+	// Sort the paths based on original filenames
 	const sortedFilePaths = orderBy(filePaths)
 
 	for (const filePath of sortedFilePaths) {
@@ -166,7 +166,7 @@ export async function renameFiles(options: {
 			filePathIntermediate: undefined,
 			filePathOriginal: filePath,
 			filePathRenamed: undefined,
-			status: 'scheduled', // Will be tested for later once we know the final file name
+			status: 'scheduled', // Will be tested for later once we know the final filename
 		})
 	}
 
@@ -217,7 +217,7 @@ export async function renameFiles(options: {
 		task.filePathRenamed = path.format(pathObject)
 	}
 
-	// Sort the paths again based on the new file names
+	// Sort the paths again based on the new filenames
 	fileRenamePlan = orderBy(fileRenamePlan, [(v) => v.filePathRenamed])
 
 	// Find duplicates that need to be incremented
@@ -321,7 +321,7 @@ export async function renameFiles(options: {
 		}
 	}
 
-	// Check for conflicts between original and final paths, setting intermediate file name if needed
+	// Check for conflicts between original and final paths, setting intermediate filename if needed
 	for (const task of fileRenamePlan) {
 		for (const otherTask of fileRenamePlan) {
 			if (task === otherTask) {
