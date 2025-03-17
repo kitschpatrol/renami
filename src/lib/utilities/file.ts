@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ENVIRONMENT } from './platform'
 
 export type FileAdapter = {
@@ -13,6 +14,32 @@ export type FileAdapter = {
 	}>
 	writeFile(filePath: string, data: string): Promise<void> // Not used, yet
 }
+
+/**
+ * Zod schema for FileAdapter, satisfies instead of infers for cleaner type intellisense.
+ */
+export const FileAdapterSchema = z.object({
+	readFile: z.function().args(z.string()).returns(z.promise(z.string())),
+	readFileBuffer: z
+		.function()
+		.args(z.string())
+		.returns(z.promise(z.instanceof(Uint8Array))),
+	rename: z.function().args(z.string(), z.string()).returns(z.promise(z.void())),
+	stat: z
+		.function()
+		.args(z.string())
+		.returns(
+			z.promise(
+				z.object({
+					// Require only the fields we can also get in Obsidian
+					ctimeMs: z.number(), // Time of creation, represented as a unix timestamp, in milliseconds.
+					mtimeMs: z.number(), // Time of last modification, represented as a unix timestamp, in milliseconds.
+					size: z.number(), // Size on disk, as bytes.
+				}),
+			),
+		),
+	writeFile: z.function().args(z.string(), z.string()).returns(z.promise(z.void())), // Not used, yet
+}) satisfies z.ZodType<FileAdapter>
 
 /**
  * Wrapper around the file system stat function to check if a file exists.

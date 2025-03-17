@@ -1,7 +1,8 @@
 /* eslint-disable ts/require-await */
 
-import { type FileAdapter } from './utilities/file'
-import { type PathObject } from './utilities/path'
+import { z } from 'zod'
+import { type FileAdapter, FileAdapterSchema } from './utilities/file'
+import { type PathObject, PathObjectSchema } from './utilities/path'
 import {
 	type CaseType,
 	convertCase,
@@ -18,6 +19,21 @@ export type Transform = (context: {
 	fileAdapter: FileAdapter
 	filePath: PathObject
 }) => Promise<PathObject | string | undefined>
+
+/**
+ * Zod schema for Transform function, satisfies instead of infers for cleaner type intellisense.
+ */
+export const TransformSchema = z
+	.function()
+	.args(
+		z.object({
+			fileAdapter: FileAdapterSchema,
+			filePath: PathObjectSchema,
+		}),
+	)
+	.returns(
+		z.promise(z.union([PathObjectSchema, z.string(), z.undefined()])),
+	) satisfies z.ZodType<Transform>
 
 /**
  * Ensures that the filename is filesystem-safe and Unicode normalized

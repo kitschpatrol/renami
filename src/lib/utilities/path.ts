@@ -1,9 +1,21 @@
 import isAbsolutePath from '@stdlib/assert-is-absolute-path'
 import path from 'path-browserify-esm'
 import slash from 'slash'
+import { z } from 'zod'
 import log from './log'
 
-export type PathObject = path.PathObject
+/**
+ * Zod schema for PathObject, which is a copy of the Node.js PathObject.
+ */
+export const PathObjectSchema = z.object({
+	base: z.string(),
+	dir: z.string(),
+	ext: z.string(),
+	name: z.string(),
+	root: z.string(),
+})
+
+export type PathObject = z.infer<typeof PathObjectSchema>
 
 /**
  * The browserify polyfill doesn't implement win32 absolute path detection...
