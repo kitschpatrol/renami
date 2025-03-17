@@ -476,8 +476,8 @@ describe('generic file helper tests', () => {
 				dryRun: true,
 			},
 			transform: [
-				fileCallback((path, fileBuffer, FileInfo) => {
-					callbackAccumulator.push({ fileBuffer, FileInfo, path })
+				fileCallback(({ fileBuffer, fileInfo, filePath }) => {
+					callbackAccumulator.push({ fileBuffer, fileInfo, filePath })
 					// eslint-disable-next-line unicorn/no-useless-undefined
 					return undefined
 				}),
