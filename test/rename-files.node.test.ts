@@ -398,7 +398,7 @@ describe('markdown template tests', () => {
 			options: {
 				dryRun: true,
 			},
-			transform: ['{title}'],
+			transform: ['{title} - {Studio Team}'],
 		})
 
 		expect(result.duration).toBeLessThan(20)
@@ -410,12 +410,12 @@ describe('markdown template tests', () => {
 			  "files": [
 			    {
 			      "filePathOriginal": "/frontmatter-1.md",
-			      "filePathRenamed": "/Hello World.md",
+			      "filePathRenamed": "/Hello World - Eric Mika - Someone Else.md",
 			      "status": "renamed",
 			    },
 			    {
 			      "filePathOriginal": "/frontmatter-2.md",
-			      "filePathRenamed": "/Some Title.md",
+			      "filePathRenamed": "/Some Title -.md",
 			      "status": "renamed",
 			    },
 			  ],

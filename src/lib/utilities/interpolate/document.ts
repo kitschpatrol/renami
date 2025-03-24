@@ -2,6 +2,8 @@ import { toString } from 'mdast-util-to-string'
 import propertyExpr from 'property-expr'
 import { type Node, select } from 'unist-util-select'
 import { formatValue } from '../format'
+import { type JsonValue, stringifyCompact } from '../json'
+import { extractLinkLabel } from '../markdown'
 import { interpolate, type InterpolationContext } from './core'
 
 /**
@@ -24,7 +26,19 @@ export function interpolateDocument(
 			// Single braces: object accessor using object-path
 			const getter = propertyExpr.getter(value, true)
 			const resolvedValue = getter(metadata) as unknown
-			return formatValue(resolvedValue, pipeValues)
+
+			// Does its best to get something form the resolved value
+			const cleanResolvedValue = stringifyCompact(resolvedValue, {
+				delimiter: ' - ',
+				replacer(_, value) {
+					if (typeof value === 'string') {
+						return extractLinkLabel(value)
+					}
+					return value
+				},
+			})
+
+			return formatValue(cleanResolvedValue, pipeValues)
 		}
 
 		if (braceCount === 2) {
