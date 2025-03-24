@@ -55,15 +55,6 @@ export function formatValue(value: unknown, format?: string | string[]): string 
 		return convertCase(value, format as CaseType)
 	}
 
-	// Truncate strings if format is a number string
-	// e.g. 'I love {name|10}'
-	if (is.nonEmptyString(value) && format.length < 4) {
-		const maxLength = Number.parseInt(format, 10)
-		if (is.safeInteger(maxLength) && maxLength >= 1 && maxLength < 1000) {
-			return truncate(String(value), maxLength, FILENAME_MAX_LENGTH, true, '')
-		}
-	}
-
 	// Format number
 	// e.g. 'I have {count|0,0.00}'
 	try {
@@ -79,6 +70,16 @@ export function formatValue(value: unknown, format?: string | string[]): string 
 		return formatDate(value, format)
 	} catch {
 		// Ignore errors and try the next format
+	}
+
+	// Truncate strings if format is a number string
+	// Collides with the single-character number format string `0`
+	// e.g. 'I love {name|10}'
+	if (is.nonEmptyString(value) && format.length < 4) {
+		const maxLength = Number.parseInt(format, 10)
+		if (is.safeInteger(maxLength) && maxLength >= 1 && maxLength < 1000) {
+			return truncate(String(value), maxLength, FILENAME_MAX_LENGTH, true, false, '')
+		}
 	}
 
 	// TODO other formatting treats?

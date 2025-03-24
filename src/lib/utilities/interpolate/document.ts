@@ -1,8 +1,10 @@
+import { isArray, isObject, isString } from '@sindresorhus/is'
 import { toString } from 'mdast-util-to-string'
 import propertyExpr from 'property-expr'
 import { type Node, select } from 'unist-util-select'
+import { defaultOptions, type Options } from '../../config'
 import { formatValue } from '../format'
-import { type JsonValue, stringifyCompact } from '../json'
+import { stringifyCompact } from '../json'
 import { extractLinkLabel } from '../markdown'
 import { interpolate, type InterpolationContext } from './core'
 
@@ -17,6 +19,7 @@ export function interpolateDocument(
 	template: string,
 	metadata: Record<string, unknown>,
 	tree: Node,
+	options: Options = defaultOptions,
 ): string {
 	return interpolate(template, (context: InterpolationContext) => {
 		const { braceCount, pipeValues, value } = context
@@ -28,15 +31,18 @@ export function interpolateDocument(
 			const resolvedValue = getter(metadata) as unknown
 
 			// Does its best to get something form the resolved value
-			const cleanResolvedValue = stringifyCompact(resolvedValue, {
-				delimiter: ' - ',
-				replacer(_, value) {
-					if (typeof value === 'string') {
-						return extractLinkLabel(value)
-					}
-					return value
-				},
-			})
+			const cleanResolvedValue =
+				isString(resolvedValue) || isArray(resolvedValue) || isObject(resolvedValue)
+					? stringifyCompact(resolvedValue, {
+							delimiter: options.delimiter,
+							replacer(_, value) {
+								if (typeof value === 'string') {
+									return extractLinkLabel(value)
+								}
+								return value
+							},
+						})
+					: resolvedValue
 
 			return formatValue(cleanResolvedValue, pipeValues)
 		}

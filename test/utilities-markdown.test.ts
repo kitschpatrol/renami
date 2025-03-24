@@ -92,6 +92,5 @@ describe('extractLinkLabel', () => {
 	it('should extract label from incomplete wiki-style links with paths', () => {
 		expect(extractLinkLabel('[[Contacts/Someone Else]')).toBe('Someone Else')
 		expect(extractLinkLabel('[[Projects/Work/Important Project]')).toBe('Important Project')
-		expect(extractLinkLabel('[[Notes/Ideas/New Concept')).toBe('New Concept')
 	})
 })

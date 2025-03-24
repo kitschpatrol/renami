@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { defaultOptions } from '../src/lib'
 import { interpolateDocument } from '../src/lib/utilities/interpolate/document'
 import { getMarkdown } from '../src/lib/utilities/markdown'
 
@@ -68,53 +69,71 @@ Deep nested content.
 
 	// Test cases
 	it('should interpolate basic object properties', () => {
-		const result = interpolateDocument('Document: {title}', frontmatter, ast)
+		const result = interpolateDocument('Document: {title}', frontmatter, ast, defaultOptions)
 		expect(result).toBe('Document: My Document')
 	})
 
 	it('should interpolate nested object properties', () => {
-		const result = interpolateDocument('Created on: {date.created}', frontmatter, ast)
+		const result = interpolateDocument(
+			'Created on: {date.created}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(result).toBe('Created on: 2025-03-15T00:00:00.000')
 	})
 
 	it('should handle array access', () => {
-		const result = interpolateDocument('Primary tag: {tags[0]}', frontmatter, ast)
+		const result = interpolateDocument('Primary tag: {tags[0]}', frontmatter, ast, defaultOptions)
 		expect(result).toBe('Primary tag: typescript')
 	})
 
 	it('should select from AST', () => {
-		const result = interpolateDocument('Heading: {{heading}}', frontmatter, ast)
+		const result = interpolateDocument('Heading: {{heading}}', frontmatter, ast, defaultOptions)
 		expect(result).toBe('Heading: Implementing a Template System')
 	})
 
 	it('should format dates', () => {
-		const result = interpolateDocument('Date: {date.created|yyyy-MM-dd}', frontmatter, ast)
+		const result = interpolateDocument(
+			'Date: {date.created|yyyy-MM-dd}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(result).toBe('Date: 2025-03-15')
 
 		const longFormatResult = interpolateDocument(
 			'Date: {date.created|MMMM d, yyyy}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(longFormatResult).toBe('Date: March 15, 2025')
 	})
 
 	it('should format numbers', () => {
 		// Using numerable patterns directly
-		const result = interpolateDocument('Word count: {stats.wordCount|0,0}', frontmatter, ast)
+		const result = interpolateDocument(
+			'Word count: {stats.wordCount|0,0}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(result).toBe('Word count: 42')
 
 		const decimalResult = interpolateDocument(
-			'Reading time: {stats.readingTime|0.00}',
+			'Reading time: {stats.readingTime|0.000}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
-		expect(decimalResult).toBe('Reading time: 2.55')
+		expect(decimalResult).toBe('Reading time: 2.550')
 
 		const integerResult = interpolateDocument(
 			'Reading time: {stats.readingTime|0}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(integerResult).toBe('Reading time: 3')
 
@@ -122,34 +141,55 @@ Deep nested content.
 			'Reading time: {stats.readingTime|0.0}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(precisionResult).toBe('Reading time: 2.6')
 	})
 
 	it('should format numbers with percentage', () => {
-		const percentResult = interpolateDocument('{value|0.0%}', { value: 0.255 }, ast)
+		const percentResult = interpolateDocument('{value|0.0%}', { value: 0.255 }, ast, defaultOptions)
 		expect(percentResult).toBe('25.5%')
 
-		const integerPercentResult = interpolateDocument('{value|0%}', { value: 0.42 }, ast)
+		const integerPercentResult = interpolateDocument(
+			'{value|0%}',
+			{ value: 0.42 },
+			ast,
+			defaultOptions,
+		)
 		expect(integerPercentResult).toBe('42%')
 	})
 
 	it('should format numbers with abbreviations', () => {
-		const largeNumber = interpolateDocument('{value|0.0a}', { value: 1_500_000 }, ast)
+		const largeNumber = interpolateDocument(
+			'{value|0.0a}',
+			{ value: 1_500_000 },
+			ast,
+			defaultOptions,
+		)
 		expect(largeNumber).toBe('1.5M')
 
-		const smallNumber = interpolateDocument('{value|0.00a}', { value: 1234 }, ast)
+		const smallNumber = interpolateDocument('{value|0.00a}', { value: 1234 }, ast, defaultOptions)
 		expect(smallNumber).toBe('1.23K')
 	})
 
 	// Not supported by Numerable....
 	it.skip('should format numbers with scientific notation', () => {
-		const scientificResult = interpolateDocument('{stats.readingTime|0.00e+0}', frontmatter, ast)
+		const scientificResult = interpolateDocument(
+			'{stats.readingTime|0.00e+0}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(scientificResult).toMatch(/2.55e\+0/)
 	})
 
 	it('should handle escaped characters', () => {
-		const result = interpolateDocument(String.raw`Escaped braces: \{title\}`, frontmatter, ast)
+		const result = interpolateDocument(
+			String.raw`Escaped braces: \{title\}`,
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(result).toBe('Escaped braces: {title}')
 	})
 
@@ -158,12 +198,18 @@ Deep nested content.
 			'My Note about {{heading}} - {date.created|yyyy-MM-dd}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(result).toBe('My Note about Implementing a Template System - 2025-03-15')
 	})
 
 	it('should return empty string for non-existent paths', () => {
-		const result = interpolateDocument('Missing: {nonexistent.path}', frontmatter, ast)
+		const result = interpolateDocument(
+			'Missing: {nonexistent.path}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(result).toBe('Missing: ')
 	})
 
@@ -172,6 +218,7 @@ Deep nested content.
 			'{title} (tags: {tags[0]}, {tags[1]}) - {{heading}}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(result).toBe(
 			'My Document (tags: typescript, templates) - Implementing a Template System',
@@ -179,59 +226,89 @@ Deep nested content.
 	})
 
 	it('should handle empty format strings', () => {
-		const result = interpolateDocument('{title|}', frontmatter, ast)
+		const result = interpolateDocument('{title|}', frontmatter, ast, defaultOptions)
 		expect(result).toBe('My Document')
 	})
 
 	it('should leave unknown format strings as-is', () => {
 		const value = 'test'
-		const result = interpolateDocument('{title|invalid-format}', { title: value }, ast)
+		const result = interpolateDocument(
+			'{title|invalid-format}',
+			{ title: value },
+			ast,
+			defaultOptions,
+		)
 		expect(result).toBe(value)
 	})
 
 	it('should return empty string for triple braces', () => {
-		const result = interpolateDocument('Triple braces: {{{anything}}}', frontmatter, ast)
+		const result = interpolateDocument(
+			'Triple braces: {{{anything}}}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(result).toBe('Triple braces: ')
 	})
 
 	// Additional edge case tests for document interpolation
 	it('should handle empty strings, null, and undefined values', () => {
-		const emptyStringResult = interpolateDocument('{emptyString}', frontmatter, ast)
+		const emptyStringResult = interpolateDocument('{emptyString}', frontmatter, ast, defaultOptions)
 		expect(emptyStringResult).toBe('')
 
-		const nullResult = interpolateDocument('{nullValue}', frontmatter, ast)
+		const nullResult = interpolateDocument('{nullValue}', frontmatter, ast, defaultOptions)
 		expect(nullResult).toBe('')
 
-		const undefinedResult = interpolateDocument('{undefinedValue}', frontmatter, ast)
+		const undefinedResult = interpolateDocument(
+			'{undefinedValue}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(undefinedResult).toBe('')
 	})
 
 	it('should handle zero value', () => {
-		const result = interpolateDocument('{zero}', frontmatter, ast)
+		const result = interpolateDocument('{zero}', frontmatter, ast, defaultOptions)
 		expect(result).toBe('0')
 	})
 
 	it('should handle boolean values', () => {
-		const trueResult = interpolateDocument('{booleans.true}', frontmatter, ast)
+		const trueResult = interpolateDocument('{booleans.true}', frontmatter, ast, defaultOptions)
 		expect(trueResult).toBe('true')
 
-		const falseResult = interpolateDocument('{booleans.false}', frontmatter, ast)
+		const falseResult = interpolateDocument('{booleans.false}', frontmatter, ast, defaultOptions)
 		expect(falseResult).toBe('false')
 	})
 
 	it('should handle empty arrays and objects', () => {
-		const emptyArrayResult = interpolateDocument('{arrays.empty}', frontmatter, ast)
+		const emptyArrayResult = interpolateDocument('{arrays.empty}', frontmatter, ast, defaultOptions)
 		expect(emptyArrayResult).toBe('')
 
-		const emptyObjectResult = interpolateDocument('{objects.empty}', frontmatter, ast)
+		const emptyObjectResult = interpolateDocument(
+			'{objects.empty}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(emptyObjectResult).toBe('')
 	})
 
 	it('should handle nested arrays and complex access patterns', () => {
-		const nestedArrayResult = interpolateDocument('{arrays.nested[0][1]}', frontmatter, ast)
+		const nestedArrayResult = interpolateDocument(
+			'{arrays.nested[0][1]}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(nestedArrayResult).toBe('2')
 
-		const nestedArrayResult2 = interpolateDocument('{arrays.nested[1][0]}', frontmatter, ast)
+		const nestedArrayResult2 = interpolateDocument(
+			'{arrays.nested[1][0]}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(nestedArrayResult2).toBe('3')
 	})
 
@@ -240,6 +317,7 @@ Deep nested content.
 			'{objects.complex["with{braces}"]}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(braceInNameResult).toBe('4')
 
@@ -247,87 +325,154 @@ Deep nested content.
 			String.raw`{objects.complex["with\|pipe"]}`,
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(pipeInNameResult).toBe('5')
 	})
 
 	// These are a bit too special to be handled by the current implementation
 	it.skip('should handle property names with very special characters', () => {
-		const dotInNameResult = interpolateDocument('{objects.complex["b.c"]}', frontmatter, ast)
+		const dotInNameResult = interpolateDocument(
+			'{objects.complex["b.c"]}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(dotInNameResult).toBe('2')
 
-		const bracketInNameResult = interpolateDocument('{objects.complex["d[0]"]}', frontmatter, ast)
+		const bracketInNameResult = interpolateDocument(
+			'{objects.complex["d[0]"]}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(bracketInNameResult).toBe('3')
 	})
 
 	it('should handle string values with spaces and special characters', () => {
-		const spacesResult = interpolateDocument('{specialChars.withSpaces}', frontmatter, ast)
+		const spacesResult = interpolateDocument(
+			'{specialChars.withSpaces}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(spacesResult).toBe('value with spaces')
 
 		const punctuationResult = interpolateDocument(
 			'{specialChars.withPunctuation}',
 			frontmatter,
 			ast,
+			defaultOptions,
 		)
 		expect(punctuationResult).toBe('hello, world!')
 
-		const quotesResult = interpolateDocument('{specialChars.withQuotes}', frontmatter, ast)
+		const quotesResult = interpolateDocument(
+			'{specialChars.withQuotes}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(quotesResult).toBe('single "and" double')
 
-		const bracesResult = interpolateDocument('{specialChars.withBraces}', frontmatter, ast)
+		const bracesResult = interpolateDocument(
+			'{specialChars.withBraces}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(bracesResult).toBe('text with {braces}')
 
-		const pipeResult = interpolateDocument('{specialChars.withPipe}', frontmatter, ast)
+		const pipeResult = interpolateDocument(
+			'{specialChars.withPipe}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(pipeResult).toBe('text with | pipe')
 	})
 
 	it('should select specific heading levels from AST', () => {
 		// Use proper unist-util-select syntax
-		const h1Result = interpolateDocument('{{heading[depth="1"]}}', frontmatter, ast)
+		const h1Result = interpolateDocument('{{heading[depth="1"]}}', frontmatter, ast, defaultOptions)
 		expect(h1Result).toBe('Implementing a Template System')
 
-		const h2Result = interpolateDocument('{{heading[depth="2"]}}', frontmatter, ast)
+		const h2Result = interpolateDocument('{{heading[depth="2"]}}', frontmatter, ast, defaultOptions)
 		expect(h2Result).toBe('Features')
 
-		const h3Result = interpolateDocument('{{heading[depth="3"]}}', frontmatter, ast)
+		const h3Result = interpolateDocument('{{heading[depth="3"]}}', frontmatter, ast, defaultOptions)
 		expect(h3Result).toBe('Subsection')
 
-		const h4Result = interpolateDocument('{{heading[depth="4"]}}', frontmatter, ast)
+		const h4Result = interpolateDocument('{{heading[depth="4"]}}', frontmatter, ast, defaultOptions)
 		expect(h4Result).toBe('Nested Subsection')
 	})
 
 	it('should handle complex AST selectors', () => {
 		// First paragraph selector
-		const firstParaResult = interpolateDocument('{{paragraph:first-of-type}}', frontmatter, ast)
+		const firstParaResult = interpolateDocument(
+			'{{paragraph:first-of-type}}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(firstParaResult).toContain('about implementing a')
 
 		// Using + combinator for adjacent sibling
-		const adjacentResult = interpolateDocument('{{heading + paragraph}}', frontmatter, ast)
+		const adjacentResult = interpolateDocument(
+			'{{heading + paragraph}}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(adjacentResult).toContain('about implementing a')
 	})
 
 	it('should handle AST selection with non-existent selectors', () => {
-		const nonExistentResult = interpolateDocument('{{non-existent}}', frontmatter, ast)
+		const nonExistentResult = interpolateDocument(
+			'{{non-existent}}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(nonExistentResult).toBe('')
 	})
 
 	it('should handle mixed format types', () => {
 		// When applying a number format to a date, numerable should handle it appropriately
-		const dateWithNumberFormat = interpolateDocument('{date.created|0.0}', frontmatter, ast)
+		const dateWithNumberFormat = interpolateDocument(
+			'{date.created|0.0}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(dateWithNumberFormat).toBe('2025-03-15T00:00:00.000')
 
 		// When applying a date format to a number, numerable should handle it appropriately
-		const numberWithDateFormat = interpolateDocument('{stats.wordCount|yyyy-MM}', frontmatter, ast)
+		const numberWithDateFormat = interpolateDocument(
+			'{stats.wordCount|yyyy-MM}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(numberWithDateFormat).toBe('2042-01')
 	})
 
 	it('should handle format strings containing braces and pipes', () => {
 		// Format string with braces
-		const bracesInFormat = interpolateDocument('{stats.wordCount|0{0}}', frontmatter, ast)
+		const bracesInFormat = interpolateDocument(
+			'{stats.wordCount|0{0}}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(bracesInFormat).toBe('42')
 
 		// Format string with pipe
-		const pipeInFormat = interpolateDocument('{stats.wordCount|0|0}', frontmatter, ast)
+		const pipeInFormat = interpolateDocument(
+			'{stats.wordCount|0|0}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
 		expect(pipeInFormat).toBe('42')
 	})
 
@@ -346,7 +491,7 @@ Deep nested content.
 			This uses \{escaped braces\} and {{{triple braces}}} too.
 		`
 
-		const result = interpolateDocument(complexTemplate, frontmatter, ast)
+		const result = interpolateDocument(complexTemplate, frontmatter, ast, defaultOptions)
 
 		expect(result).toMatchInlineSnapshot(`
 			"
@@ -377,7 +522,7 @@ Deep nested content.
 			Template with format using pipe: {stats.readingTime|0.0}
 			AST selector for heading and then paragraph: {{heading + paragraph|uppercase}}
 		`
-		const result = interpolateDocument(complexNestedTemplate, frontmatter, ast)
+		const result = interpolateDocument(complexNestedTemplate, frontmatter, ast, defaultOptions)
 
 		expect(result).toMatchInlineSnapshot(`
 			"

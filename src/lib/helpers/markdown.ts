@@ -1,5 +1,6 @@
 import { type Root as MarkdownAst } from 'mdast'
 import path from 'path-browserify-esm'
+import { type Options } from '../config'
 import { type Transform } from '../transform'
 import { interpolateDocument } from '../utilities/interpolate/document'
 import { getMarkdown } from '../utilities/markdown'
@@ -22,7 +23,11 @@ export function markdownCallback(
 		const contents = await context.fileAdapter.readFile(fullPath)
 
 		const { ast, frontmatter } = getMarkdown(contents)
-		const result = callback({ ast, filePath: context.filePath, frontmatter })
+		const result = callback({
+			ast,
+			filePath: context.filePath,
+			frontmatter,
+		})
 		return result instanceof Promise ? result : result
 	}
 }
@@ -32,6 +37,8 @@ export function markdownCallback(
  * @param template Template string with {key} for frontmatter and {{select}} for `unist-util-select` selectors (Uses the Pupa micro-template library)
  * @returns renami transform function
  */
-export function markdownTemplate(template: string): Transform {
-	return markdownCallback(({ ast, frontmatter }) => interpolateDocument(template, frontmatter, ast))
+export function markdownTemplate(template: string, options: Options): Transform {
+	return markdownCallback(({ ast, frontmatter }) =>
+		interpolateDocument(template, frontmatter, ast, options),
+	)
 }

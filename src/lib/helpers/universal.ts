@@ -1,3 +1,4 @@
+import { type Options } from '../config'
 import { type Transform } from '../transform'
 import log from '../utilities/log'
 import { markdownTemplate } from './markdown'
@@ -6,11 +7,11 @@ import { markdownTemplate } from './markdown'
  * Delegates to the appropriate template handler based on the file type
  * @returns renami transform function
  */
-export function universalTemplate(template: string): Transform {
+export function universalTemplate(template: string, options: Options): Transform {
 	return async (context) => {
 		switch (context.filePath.ext.toLowerCase()) {
 			case '.md': {
-				return markdownTemplate(template)(context)
+				return markdownTemplate(template, options)(context)
 			}
 
 			// TODO more file type template handlers!

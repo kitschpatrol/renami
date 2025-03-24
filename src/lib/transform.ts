@@ -5,6 +5,8 @@ import { type FileAdapter, FileAdapterSchema } from './utilities/file'
 import { type PathObject, PathObjectSchema } from './utilities/path'
 import {
 	type CaseType,
+	collapseDuplicateSpaces,
+	collapseSurplusDelimiters,
 	convertCase,
 	getSafeFilename,
 	stripIncrement,
@@ -36,6 +38,30 @@ export const TransformSchema = z
 	) satisfies z.ZodType<Transform>
 
 /**
+ * Collapses surplus delimiters (i.e. two or more consecutive delimiters)
+ * into a single space, then removes any delimiter tokens at the boundaries.
+ * When only a single delimiter occurs, its surrounding whitespace is preserved.
+ * @param delimiter - Array of delimiters to collapse (only the first is used)
+ */
+export function collapseSurplusDelimitersTransform(delimiter: string): Transform {
+	return async (context) => collapseSurplusDelimiters(context.filePath.name, delimiter)
+}
+
+/**
+ * Collapses duplicate whitespace into a single space
+ */
+export function collapseWhitespaceTransform(): Transform {
+	return async (context) => collapseDuplicateSpaces(context.filePath.name)
+}
+
+/**
+ * Trims leading and trailing whitespace
+ */
+export function trimTransform(): Transform {
+	return async (context) => context.filePath.name.trim()
+}
+
+/**
  * Ensures that the filename is filesystem-safe and Unicode normalized
  */
 export function safeTransform(defaultEmptyFilename: string): Transform {
@@ -49,18 +75,21 @@ export function safeTransform(defaultEmptyFilename: string): Transform {
 export function truncateTransform(options: {
 	fileSystemMaxLength: number
 	maxLength: number
+	trim: boolean
 	truncateOnWordBoundary: boolean
 	truncationString: string
 }): Transform {
 	return async (context) => {
 		// TODO increment-aware truncation?
-		const { fileSystemMaxLength, maxLength, truncateOnWordBoundary, truncationString } = options
+		const { fileSystemMaxLength, maxLength, trim, truncateOnWordBoundary, truncationString } =
+			options
 
 		return truncate(
 			context.filePath.name,
 			maxLength - context.filePath.ext.length,
 			fileSystemMaxLength,
 			truncateOnWordBoundary,
+			trim,
 			truncationString,
 		)
 	}

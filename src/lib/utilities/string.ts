@@ -1,3 +1,4 @@
+import escapeStringRegexp from 'escape-string-regexp'
 import filenamify from 'filenamify'
 import { slug } from 'github-slugger'
 
@@ -32,6 +33,7 @@ function isWordBoundary(text: string, index: number): boolean {
  * @param maxLength - The maximum desired length of the result (including truncation string)
  * @param fileSystemMaxLength - The absolute maximum length permitted (e.g., by a file system)
  * @param truncateOnWordBoundary - Whether to truncate at a word boundary
+ * @param trim - Whether to trim leading and trailing white space (before the truncation string is appended)
  * @param truncationString - The string to append after truncation (e.g., "...")
  * @returns The truncated string with the truncation string appended if truncation occurred
  */
@@ -40,11 +42,13 @@ export function truncate(
 	maxLength: number,
 	fileSystemMaxLength: number,
 	truncateOnWordBoundary: boolean,
+	trim: boolean,
 	truncationString = '...',
 ): string {
 	// If the truncation string is longer than either max length, we can't proceed sensibly
 	if (truncationString.length > Math.min(maxLength, fileSystemMaxLength)) {
-		return truncationString.slice(0, Math.min(maxLength, fileSystemMaxLength))
+		const result = truncationString.slice(0, Math.min(maxLength, fileSystemMaxLength))
+		return trim ? result.trim() : result
 	}
 
 	// Calculate available length for the content before appending truncation string
@@ -53,17 +57,19 @@ export function truncate(
 
 	// No need to truncate if the text is already short enough
 	if (text.length <= effectiveMaxLength) {
-		return text
+		return trim ? text.trim() : text
 	}
 
 	// If we can't fit any content plus the truncation string, return just the truncation string
 	if (safeMaxLength <= 0) {
-		return truncationString.slice(0, effectiveMaxLength)
+		const result = truncationString.slice(0, effectiveMaxLength)
+		return trim ? result.trim() : result
 	}
 
 	// If we don't need to respect word boundaries, simple slice
 	if (!truncateOnWordBoundary) {
-		return text.slice(0, safeMaxLength) + truncationString
+		const result = text.slice(0, safeMaxLength)
+		return (trim ? result.trim() : result) + truncationString
 	}
 
 	// Look backwards from safeMaxLength to find a boundary
@@ -76,7 +82,8 @@ export function truncate(
 	}
 
 	// If we couldn't find a boundary within a reasonable range, use the original cut point
-	return text.slice(0, boundary) + truncationString
+	const result = text.slice(0, boundary)
+	return (trim ? result.trim() : result) + truncationString
 }
 
 /**
@@ -315,15 +322,13 @@ export function convertCase(text: string, caseType: CaseType): string {
  * @returns A safe filename
  */
 export function getSafeFilename(text: string, defaultEmptyFilename = 'Untitled'): string {
-	let basicSafeFilename = filenamify(text.trim(), {
+	let basicSafeFilename = filenamify(text, {
 		maxLength: Number.MAX_SAFE_INTEGER,
 		replacement: ' ',
 	})
-		.replaceAll(/\s+/g, ' ')
-		.trim()
 
-	// Edge case where the filename is empty after invalid characters are removed
-	if (basicSafeFilename.length === 0) {
+	// Edge case where the filename is empty or all whitespace after invalid characters are removed
+	if (basicSafeFilename.trim().length === 0) {
 		basicSafeFilename = defaultEmptyFilename
 	}
 
@@ -407,4 +412,34 @@ export function html(strings: TemplateStringsArray, ...values: unknown[]): strin
  */
 export function css(strings: TemplateStringsArray, ...values: unknown[]): string {
 	return trimLeadingIndentation(strings, ...values)
+}
+
+/**
+ * Strip surplus delimiters from a string
+ */
+export function collapseSurplusDelimiters(text: string, delimiter: string) {
+	if (delimiter.length === 0 || !text.includes(delimiter)) {
+		return text
+	}
+
+	let newText = text
+
+	// Leading, possibly with extra leading spaces
+	newText = newText.replaceAll(new RegExp(`^\\s*(${escapeStringRegexp(delimiter)}){1,}`, 'g'), '')
+
+	// Trailing, possibly with extra trailing spaces
+	newText = newText.replaceAll(new RegExp(`(${escapeStringRegexp(delimiter)}){1,}\\s*$`, 'g'), '')
+	// NewText = newText.replace(new RegExp(`${escapeStringRegexp(delimiter)}\\s*$`), '')
+
+	// Middle
+	newText = newText.replaceAll(new RegExp(`(${escapeStringRegexp(delimiter)}){2,}`, 'g'), delimiter)
+
+	return newText
+}
+
+/**
+ * Collapse multiple spaces into a single space
+ */
+export function collapseDuplicateSpaces(text: string): string {
+	return text.replaceAll(/\s+/g, ' ')
 }

@@ -23,14 +23,6 @@ describe('getSafeFilename', () => {
 		)
 	})
 
-	test('trims whitespace', () => {
-		expect(getSafeFilename('  filename  ')).toBe('filename')
-	})
-
-	test('collapses multiple spaces', () => {
-		expect(getSafeFilename('file  name  with    spaces')).toBe('file name with spaces')
-	})
-
 	test('returns default name when input is empty', () => {
 		expect(getSafeFilename('')).toBe('Untitled')
 	})
@@ -63,73 +55,73 @@ describe('getSafeFilename', () => {
 
 describe('truncate', () => {
 	test('returns original string when it is shorter than maxLength', () => {
-		expect(truncate('hello', 10, 100, false)).toBe('hello')
+		expect(truncate('hello', 10, 100, false, true)).toBe('hello')
 	})
 
 	test('truncates string to maxLength with default truncation string', () => {
-		expect(truncate('hello world', 8, 100, false)).toBe('hello...')
+		expect(truncate('hello world', 8, 100, false, true)).toBe('hello...')
 	})
 
 	test('respects fileSystemMaxLength when it is smaller than maxLength', () => {
-		expect(truncate('hello world', 10, 7, false)).toBe('hell...')
+		expect(truncate('hello world', 10, 7, false, true)).toBe('hell...')
 	})
 
 	test('returns just truncation string when maxLength equals truncation string length', () => {
-		expect(truncate('hello', 3, 100, false)).toBe('...')
+		expect(truncate('hello', 3, 100, false, true)).toBe('...')
 	})
 
 	test('handles custom truncation string', () => {
-		expect(truncate('hello world', 8, 100, false, '…')).toBe('hello w…')
+		expect(truncate('hello world', 8, 100, false, true, '…')).toBe('hello w…')
 	})
 
 	test('returns truncation string when safeMaxLength is 0', () => {
-		expect(truncate('hello', 3, 3, false)).toBe('...')
+		expect(truncate('hello', 3, 3, false, true)).toBe('...')
 	})
 
 	test('truncates string when truncation string is shorter than maxLength', () => {
-		expect(truncate('hello world', 8, 100, false, '..')).toBe('hello ..')
+		expect(truncate('hello world', 8, 100, false, false, '..')).toBe('hello ..')
 	})
 
 	test('handles edge case with very long truncation string', () => {
 		const longTruncation = '...............'
-		expect(truncate('hello', 5, 10, false, longTruncation)).toBe('.....')
+		expect(truncate('hello', 5, 10, false, true, longTruncation)).toBe('.....')
 	})
 
 	test('truncates at word boundary when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello world', 10, 100, true)).toBe('hello...')
+		expect(truncate('hello world', 10, 100, true, true)).toBe('hello...')
 	})
 
 	test('handles camelCase boundaries when exact length', () => {
-		expect(truncate('helloWorld', 10, 100, true)).toBe('helloWorld')
+		expect(truncate('helloWorld', 10, 100, true, true)).toBe('helloWorld')
 	})
 
 	test('handles near break max length when truncateOnWordBoundary is true', () => {
-		expect(truncate('helloWorld', 7, 100, true)).toBe('hell...')
+		expect(truncate('helloWorld', 7, 100, true, true)).toBe('hell...')
 	})
 
 	test('handles break and truncation string summing to maxlength when truncateOnWordBoundary is true', () => {
-		expect(truncate('helloWorld', 8, 100, true)).toBe('hello...')
+		expect(truncate('helloWorld', 8, 100, true, true)).toBe('hello...')
 	})
 
 	test('handles one more than break max length when truncateOnWordBoundary is true', () => {
-		expect(truncate('helloWorld', 9, 100, true)).toBe('hello...')
+		expect(truncate('helloWorld', 9, 100, true, true)).toBe('hello...')
 	})
 
 	test('handles hyphen boundaries when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello-world', 10, 100, true)).toBe('hello...')
+		expect(truncate('hello-world', 10, 100, true, true)).toBe('hello...')
 	})
 
 	test('truncates at period delimiter when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello.world', 10, 100, true)).toBe('hello...')
+		expect(truncate('hello.world', 10, 100, true, true)).toBe('hello...')
 	})
 
 	test('truncates at underscore delimiter when truncateOnWordBoundary is true', () => {
-		expect(truncate('hello_world', 10, 100, true)).toBe('hello...')
+		expect(truncate('hello_world', 10, 100, true, true)).toBe('hello...')
 	})
 
 	test('truncates at original position if no word boundary found within search range', () => {
 		const longWord = 'supercalifragilisticexpialidocious'
-		expect(truncate(longWord, 8, 100, true)).toBe('super...')
+		expect(truncate(longWord, 8, 100, true, true)).toBe('super...')
 	})
 })
 

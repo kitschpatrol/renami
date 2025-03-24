@@ -7,9 +7,12 @@ import { defaultOptions, type Options } from './config'
 import { universalTemplate } from './helpers/universal'
 import {
 	caseTransform,
+	collapseSurplusDelimitersTransform,
+	collapseWhitespaceTransform,
 	safeTransform,
 	stripIncrementTransform,
 	type Transform,
+	trimTransform,
 	truncateTransform,
 } from './transform'
 import { ensureArray } from './utilities/array'
@@ -139,16 +142,21 @@ export async function renameFiles(options: {
 		transform = [],
 	} = options
 
+	const localOptions = deepmerge(defaultOptions, transformOptions ?? {})
 	const {
 		caseType,
+		collapseDuplicateWhitespace,
+		collapseSurplusDelimiters,
 		defaultName,
+		delimiter,
 		dryRun,
 		maxLength,
+		trim,
 		truncateOnWordBoundary,
 		truncationString,
 		validateInput,
 		validateOutput,
-	} = deepmerge(defaultOptions, transformOptions ?? {})
+	} = localOptions
 
 	// Validate, throws if any file is invalid
 	if (validateInput) {
@@ -173,19 +181,23 @@ export async function renameFiles(options: {
 	const transformArray = [
 		// Wrap user-provided transforms in an array if necessary
 		...ensureArray(transform).map((transformItem) => {
-			// Turn and plain string values into Universal Template functions
+			// Turn any plain string values into Universal Template functions
 			if (typeof transformItem === 'string') {
-				return universalTemplate(transformItem)
+				return universalTemplate(transformItem, localOptions)
 			}
 			return transformItem
 		}),
 		// Standard transforms
-		safeTransform(defaultName),
 		stripIncrementTransform(),
+		safeTransform(defaultName),
+		...(collapseSurplusDelimiters ? [collapseSurplusDelimitersTransform(delimiter)] : []),
+		...(collapseDuplicateWhitespace ? [collapseWhitespaceTransform()] : []),
+		...(trim ? [trimTransform()] : []),
 		caseTransform(caseType),
 		truncateTransform({
 			fileSystemMaxLength: FILENAME_MAX_LENGTH,
 			maxLength,
+			trim,
 			truncateOnWordBoundary,
 			truncationString,
 		}),
@@ -308,6 +320,7 @@ export async function renameFiles(options: {
 			const name = await truncateTransform({
 				fileSystemMaxLength: FILENAME_MAX_LENGTH,
 				maxLength: maxLengthWithIncrement,
+				trim,
 				truncateOnWordBoundary,
 				truncationString,
 			})({ fileAdapter, filePath: pathObject })

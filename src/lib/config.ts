@@ -11,12 +11,20 @@ import { CASE_TYPE_NAMES, type CaseType } from './utilities/string'
 export type Options = {
 	/** Enforce a specific letter casing on the final filenames. */
 	caseType: CaseType
+	/** Replace duplicate whitespace with a single space  */
+	collapseDuplicateWhitespace: boolean
+	/** If a template is missing values and has sections like `bla - - bla - `, this will collapse extra delimiter strings to yield `bla - bla` */
+	collapseSurplusDelimiters: boolean
 	/** In rare cases a path that's all unsave characters will become zero-length... this default is used in such cases. */
 	defaultName: string
+	/** Delimiter to use to join array values in templates, and used to collapse surplus delimiters in templates */
+	delimiter: string
 	/** Don't actually rename any files */
 	dryRun: boolean
 	/** Maximum number of characters in the file, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum. */
 	maxLength: number
+	/** Trim leading and trailing white space */
+	trim: boolean
 	/** Try to truncate the file on a word boundary, might result in files shorter than the maxLength target. */
 	truncateOnWordBoundary: boolean
 	/** String like '...' to use when truncation is needed */
@@ -49,9 +57,13 @@ export type RenamiConfig = {
 const OptionsSchema = z
 	.object({
 		caseType: z.enum(CASE_TYPE_NAMES),
+		collapseDuplicateWhitespace: z.boolean(),
+		collapseSurplusDelimiters: z.boolean(),
 		defaultName: z.string().min(1),
+		delimiter: z.string(),
 		dryRun: z.boolean(),
 		maxLength: z.number().int().positive().lte(1000),
+		trim: z.boolean(),
 		truncateOnWordBoundary: z.boolean(),
 		truncationString: z.string(),
 		validateInput: z.boolean(),
@@ -86,9 +98,13 @@ const RenamiConfigSchema = z
 
 export const defaultOptions: Options = {
 	caseType: 'preserve',
+	collapseDuplicateWhitespace: true,
+	collapseSurplusDelimiters: true,
 	defaultName: 'Untitled',
+	delimiter: ' - ',
 	dryRun: false,
 	maxLength: FILENAME_MAX_LENGTH,
+	trim: true,
 	truncateOnWordBoundary: true,
 	truncationString: '...',
 	validateInput: true,
