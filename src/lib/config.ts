@@ -21,6 +21,8 @@ export type Options = {
 	delimiter: string
 	/** Don't actually rename any files */
 	dryRun: boolean
+	/** Ignore notes matching the containing folder name, as may be the case when using the (obsidian-folder-notes)[https://github.com/LostPaul/obsidian-folder-notes] plugin. */
+	ignoreFolderNotes: boolean
 	/** Maximum number of characters in the file, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum. */
 	maxLength: number
 	/** Trim leading and trailing white space */
@@ -62,6 +64,7 @@ const OptionsSchema = z
 		defaultName: z.string().min(1),
 		delimiter: z.string(),
 		dryRun: z.boolean(),
+		ignoreFolderNotes: z.boolean(),
 		maxLength: z.number().int().positive().lte(1000),
 		trim: z.boolean(),
 		truncateOnWordBoundary: z.boolean(),
@@ -103,6 +106,7 @@ export const defaultOptions: Options = {
 	defaultName: 'Untitled',
 	delimiter: ' - ',
 	dryRun: false,
+	ignoreFolderNotes: false,
 	maxLength: FILENAME_MAX_LENGTH,
 	trim: true,
 	truncateOnWordBoundary: true,

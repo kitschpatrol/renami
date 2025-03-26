@@ -493,3 +493,73 @@ describe('generic file helper tests', () => {
 		expect(callbackAccumulator).toHaveLength(2)
 	})
 })
+
+describe('ignore folder notes tests', () => {
+	// Setup the temp files fixture with source files
+	const tempFiles = useTempFiles({
+		cleanup: true, // Will clean up after each test
+		prefix: 'renami-rename-files-test-',
+		sourcePath: './test/assets/test-ignore-folder-notes',
+	})
+
+	it('should ignore folder notes if asked', async () => {
+		const filePaths = await tempFiles.getFiles()
+
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				caseType: 'screaming-kebab',
+				dryRun: true,
+				ignoreFolderNotes: true,
+			},
+		})
+
+		expect(result.duration).toBeLessThan(10)
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/folder/basic.md",
+			      "filePathRenamed": "/folder/BASIC.md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+
+	it('should not ignore folder notes if asked', async () => {
+		const filePaths = await tempFiles.getFiles()
+
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				caseType: 'screaming-kebab',
+				dryRun: true,
+				ignoreFolderNotes: false,
+			},
+		})
+
+		expect(result.duration).toBeLessThan(10)
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/folder/basic.md",
+			      "filePathRenamed": "/folder/BASIC.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/folder/folder.md",
+			      "filePathRenamed": "/folder/FOLDER.md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+})

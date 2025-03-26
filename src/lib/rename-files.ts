@@ -18,7 +18,13 @@ import {
 import { ensureArray } from './utilities/array'
 import { exists, type FileAdapter, getDefaultFileAdapter } from './utilities/file'
 import log from './utilities/log'
-import { isAbsolute, normalize, pathObjectSetAll, pathObjectSetName } from './utilities/path'
+import {
+	isAbsolute,
+	normalize,
+	pathIsFolderNote,
+	pathObjectSetAll,
+	pathObjectSetName,
+} from './utilities/path'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
 import { appendIncrement, convertCase, getIncrement } from './utilities/string'
 
@@ -150,6 +156,7 @@ export async function renameFiles(options: {
 		defaultName,
 		delimiter,
 		dryRun,
+		ignoreFolderNotes,
 		maxLength,
 		trim,
 		truncateOnWordBoundary,
@@ -176,6 +183,11 @@ export async function renameFiles(options: {
 			filePathRenamed: undefined,
 			status: 'scheduled', // Will be tested for later once we know the final filename
 		})
+	}
+
+	// Filter folder notes...
+	if (ignoreFolderNotes) {
+		fileRenamePlan = fileRenamePlan.filter((task) => !pathIsFolderNote(task.filePathOriginal))
 	}
 
 	const transformArray = [
@@ -358,6 +370,8 @@ export async function renameFiles(options: {
 	fileRenamePlan = orderBy(fileRenamePlan, [(v) => v.filePathRenamed])
 
 	// Checking for conflicts with existing files!
+	// This could be optimized significantly by passing the list of all files...
+	// But again this allows simpler fileAdapter implementations
 	if (validateOutput) {
 		for (const task of fileRenamePlan) {
 			if (task.filePathIntermediate !== undefined) {

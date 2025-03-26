@@ -139,3 +139,15 @@ export function pathObjectSetAll(source: PathObject, target: PathObject): void {
 	target.ext = source.ext
 	target.root = source.root
 }
+
+/**
+ * Helper for https://github.com/LostPaul/obsidian-folder-notes
+ * Case-insensitive
+ * @param filePath Absolute path to file
+ */
+export function pathIsFolderNote(filePath: string): boolean {
+	const bareFileName = path.basename(filePath, path.extname(filePath)).toLowerCase()
+	const parentFolderName = path.basename(path.dirname(filePath)).toLowerCase()
+	console.log(bareFileName, parentFolderName)
+	return bareFileName === parentFolderName
+}

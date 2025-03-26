@@ -46,7 +46,7 @@ await yargs(hideBin(process.argv))
 					}
 				}
 			}
-			log.info(`Operation completed in ${prettyMilliseconds(report.duration)}`)
+			log.info(`Rename completed in ${prettyMilliseconds(report.duration)}`)
 
 			if (report.rules.length === 0) {
 				log.warn('No files were renamed.')
