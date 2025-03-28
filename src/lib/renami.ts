@@ -10,7 +10,7 @@ import { getDefaultFileAdapter } from './utilities/file-adapter'
 import { getDefaultGlobAdapter } from './utilities/glob-adapter'
 import log from './utilities/log'
 
-export type RenameReport = {
+export type RenamiReport = {
 	duration: number
 	rules: Array<{
 		pattern: string[]
@@ -71,7 +71,7 @@ async function getMaskedMatchedFiles(
  * If a string is provided, it will be used as the config file path.
  * @returns A report of the renaming process
  */
-export async function rename(options?: {
+export async function renami(options?: {
 	/** Can be a path to config file, a config object, or undefined to attempt config discovery in accordance with Cosmiconfig's resolution strategy. */
 	config?: Partial<RenamiConfig> | string
 	/** Path to search for config file from. Defaults to the current working directory. */
@@ -80,7 +80,7 @@ export async function rename(options?: {
 	fileAdapter?: FileAdapter
 	/** Glob adapter to use for file operations in non-Node environments. */
 	globAdapter?: GlobAdapter
-}): Promise<RenameReport> {
+}): Promise<RenamiReport> {
 	const startTime = performance.now()
 	const {
 		config,
@@ -112,7 +112,7 @@ export async function rename(options?: {
 		}
 	}
 
-	const renameReport: RenameReport = {
+	const renamiReport: RenamiReport = {
 		duration: 0,
 		rules: [],
 	}
@@ -132,12 +132,12 @@ export async function rename(options?: {
 			transform,
 		})
 
-		renameReport.rules.push({
+		renamiReport.rules.push({
 			pattern: ensureArray(pattern),
 			report,
 		})
 	}
 
-	renameReport.duration = performance.now() - startTime
-	return renameReport
+	renamiReport.duration = performance.now() - startTime
+	return renamiReport
 }

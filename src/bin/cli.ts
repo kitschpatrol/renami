@@ -4,7 +4,7 @@ import prettyMilliseconds from 'pretty-ms'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { version } from '../../package.json'
-import { rename } from '../lib'
+import { renami } from '../lib'
 import log from '../lib/utilities/log'
 
 await yargs(hideBin(process.argv))
@@ -30,7 +30,7 @@ await yargs(hideBin(process.argv))
 				log.verbose = true
 			}
 
-			const report = await rename({ config })
+			const report = await renami({ config })
 
 			for (const rule of report.rules) {
 				log.info(`Pattern: ${rule.pattern}`)

@@ -1,4 +1,4 @@
-import type { RenameReport } from '../../src/lib'
+import type { RenamiReport } from '../../src/lib'
 import type { FileRenameReport } from '../../src/lib/rename-files'
 
 /**
@@ -19,7 +19,7 @@ export function sanitizeOutput(report: FileRenameReport, tempPath: string): File
 /**
  * Remove the duration and temp path from the report.
  */
-export function sanitizeRenameReport(report: RenameReport, tempPath: string): RenameReport {
+export function sanitizeRenameReport(report: RenamiReport, tempPath: string): RenamiReport {
 	return {
 		...report,
 		duration: 0, // Ignore duration
