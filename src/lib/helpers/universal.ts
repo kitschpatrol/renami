@@ -1,5 +1,5 @@
-import { type Options } from '../config'
-import { type Transform } from '../transform'
+import type { Options } from '../config'
+import type { Transform } from '../transform'
 import log from '../utilities/log'
 import { markdownTemplate } from './markdown'
 

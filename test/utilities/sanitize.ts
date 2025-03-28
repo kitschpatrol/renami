@@ -1,4 +1,4 @@
-import { type FileRenameReport, type RenameReport } from '../../src/lib'
+import type { FileRenameReport, RenameReport } from '../../src/lib'
 
 /**
  * Remove the duration and temp path from the report.

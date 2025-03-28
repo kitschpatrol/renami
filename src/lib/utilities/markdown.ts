@@ -1,4 +1,4 @@
-import { type Root as MarkdownAst } from 'mdast'
+import type { Root as MarkdownAst } from 'mdast'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
@@ -42,16 +42,6 @@ export function getMarkdown(content: string): {
  * Creates nice readable labels from Markdown links
  * Might be better to use the micromark parser for this, but this is a good start
  * @param markdown The string content containing markdown or a URL
- * @returns label string, or the original string if no links or URLs are found
- */
-/**
- * Creates nice readable labels from Markdown links
- * @param markdown
- * @returns label string, or the original string if no links or URLs are found
- */
-/**
- * Creates nice readable labels from Markdown links
- * @param markdown
  * @returns label string, or the original string if no links or URLs are found
  */
 export function extractLinkLabel(markdown: string): string {

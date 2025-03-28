@@ -1,10 +1,10 @@
-import { type Root as MarkdownAst } from 'mdast'
+import type { Root as MarkdownAst } from 'mdast'
 import path from 'path-browserify-esm'
-import { type Options } from '../config'
-import { type Transform } from '../transform'
+import type { Options } from '../config'
+import type { Transform } from '../transform'
+import type { PathObject } from '../utilities/path'
 import { interpolateDocument } from '../utilities/interpolate/document'
 import { getMarkdown } from '../utilities/markdown'
-import { type PathObject } from '../utilities/path'
 
 /**
  * Compose a filename from a Unified Markdown AST and / or frontmatter object using a callback function

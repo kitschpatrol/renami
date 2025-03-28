@@ -3,7 +3,10 @@ import { deepmerge } from 'deepmerge-ts'
 import { nanoid } from 'nanoid'
 import { orderBy } from 'natural-orderby'
 import path from 'path-browserify-esm'
-import { defaultOptions, type Options } from './config'
+import type { Options } from './config'
+import type { Transform } from './transform'
+import type { FileAdapter } from './utilities/file'
+import { defaultOptions } from './config'
 import { universalTemplate } from './helpers/universal'
 import {
 	caseTransform,
@@ -11,12 +14,11 @@ import {
 	collapseWhitespaceTransform,
 	safeTransform,
 	stripIncrementTransform,
-	type Transform,
 	trimTransform,
 	truncateTransform,
 } from './transform'
 import { ensureArray } from './utilities/array'
-import { exists, type FileAdapter, getDefaultFileAdapter } from './utilities/file'
+import { exists, getDefaultFileAdapter } from './utilities/file'
 import log from './utilities/log'
 import {
 	isAbsolute,

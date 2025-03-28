@@ -1,10 +1,12 @@
 /* eslint-disable ts/require-await */
 
 import { z } from 'zod'
-import { type FileAdapter, FileAdapterSchema } from './utilities/file'
-import { type PathObject, PathObjectSchema } from './utilities/path'
+import type { FileAdapter } from './utilities/file'
+import type { PathObject } from './utilities/path'
+import type { CaseType } from './utilities/string'
+import { FileAdapterSchema } from './utilities/file'
+import { PathObjectSchema } from './utilities/path'
 import {
-	type CaseType,
 	collapseDuplicateSpaces,
 	collapseSurplusDelimiters,
 	convertCase,

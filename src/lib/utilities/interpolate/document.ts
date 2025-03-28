@@ -1,12 +1,15 @@
+import type { Node } from 'unist-util-select'
 import { isArray, isObject, isString } from '@sindresorhus/is'
 import { toString } from 'mdast-util-to-string'
 import propertyExpr from 'property-expr'
-import { type Node, select } from 'unist-util-select'
-import { defaultOptions, type Options } from '../../config'
+import { select } from 'unist-util-select'
+import type { Options } from '../../config'
+import type { InterpolationContext } from './core'
+import { defaultOptions } from '../../config'
 import { formatValue } from '../format'
 import { stringifyCompact } from '../json'
 import { extractLinkLabel } from '../markdown'
-import { interpolate, type InterpolationContext } from './core'
+import { interpolate } from './core'
 
 /**
  * Interpolates a template string with metadata and AST tree

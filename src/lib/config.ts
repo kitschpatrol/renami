@@ -3,10 +3,12 @@ import { TypeScriptLoader as typeScriptLoader } from 'cosmiconfig-typescript-loa
 import { deepmerge } from 'deepmerge-ts'
 import path from 'path-browserify-esm'
 import { z } from 'zod'
-import { type Transform, TransformSchema } from './transform'
+import type { Transform } from './transform'
+import type { CaseType } from './utilities/string'
+import { TransformSchema } from './transform'
 import log from './utilities/log'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
-import { CASE_TYPE_NAMES, type CaseType } from './utilities/string'
+import { CASE_TYPE_NAMES } from './utilities/string'
 
 export type Options = {
 	/** Enforce a specific letter casing on the final filenames. */

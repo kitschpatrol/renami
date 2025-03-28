@@ -2,7 +2,6 @@ import { globby } from 'globby'
 // eslint-disable-next-line node/no-unsupported-features/node-builtins
 import { cp, mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-// eslint-disable-next-line unicorn/import-style
 import { join } from 'node:path'
 import { afterEach, beforeEach } from 'vitest'
 

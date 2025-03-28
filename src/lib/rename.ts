@@ -1,9 +1,12 @@
 import { deepmerge } from 'deepmerge-ts'
 import { globby } from 'globby'
-import { loadConfig, type RenamiConfig } from './config'
-import { type FileRenameReport, renameFiles } from './rename-files'
+import type { RenamiConfig } from './config'
+import type { FileRenameReport } from './rename-files'
+import type { FileAdapter } from './utilities/file'
+import { loadConfig } from './config'
+import { renameFiles } from './rename-files'
 import { ensureArray } from './utilities/array'
-import { type FileAdapter, getDefaultFileAdapter } from './utilities/file'
+import { getDefaultFileAdapter } from './utilities/file'
 import log from './utilities/log'
 
 export type RenameReport = {

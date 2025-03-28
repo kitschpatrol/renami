@@ -1,8 +1,9 @@
 import is from '@sindresorhus/is'
+import type { CaseType } from './string'
 import { formatDate } from './date'
 import { formatNumber } from './number'
 import { FILENAME_MAX_LENGTH } from './platform'
-import { CASE_TYPE_NAMES, type CaseType, convertCase, truncate } from './string'
+import { CASE_TYPE_NAMES, convertCase, truncate } from './string'
 
 /**
  * Helper to convert array or object to empty string
