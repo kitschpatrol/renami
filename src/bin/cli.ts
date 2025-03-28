@@ -4,7 +4,8 @@ import prettyMilliseconds from 'pretty-ms'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { version } from '../../package.json'
-import { log, rename } from '../lib'
+import { rename } from '../lib'
+import log from '../lib/utilities/log'
 
 await yargs(hideBin(process.argv))
 	.scriptName('renami')

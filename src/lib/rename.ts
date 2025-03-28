@@ -122,8 +122,6 @@ export async function rename(options?: {
 	const maskedMatches = await getMaskedMatchedFiles(rules, configCwd, globAdapter)
 
 	for (const [index, { options: transformOptions, pattern, transform }] of rules.entries()) {
-		// TODO hmm gitignore breaks testing with "path is not in CWD"
-		// Since 2019... https://github.com/sindresorhus/globby/issues/133
 		const filePaths = maskedMatches[index]
 		const options = deepmerge(defaultTransformOptions, transformOptions ?? {})
 

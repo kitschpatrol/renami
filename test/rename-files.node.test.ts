@@ -1,7 +1,8 @@
 /* eslint-disable ts/require-await */
 
 import { describe, expect, it } from 'vitest'
-import { renameFiles, transformHelper } from '../src/lib'
+import { transformHelper } from '../src/lib'
+import { renameFiles } from '../src/lib/rename-files'
 import { CASE_TYPE_NAMES } from '../src/lib/utilities/string'
 import { useTempFiles } from './fixtures/file-fixture'
 import { sanitizeOutput } from './utilities/sanitize'
