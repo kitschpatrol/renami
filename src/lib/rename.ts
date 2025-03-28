@@ -1,12 +1,13 @@
 import { deepmerge } from 'deepmerge-ts'
-import { globby } from 'globby'
 import type { RenamiConfig } from './config'
 import type { FileRenameReport } from './rename-files'
 import type { FileAdapter } from './utilities/file-adapter'
+import type { GlobAdapter } from './utilities/glob-adapter'
 import { loadConfig } from './config'
 import { renameFiles } from './rename-files'
 import { ensureArray } from './utilities/array'
 import { getDefaultFileAdapter } from './utilities/file-adapter'
+import { getDefaultGlobAdapter } from './utilities/glob-adapter'
 import log from './utilities/log'
 
 export type RenameReport = {
@@ -26,6 +27,7 @@ export type RenameReport = {
 async function getMaskedMatchedFiles(
 	rules: RenamiConfig['rules'],
 	cwd: string,
+	globAdapter: GlobAdapter,
 ): Promise<string[][]> {
 	if (!rules || rules.length === 0) {
 		return []
@@ -40,7 +42,7 @@ async function getMaskedMatchedFiles(
 
 	for (const rule of reversedRules) {
 		// Match files for the current rule
-		const matchedFiles = await globby(rule.pattern, {
+		const matchedFiles = await globAdapter.globMatch(rule.pattern, {
 			// Causes test errors...
 			// gitignore: true,
 			absolute: true,
@@ -76,9 +78,16 @@ export async function rename(options?: {
 	configSearchFrom?: string
 	/** File adapter to use for file operations in non-Node environments. */
 	fileAdapter?: FileAdapter
+	/** Glob adapter to use for file operations in non-Node environments. */
+	globAdapter?: GlobAdapter
 }): Promise<RenameReport> {
 	const startTime = performance.now()
-	const { config, configSearchFrom, fileAdapter = await getDefaultFileAdapter() } = options ?? {}
+	const {
+		config,
+		configSearchFrom,
+		fileAdapter = await getDefaultFileAdapter(),
+		globAdapter = await getDefaultGlobAdapter(),
+	} = options ?? {}
 
 	const loadedConfig = await loadConfig(config, configSearchFrom)
 
@@ -110,7 +119,7 @@ export async function rename(options?: {
 
 	// Get masked matched files for all rules (files exclusive to each rule)
 
-	const maskedMatches = await getMaskedMatchedFiles(rules, configCwd)
+	const maskedMatches = await getMaskedMatchedFiles(rules, configCwd, globAdapter)
 
 	for (const [index, { options: transformOptions, pattern, transform }] of rules.entries()) {
 		// TODO hmm gitignore breaks testing with "path is not in CWD"
