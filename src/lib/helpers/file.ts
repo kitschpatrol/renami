@@ -1,4 +1,4 @@
-import path from 'path-browserify-esm'
+import path from 'pathe'
 import type { Transform } from '../transform'
 import type { FileAdapter } from '../utilities/file'
 import type { PathObject } from '../utilities/path'

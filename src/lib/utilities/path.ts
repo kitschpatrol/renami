@@ -1,6 +1,5 @@
 import isAbsolutePath from '@stdlib/assert-is-absolute-path'
-import path from 'path-browserify-esm'
-import slash from 'slash'
+import path from 'pathe'
 import { z } from 'zod'
 import log from './log'
 
@@ -19,45 +18,11 @@ export type PathObject = z.infer<typeof PathObjectSchema>
 
 /**
  * The browserify polyfill doesn't implement win32 absolute path detection...
- * @param filePath Normalized path
+ * @param filePath POSIX-Normalized path
  * @returns Whether the path is absolute
  */
 export function isAbsolute(filePath: string): boolean {
-	return isAbsolutePath.posix(filePath) || isAbsolutePath.win32(filePath)
-}
-
-const RE_WINDOWS_EXTENDED_LENGTH_PATH = /^\\\\\?\\.+/
-
-// Unused
-// const RE_WINDOWS_UNC_PATH = /^\\\\[^\\]+\\[^\\]+/
-
-/**
- * Converts all paths to cross-platform 'mixed' style with forward slashes.
- * Warns on unsupported Windows extended length paths.
- * @param filePath Path to normalize
- * @returns normalized path
- */
-export function normalize(filePath: string): string {
-	if (RE_WINDOWS_EXTENDED_LENGTH_PATH.test(filePath)) {
-		log.warn(`Unsupported extended length path detected: ${filePath}`)
-		return filePath
-	}
-
-	// If (RE_WINDOWS_UNC_PATH.test(filePath)) {
-	// 	log.warn(`Unsupported UNC path detected: ${filePath}`)
-	// 	return path.normalize(filePath)
-	// }
-
-	const basicPath = slash(filePath)
-	const normalizedPath = path.normalize(basicPath)
-
-	// Tricky cases where we still want leading './' to distinguish between relative and "named"" paths,
-	// otherwise it's stripped by normalization
-	if (basicPath.startsWith('./')) {
-		return `./${normalizedPath}`
-	}
-
-	return normalizedPath
+	return isAbsolutePath.posix(filePath)
 }
 
 /**

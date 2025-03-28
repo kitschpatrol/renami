@@ -123,6 +123,16 @@ exports[`rename tests > should apply only the last matching rule in an array if 
             "status": "renamed",
           },
           {
+            "filePathOriginal": "/test-ignore-folder-notes/folder/basic.md",
+            "filePathRenamed": "/test-ignore-folder-notes/folder/bar (1).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-ignore-folder-notes/folder/folder.md",
+            "filePathRenamed": "/test-ignore-folder-notes/folder/bar (2).md",
+            "status": "renamed",
+          },
+          {
             "filePathOriginal": "/test-increment/Basic (1).md",
             "filePathRenamed": "/test-increment/bar (1).md",
             "status": "renamed",
@@ -265,6 +275,16 @@ exports[`rename tests > should rename recursively with per-directory increments 
           {
             "filePathOriginal": "/test-frontmatter/frontmatter-2.md",
             "filePathRenamed": "/test-frontmatter/bla (2).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-ignore-folder-notes/folder/basic.md",
+            "filePathRenamed": "/test-ignore-folder-notes/folder/bla (1).md",
+            "status": "renamed",
+          },
+          {
+            "filePathOriginal": "/test-ignore-folder-notes/folder/folder.md",
+            "filePathRenamed": "/test-ignore-folder-notes/folder/bla (2).md",
             "status": "renamed",
           },
           {

@@ -2,7 +2,7 @@
 import { deepmerge } from 'deepmerge-ts'
 import { nanoid } from 'nanoid'
 import { orderBy } from 'natural-orderby'
-import path from 'path-browserify-esm'
+import path from 'pathe'
 import type { Options } from './config'
 import type { Transform } from './transform'
 import type { FileAdapter } from './utilities/file'
@@ -20,13 +20,7 @@ import {
 import { ensureArray } from './utilities/array'
 import { exists, getDefaultFileAdapter } from './utilities/file'
 import log from './utilities/log'
-import {
-	isAbsolute,
-	normalize,
-	pathIsFolderNote,
-	pathObjectSetAll,
-	pathObjectSetName,
-} from './utilities/path'
+import { isAbsolute, pathIsFolderNote, pathObjectSetAll, pathObjectSetName } from './utilities/path'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
 import { appendIncrement, convertCase, getIncrement } from './utilities/string'
 
@@ -63,7 +57,7 @@ async function validateFilePath(
 		return 'empty'
 	}
 
-	const normalized = normalize(filePath)
+	const normalized = path.normalize(filePath)
 	if (normalized !== filePath) {
 		return 'not-normalized'
 	}

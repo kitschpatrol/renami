@@ -1,5 +1,5 @@
 import type { Root as MarkdownAst } from 'mdast'
-import path from 'path-browserify-esm'
+import path from 'pathe'
 import type { Options } from '../config'
 import type { Transform } from '../transform'
 import type { PathObject } from '../utilities/path'

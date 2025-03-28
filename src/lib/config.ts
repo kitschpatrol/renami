@@ -1,7 +1,7 @@
 import { cosmiconfig } from 'cosmiconfig'
 import { TypeScriptLoader as typeScriptLoader } from 'cosmiconfig-typescript-loader'
 import { deepmerge } from 'deepmerge-ts'
-import path from 'path-browserify-esm'
+import path from 'pathe'
 import { z } from 'zod'
 import type { Transform } from './transform'
 import type { CaseType } from './utilities/string'
