@@ -126,7 +126,7 @@ export const defaultRenamiConfig: RenamiConfig = {
  * @param config - Partial Config object with custom configuration
  * @returns RenamiConfig object merged with defaults
  */
-export function renamiConfig(config: Partial<RenamiConfig>): RenamiConfig {
+export function defineRenamiConfig(config: Partial<RenamiConfig>): RenamiConfig {
 	return deepmerge(defaultRenamiConfig, config)
 }
 
@@ -137,7 +137,9 @@ export function loadConfigObject(config: Partial<RenamiConfig>): RenamiConfig | 
 	if (typeof config === 'object') {
 		try {
 			// Set defaults, validate and parse the config
-			const validatedConfig = parseConfig(renamiConfig(config as unknown as Partial<RenamiConfig>))
+			const validatedConfig = parseConfig(
+				defineRenamiConfig(config as unknown as Partial<RenamiConfig>),
+			)
 			return validatedConfig
 		} catch (error) {
 			if (error instanceof Error) {
@@ -190,7 +192,7 @@ export async function loadConfig(
 			try {
 				// Validate and parse the config
 				const validatedConfig = parseConfig(
-					renamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
+					defineRenamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
 				)
 
 				log.info(`Loaded config from provided file path: ${loadedConfig.filepath}`)
@@ -212,7 +214,7 @@ export async function loadConfig(
 		try {
 			// Validate and parse the config
 			const validatedConfig = parseConfig(
-				renamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
+				defineRenamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
 			)
 
 			log.info(`Found config at location: ${loadedConfig.filepath}`)

@@ -1,7 +1,7 @@
 /* eslint-disable ts/require-await */
-import { renamiConfig, transformHelper } from '../../src/lib'
+import { defineRenamiConfig, transformHelper } from '../../src/lib'
 
-export default renamiConfig({
+export default defineRenamiConfig({
 	options: {
 		dryRun: true,
 		validateInput: false,
