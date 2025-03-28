@@ -27,7 +27,11 @@
 
 ## Overview
 
-Renami provides a configuration-driven approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
+Let your files tell you their true names.
+
+Renami treats file names as a function of file content.
+
+It provides a configuration-driven and deterministic approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
 
 The tool makes it easy to pull specific metadata from a file's content and pass it into simple templates to rename files.
 
@@ -47,13 +51,16 @@ The point is to write config that focuses on the _semantic_ aspects of the name 
   - Set Markdown file names from frontmatter fields via easy string-based templates
   - Set Markdown file name from content with [CSS-like selectors](https://github.com/syntax-tree/unist-util-select)
   - Set file names from file metadata like creation and modification dates
-- Change file extensions
+- Easily extensible / customizable
+  - Simple cases can be managed with simple template strings
+  - Custom handling of additional file types can be implemented right in the TypeScript configuration file
+  - Built-in support for additional additional file types is planned but not promised
+- File extension normalization (`.jpeg` --> `.jpg`, etc.)
 - Unicode normalization
-- Max-length name truncation with configurable `...` and support for detecting word breaks
+- Max-length name truncation with configurable `...` and support for breaking on words
 - Automatic deduplication with numeric increments
 - All kinds of text case transformations
-- Easily extensible / customizable
-- Idempotence, stable output over repeated invocations
+- Idempotent — stable, deterministic file name output across repeat invocations
 
 ### Non-Features
 
@@ -84,9 +91,9 @@ npm install --global renami
 
 ### Configuration
 
-Renami depends almost entirely on configuration to describe how it should rename files when its run. It uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration.
+Renami depends almost entirely on configuration to describe how it should rename files when its run. Internally, it uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration in the usual locations.
 
-The library also exports a typed configuration factory function to simplify authoring configurations.
+The library also exports a typed configuration factory function to provide type hinting when authoring configurations.
 
 A trivial configuration might look like this:
 

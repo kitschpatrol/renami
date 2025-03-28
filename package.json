@@ -47,7 +47,7 @@
 	},
 	"dependencies": {
 		"@types/mdast": "^4.0.4",
-		"@types/node": "^20.17.25",
+		"@types/node": "^20.17.28",
 		"@types/yargs": "^17.0.33",
 		"chalk": "^5.4.1",
 		"cosmiconfig": "^9.0.0",
@@ -57,7 +57,7 @@
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
-		"@kitschpatrol/shared-config": "^5.3.1",
+		"@kitschpatrol/shared-config": "^5.4.0",
 		"@sindresorhus/is": "^7.0.1",
 		"@stdlib/assert-is-absolute-path": "^0.2.2",
 		"bumpp": "^10.1.0",
@@ -71,7 +71,7 @@
 		"natural-orderby": "^5.0.0",
 		"numerable": "^0.3.15",
 		"path-browserify-esm": "^1.0.6",
-		"pkgroll": "^2.11.2",
+		"pkgroll": "^2.12.1",
 		"pretty-ms": "^9.2.0",
 		"property-expr": "^2.0.6",
 		"remark-frontmatter": "^5.0.0",
@@ -85,7 +85,7 @@
 		"vitest": "^3.0.9",
 		"zod": "^3.24.2"
 	},
-	"packageManager": "pnpm@10.6.5",
+	"packageManager": "pnpm@10.7.0",
 	"engines": {
 		"node": ">=20.11.0"
 	},
