@@ -1,6 +1,6 @@
 import path from 'pathe'
 import type { Transform } from '../transform'
-import type { FileAdapter } from '../utilities/file'
+import type { FileAdapter } from '../utilities/file-adapter'
 import type { PathObject } from '../utilities/path'
 
 /**

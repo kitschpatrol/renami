@@ -5,7 +5,7 @@ import { orderBy } from 'natural-orderby'
 import path from 'pathe'
 import type { Options } from './config'
 import type { Transform } from './transform'
-import type { FileAdapter } from './utilities/file'
+import type { FileAdapter } from './utilities/file-adapter'
 import { defaultOptions } from './config'
 import { universalTemplate } from './helpers/universal'
 import {
@@ -18,7 +18,7 @@ import {
 	truncateTransform,
 } from './transform'
 import { ensureArray } from './utilities/array'
-import { exists, getDefaultFileAdapter } from './utilities/file'
+import { exists, getDefaultFileAdapter } from './utilities/file-adapter'
 import log from './utilities/log'
 import { isAbsolute, pathIsFolderNote, pathObjectSetAll, pathObjectSetName } from './utilities/path'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
