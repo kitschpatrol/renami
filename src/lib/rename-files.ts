@@ -154,6 +154,7 @@ export async function renameFiles(options: {
 		dryRun,
 		ignoreFolderNotes,
 		maxLength,
+		strict,
 		trim,
 		truncateOnWordBoundary,
 		truncationString,
@@ -186,15 +187,17 @@ export async function renameFiles(options: {
 		fileRenamePlan = fileRenamePlan.filter((task) => !pathIsFolderNote(task.filePathOriginal))
 	}
 
-	const transformArray = [
+	const userTransformArray =
 		// Wrap user-provided transforms in an array if necessary
-		...ensureArray(transform).map((transformItem) => {
+		ensureArray(transform).map((transformItem) => {
 			// Turn any plain string values into Universal Template functions
 			if (typeof transformItem === 'string') {
 				return universalTemplate(transformItem, localOptions)
 			}
 			return transformItem
-		}),
+		})
+
+	const standardTransformArray = [
 		// Standard transforms
 		stripIncrementTransform(),
 		safeTransform(defaultName),
@@ -211,17 +214,32 @@ export async function renameFiles(options: {
 		}),
 	]
 
+	const transformArray = [...userTransformArray, ...standardTransformArray]
+
 	// Run the action function on each valid file and update its file path renamed value
 	for (const task of fileRenamePlan) {
 		// May contain trailing increments, like (1)!
 		const pathObject = path.parse(task.filePathOriginal)
 
+		let undefinedCount = 0
+
 		// Run actions, in order, passing along transformed output, skipping any that return undefined
-		for (const transform of transformArray) {
-			const result = await transform({ fileAdapter, filePath: pathObject })
+		for (const [index, transform] of transformArray.entries()) {
+			let result = await transform({ fileAdapter, filePath: pathObject })
 
 			if (result === undefined) {
-				continue
+				undefinedCount += 1
+
+				// Use the default name if strict and all user transforms fail
+				if (
+					strict &&
+					index === userTransformArray.length - 1 &&
+					undefinedCount === userTransformArray.length
+				) {
+					result = defaultName
+				} else {
+					continue
+				}
 			}
 
 			if (typeof result === 'string') {

@@ -23,8 +23,8 @@ export function interpolateDocument(
 	metadata: Record<string, unknown>,
 	tree: Node,
 	options: Options = defaultOptions,
-): string {
-	return interpolate(template, (context: InterpolationContext) => {
+): string | undefined {
+	const result = interpolate(template, (context: InterpolationContext) => {
 		const { braceCount, pipeValues, value } = context
 
 		// Handle different brace counts
@@ -69,4 +69,6 @@ export function interpolateDocument(
 
 		return ''
 	})
+
+	return result === '' ? undefined : result
 }

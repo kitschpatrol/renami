@@ -22,7 +22,7 @@ export type RenamiReport = {
  * Gets all files matching the pattern(s) in the rules and ensures each file
  * is only processed ONCE by the last rule that matches it.
  * @param rules - The rules from the Renami configuration
- * @returns A 2D array where each inner array contains the files exclusively matched by a rule
+ * @returns A 2D array where each inner array contains the files exclusively matched by a rule, in the same order as the passed-in rules
  */
 async function getMaskedMatchedFiles(
 	rules: RenamiConfig['rules'],

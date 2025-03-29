@@ -254,10 +254,10 @@ Deep nested content.
 	// Additional edge case tests for document interpolation
 	it('should handle empty strings, null, and undefined values', () => {
 		const emptyStringResult = interpolateDocument('{emptyString}', frontmatter, ast, defaultOptions)
-		expect(emptyStringResult).toBe('')
+		expect(emptyStringResult).toBe(undefined)
 
 		const nullResult = interpolateDocument('{nullValue}', frontmatter, ast, defaultOptions)
-		expect(nullResult).toBe('')
+		expect(nullResult).toBe(undefined)
 
 		const undefinedResult = interpolateDocument(
 			'{undefinedValue}',
@@ -265,7 +265,7 @@ Deep nested content.
 			ast,
 			defaultOptions,
 		)
-		expect(undefinedResult).toBe('')
+		expect(undefinedResult).toBe(undefined)
 	})
 
 	it('should handle zero value', () => {
@@ -283,7 +283,7 @@ Deep nested content.
 
 	it('should handle empty arrays and objects', () => {
 		const emptyArrayResult = interpolateDocument('{arrays.empty}', frontmatter, ast, defaultOptions)
-		expect(emptyArrayResult).toBe('')
+		expect(emptyArrayResult).toBe(undefined)
 
 		const emptyObjectResult = interpolateDocument(
 			'{objects.empty}',
@@ -291,7 +291,7 @@ Deep nested content.
 			ast,
 			defaultOptions,
 		)
-		expect(emptyObjectResult).toBe('')
+		expect(emptyObjectResult).toBe(undefined)
 	})
 
 	it('should handle nested arrays and complex access patterns', () => {
@@ -433,7 +433,7 @@ Deep nested content.
 			ast,
 			defaultOptions,
 		)
-		expect(nonExistentResult).toBe('')
+		expect(nonExistentResult).toBe(undefined)
 	})
 
 	it('should handle mixed format types', () => {

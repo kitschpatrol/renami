@@ -564,3 +564,174 @@ describe('ignore folder notes tests', () => {
 		`)
 	})
 })
+
+describe('strict rename tests', () => {
+	// Setup the temp files fixture with source files
+	const tempFiles = useTempFiles({
+		cleanup: true, // Will clean up after each test
+		prefix: 'renami-rename-files-test-',
+		sourcePath: './test/assets/test-basic',
+	})
+
+	it('should use default name if strict and no user-provided transforms work', async () => {
+		const filePaths = await tempFiles.getFiles()
+
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				caseType: 'kebab',
+				defaultName: 'The Default Name',
+				dryRun: true,
+				strict: true,
+			},
+			transform: '{non-existent-frontmatter-key}', // All transforms return undefined
+		})
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/basic.md",
+			      "filePathRenamed": "/the-default-name (1).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/camelCaseFile.md",
+			      "filePathRenamed": "/the-default-name (2).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/kebab-case-file.md",
+			      "filePathRenamed": "/the-default-name (3).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/miXedC_aseF-ile.md",
+			      "filePathRenamed": "/the-default-name (4).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/Sentence case file.md",
+			      "filePathRenamed": "/the-default-name (5).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/snake_case_file.md",
+			      "filePathRenamed": "/the-default-name (6).md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+
+	it('should use original name if not strict and no user-provided transforms work', async () => {
+		const filePaths = await tempFiles.getFiles()
+
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				caseType: 'kebab',
+				defaultName: 'The Default Name',
+				dryRun: true,
+				strict: false,
+			},
+			transform: '{non-existent-frontmatter-key}', // All transforms return undefined
+		})
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/basic.md",
+			      "filePathRenamed": "/basic.md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/camelCaseFile.md",
+			      "filePathRenamed": "/camel-case-file.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/kebab-case-file.md",
+			      "filePathRenamed": "/kebab-case-file.md",
+			      "status": "unchanged",
+			    },
+			    {
+			      "filePathOriginal": "/miXedC_aseF-ile.md",
+			      "filePathRenamed": "/mi-xed-c-ase-f-ile.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/Sentence case file.md",
+			      "filePathRenamed": "/sentence-case-file.md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/snake_case_file.md",
+			      "filePathRenamed": "/snake-case-file.md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+
+	it('strict mode should handle partially failed string templates correctly', async () => {
+		const filePaths = await tempFiles.getFiles()
+
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				caseType: 'kebab',
+				defaultName: 'The Default Name',
+				dryRun: true,
+				strict: true,
+			},
+			transform: 'Name-{non-existent-frontmatter-key}', // All transforms return undefined
+		})
+
+		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
+			{
+			  "dryRun": true,
+			  "duration": 0,
+			  "files": [
+			    {
+			      "filePathOriginal": "/basic.md",
+			      "filePathRenamed": "/name (1).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/camelCaseFile.md",
+			      "filePathRenamed": "/name (2).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/kebab-case-file.md",
+			      "filePathRenamed": "/name (3).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/miXedC_aseF-ile.md",
+			      "filePathRenamed": "/name (4).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/Sentence case file.md",
+			      "filePathRenamed": "/name (5).md",
+			      "status": "renamed",
+			    },
+			    {
+			      "filePathOriginal": "/snake_case_file.md",
+			      "filePathRenamed": "/name (6).md",
+			      "status": "renamed",
+			    },
+			  ],
+			}
+		`)
+	})
+})

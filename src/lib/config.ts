@@ -17,7 +17,7 @@ export type Options = {
 	collapseDuplicateWhitespace: boolean
 	/** If a template is missing values and has sections like `bla - - bla - `, this will collapse extra delimiter strings to yield `bla - bla` */
 	collapseSurplusDelimiters: boolean
-	/** In rare cases a path that's all unsave characters will become zero-length... this default is used in such cases. */
+	/** In rare cases a path that's all unsafe characters, or that has no will become zero-length... and in strict mode, if no transformations work, then this default is used in such cases. */
 	defaultName: string
 	/** Delimiter to use to join array values in templates, and used to collapse surplus delimiters in templates */
 	delimiter: string
@@ -27,6 +27,8 @@ export type Options = {
 	ignoreFolderNotes: boolean
 	/** Maximum number of characters in the file, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum. */
 	maxLength: number
+	/** If no user-provided transformations work (they all return undefined), then use the default name. Otherwise, the original name is preserved. Technically breaks idempotence. */
+	strict: boolean
 	/** Trim leading and trailing white space */
 	trim: boolean
 	/** Try to truncate the file on a word boundary, might result in files shorter than the maxLength target. */
@@ -68,6 +70,7 @@ const OptionsSchema = z
 		dryRun: z.boolean(),
 		ignoreFolderNotes: z.boolean(),
 		maxLength: z.number().int().positive().lte(1000),
+		strict: z.boolean(),
 		trim: z.boolean(),
 		truncateOnWordBoundary: z.boolean(),
 		truncationString: z.string(),
@@ -110,6 +113,7 @@ export const defaultOptions: Options = {
 	dryRun: false,
 	ignoreFolderNotes: false,
 	maxLength: FILENAME_MAX_LENGTH,
+	strict: false,
 	trim: true,
 	truncateOnWordBoundary: true,
 	truncationString: '...',
