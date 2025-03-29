@@ -264,7 +264,7 @@ Given a string template like `'File {key|format}'`, the `format` string will be 
 
 ### Case changes
 
-If the format string is a case type name, the content of the template key will be tranformed accordingly. This happens before global "options" level case directives, and may be overwritten by global case transformation options.
+If the format string is a case type name, the content of the template key will be transformed accordingly. This happens before global "options" level case directives, and may be overwritten by global case transformation options.
 
 `'Note - {title|uppercase}'` → `Note - TITLE FROM FRONTMATTER.md`
 
@@ -272,7 +272,7 @@ Supported strings are `'camel'`, `'kebab'`, `'lowercase'`, `'pascal'`, `'preserv
 
 ### Number formatting
 
-Next, renami will attempt to parse the resolved value as a numer and format it according to the [numerable](https://github.com/gastonmesseri/numerable) library's format syntax. (Similar to formats specified by [TR35](https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns) / [ICU 67](https://github.com/unicode-org/icu/blob/main/docs/userguide/format_parse/numbers/skeletons.md).)
+Next, renami will attempt to parse the resolved value as a number and format it according to the [numerable](https://github.com/gastonmesseri/numerable) library's format syntax. (Similar to formats specified by [TR35](https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns) / [ICU 67](https://github.com/unicode-org/icu/blob/main/docs/userguide/format_parse/numbers/skeletons.md).)
 
 `I have {count|0,0.00}` → `TK.md`
 
