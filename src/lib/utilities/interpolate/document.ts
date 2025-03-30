@@ -47,7 +47,7 @@ export function interpolateDocument(
 						})
 					: resolvedValue
 
-			return formatValue(cleanResolvedValue, pipeValues)
+			return formatValue(cleanResolvedValue, pipeValues, options)
 		}
 
 		if (braceCount === 2) {
@@ -55,7 +55,7 @@ export function interpolateDocument(
 			try {
 				const selected = select(value, tree)
 				const extractedValue = selected === undefined ? '' : toString(selected)
-				return formatValue(extractedValue, pipeValues)
+				return formatValue(extractedValue, pipeValues, options)
 			} catch {
 				// Return empty string if selection fails
 				return ''

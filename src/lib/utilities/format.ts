@@ -1,9 +1,20 @@
 import is from '@sindresorhus/is'
+import type { Options } from '../config'
 import type { CaseType } from './string'
+import { defaultOptions } from '../config'
 import { formatDate } from './date'
 import { formatNumber } from './number'
 import { FILENAME_MAX_LENGTH } from './platform'
 import { CASE_TYPE_NAMES, convertCase, truncate } from './string'
+
+// Shadows Options
+export type FormatOptions = Pick<Options, 'trim' | 'truncateOnWordBoundary' | 'truncationString'>
+
+const defaultFormatOptions: FormatOptions = {
+	trim: defaultOptions.trim,
+	truncateOnWordBoundary: defaultOptions.truncateOnWordBoundary,
+	truncationString: defaultOptions.truncationString,
+}
 
 /**
  * Helper to convert array or object to empty string
@@ -29,11 +40,21 @@ function emptyCollectionToString(value: unknown): string {
  * Function to format a value based on a format string or an array of format strings
  * @param value - The value to format
  * @param format - Optional format string or array of format strings to be chained in series
+ * @param options - Optional config options which can affect things like truncation
  * @returns - Formatted string
  */
-export function formatValue(value: unknown, format?: string | string[]): string {
+export function formatValue(
+	value: unknown,
+	format?: string | string[],
+	options?: FormatOptions,
+): string {
 	if (is.nullOrUndefined(format) || is.emptyArray(format) || is.emptyStringOrWhitespace(format)) {
 		return emptyCollectionToString(value)
+	}
+
+	const resolvedOptions = {
+		...defaultFormatOptions,
+		...options,
 	}
 
 	// Handle array of format strings by recursively applying each format
@@ -41,7 +62,7 @@ export function formatValue(value: unknown, format?: string | string[]): string 
 		// Apply each format string in sequence
 		let result = value
 		for (const aFormat of format) {
-			result = formatValue(result, aFormat)
+			result = formatValue(result, aFormat, resolvedOptions)
 		}
 
 		return String(result)
@@ -73,18 +94,29 @@ export function formatValue(value: unknown, format?: string | string[]): string 
 		// Ignore errors and try the next format
 	}
 
+	// At this point, Convert to string if value is not a string
+	const stringValue = emptyCollectionToString(value)
+
 	// Truncate strings if format is a number string
-	// Collides with the single-character number format string `0`
+	// Collides with the single-character number format string `0`, which
+	// will be taken by NumberFormatter since zero-length truncation doesn't make sense
 	// e.g. 'I love {name|10}'
-	if (is.nonEmptyString(value) && format.length < 4) {
+	if (is.nonEmptyString(stringValue) && format.length < 4) {
 		const maxLength = Number.parseInt(format, 10)
 		if (is.safeInteger(maxLength) && maxLength >= 1 && maxLength < 1000) {
-			return truncate(String(value), maxLength, FILENAME_MAX_LENGTH, true, false, '')
+			return truncate(
+				stringValue,
+				maxLength,
+				FILENAME_MAX_LENGTH,
+				resolvedOptions.truncateOnWordBoundary,
+				resolvedOptions.trim,
+				resolvedOptions.truncationString,
+			)
 		}
 	}
 
 	// TODO other formatting treats?
 
 	// Return as-is if no formatting succeeded
-	return emptyCollectionToString(value)
+	return stringValue
 }

@@ -183,6 +183,53 @@ Deep nested content.
 		expect(scientificResult).toMatch(/2.55e\+0/)
 	})
 
+	it('should format truncated strings with default options', () => {
+		const result = interpolateDocument('Title: {title|10}', frontmatter, ast, defaultOptions)
+		expect(result).toBe('Title: My...')
+
+		const integerResult = interpolateDocument(
+			'Reading time: {stats.readingTime|3}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
+		expect(integerResult).toBe('Reading time: ...')
+	})
+
+	it('should format truncated strings with custom options', () => {
+		const result = interpolateDocument('Title: {title|6}', frontmatter, ast, {
+			...defaultOptions,
+			truncateOnWordBoundary: false,
+			truncationString: '',
+		})
+
+		console.log(result)
+
+		expect(result).toBe('Title: My Doc')
+	})
+
+	it('should ignore negative number format string', () => {
+		const result = interpolateDocument(
+			'Title: {title|-1} - Is what it is',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
+
+		expect(result).toBe('Title: My Document - Is what it is')
+	})
+
+	it('should ignore fractional number format string', () => {
+		const result = interpolateDocument(
+			'Title: {title|10.5} - Is what it is',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
+
+		expect(result).toBe('Title: My Document - Is what it is')
+	})
+
 	it('should handle escaped characters', () => {
 		const result = interpolateDocument(
 			String.raw`Escaped braces: \{title\}`,
