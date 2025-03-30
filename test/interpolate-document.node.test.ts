@@ -483,6 +483,11 @@ Deep nested content.
 		expect(nonExistentResult).toBe(undefined)
 	})
 
+	it('should discard the frontmatter node from the ast', () => {
+		const firstChild = interpolateDocument('{{*:first-child}}', frontmatter, ast, defaultOptions)
+		expect(firstChild).toBe('Implementing a Template System')
+	})
+
 	it('should handle mixed format types', () => {
 		// When applying a number format to a date, numerable should handle it appropriately
 		const dateWithNumberFormat = interpolateDocument(

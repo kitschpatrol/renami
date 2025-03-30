@@ -24,13 +24,15 @@ export function getMarkdown(content: string): {
 		.use(remarkGfm) // Support GitHub Flavored Markdown
 		.use(remarkFrontmatter) // Parse frontmatter syntax
 
-	// Parse the content into an AST
-	const ast = processor.parse(file)
-
 	// Extract frontmatter data
 	matter(file, {
-		strip: false,
+		// Remove the frontmatter node from the AST
+		// This ensures that selectors like `{{*:first-child}}` don't return YAML
+		strip: true,
 	})
+
+	// Parse the content into an AST
+	const ast = processor.parse(file)
 
 	return {
 		ast,
