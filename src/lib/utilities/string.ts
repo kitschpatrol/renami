@@ -15,7 +15,7 @@ function isWordBoundary(text: string, index: number): boolean {
 	const current = text.charAt(index)
 
 	// If the current character is a delimiter, use this as a boundary
-	if ([' ', '-', '.', '_'].includes(current)) {
+	if ([' ', ',', '-', '.', '_'].includes(current)) {
 		return true
 	}
 
@@ -76,7 +76,15 @@ export function truncate(
 	let boundary = safeMaxLength
 	for (let i = safeMaxLength; i > 0; i--) {
 		if (isWordBoundary(text, i)) {
+			// Skip multiple adjacent boundary characters
+			// (e.g., for text like "word, next" we want "word" not "word,")
 			boundary = i
+			// Keep moving back until we find a non-boundary character
+			while (boundary > 0 && isWordBoundary(text, boundary)) {
+				boundary--
+			}
+			// Now we're on the last character of the word, so add 1 to include it
+			boundary++
 			break
 		}
 	}
