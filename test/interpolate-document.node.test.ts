@@ -172,7 +172,7 @@ Deep nested content.
 		expect(smallNumber).toBe('1.23K')
 	})
 
-	// Not supported by Numerable....
+	// Not supported by Numerable
 	it.skip('should format numbers with scientific notation', () => {
 		const scientificResult = interpolateDocument(
 			'{stats.readingTime|0.00e+0}',

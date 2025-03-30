@@ -327,13 +327,28 @@ export function convertCase(text: string, caseType: CaseType): string {
 /**
  * Ensures that the filename is filesystem-safe and Unicode normalized
  * @param text Text to be converted to a safe filename, just the extension-less name NOT the full path
+ * @param defaultEmptyFilename Default filename to use if the text is empty or all whitespace
+ * @param preserveTrailingPeriods Whether to preserve trailing periods in the filename, technically reserve on Windows...
  * @returns A safe filename
  */
-export function getSafeFilename(text: string, defaultEmptyFilename = 'Untitled'): string {
+export function getSafeFilename(
+	text: string,
+	defaultEmptyFilename = 'Untitled',
+	preserveTrailingPeriods = true,
+): string {
 	let basicSafeFilename = filenamify(text, {
 		maxLength: Number.MAX_SAFE_INTEGER,
 		replacement: ' ',
 	})
+
+	if (preserveTrailingPeriods) {
+		// Get trailing periods from original text
+		const trailingPeriods = /\.+$/.exec(text)
+		if (trailingPeriods) {
+			// Append the trailing periods to the safe filename
+			basicSafeFilename = `${basicSafeFilename}${trailingPeriods[0]}`
+		}
+	}
 
 	// Edge case where the filename is empty or all whitespace after invalid characters are removed
 	if (basicSafeFilename.trim().length === 0) {

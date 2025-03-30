@@ -4,7 +4,7 @@ import { renami } from '../src/lib'
 import { useTempFiles } from './fixtures/file-fixture'
 import { sanitizeRenameReport } from './utilities/sanitize'
 
-describe('rename tests', () => {
+describe('renami tests', () => {
 	// Setup the temp files fixture with source files from './test-files'
 	const tempFiles = useTempFiles({
 		cleanup: true, // Will clean up after each test

@@ -1,5 +1,6 @@
 /* eslint-disable ts/require-await */
 
+import pathe from 'pathe'
 import { describe, expect, it } from 'vitest'
 import { transformHelper } from '../src/lib'
 import { renameFiles } from '../src/lib/rename-files'
@@ -118,7 +119,7 @@ describe('basic rename tests', () => {
 			    },
 			    {
 			      "filePathOriginal": "/miXedC_aseF-ile.md",
-			      "filePathRenamed": "/miXedC....md",
+			      "filePathRenamed": "/miXed....md",
 			      "status": "renamed",
 			    },
 			    {
@@ -456,6 +457,27 @@ describe('markdown template tests', () => {
 			    },
 			  ],
 			}
+		`)
+	})
+
+	it('should handle inline and global truncation coherently', async () => {
+		const filePaths = await tempFiles.getFiles()
+
+		const result = await renameFiles({
+			filePaths,
+			options: {
+				dryRun: true,
+			},
+			transform: 'Heading - {{heading|10}} - {{heading|10}}',
+		})
+
+		const renamedFiles = result.files.map((file) => pathe.basename(file.filePathRenamed!))
+
+		expect(renamedFiles).toMatchInlineSnapshot(`
+			[
+			  "Heading - Hello... - Hello....md",
+			  "Heading - Some... - Some....md",
+			]
 		`)
 	})
 })
