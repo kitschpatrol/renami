@@ -15,7 +15,7 @@ function isWordBoundary(text: string, index: number): boolean {
 	const current = text.charAt(index)
 
 	// If the current character is a delimiter, use this as a boundary
-	if ([' ', ',', '-', '.', '_'].includes(current)) {
+	if ([' ', ',', '-', '.', ':', '_', '|'].includes(current)) {
 		return true
 	}
 
@@ -328,7 +328,9 @@ export function convertCase(text: string, caseType: CaseType): string {
  * Ensures that the filename is filesystem-safe and Unicode normalized
  * @param text Text to be converted to a safe filename, just the extension-less name NOT the full path
  * @param defaultEmptyFilename Default filename to use if the text is empty or all whitespace
- * @param preserveTrailingPeriods Whether to preserve trailing periods in the filename, technically reserve on Windows...
+ * @param preserveTrailingPeriods Whether to preserve trailing periods in the
+ * filename, technically reserve on Windows... single periods are still
+ * stripped.
  * @returns A safe filename
  */
 export function getSafeFilename(
@@ -343,7 +345,7 @@ export function getSafeFilename(
 
 	if (preserveTrailingPeriods) {
 		// Get trailing periods from original text
-		const trailingPeriods = /\.+$/.exec(text)
+		const trailingPeriods = /\.{2,}$/.exec(text)
 		if (trailingPeriods) {
 			// Append the trailing periods to the safe filename
 			basicSafeFilename = `${basicSafeFilename}${trailingPeriods[0]}`
