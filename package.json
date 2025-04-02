@@ -47,7 +47,7 @@
 	},
 	"dependencies": {
 		"@types/mdast": "^4.0.4",
-		"@types/node": "^20.17.28",
+		"@types/node": "^20.17.30",
 		"@types/yargs": "^17.0.33",
 		"chalk": "^5.4.1",
 		"cosmiconfig": "^9.0.0",
@@ -81,10 +81,10 @@
 		"unified": "^11.0.5",
 		"vfile": "^6.0.3",
 		"vfile-matter": "^5.0.1",
-		"vitest": "^3.0.9",
+		"vitest": "^3.1.1",
 		"zod": "^3.24.2"
 	},
-	"packageManager": "pnpm@10.7.0",
+	"packageManager": "pnpm@10.7.1",
 	"engines": {
 		"node": ">=20.11.0"
 	},
