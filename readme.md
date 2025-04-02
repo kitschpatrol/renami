@@ -29,7 +29,7 @@
 
 Let your files tell you their true names.
 
-Renami treats file names as a function of file content. It provides a configuration-driven and deterministic approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
+Renami generates file names as a function of file content. It provides a configuration-driven and deterministic approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
 
 The tool makes it easy to pull specific metadata from a file's content and pass it into simple string-based templates to rename files.
 
@@ -41,22 +41,20 @@ Renami provides an application-agnostic foundation for the [Renami Obsidian](htt
 
 Despite being configuration-driven, Renami aspires to use convention over configuration wherever possible. Basic filename hygiene like invalid character removal, Unicode normalization, deduplication, truncation, and (optionally) case transformation are all handled automatically and implicitly.
 
-The point is to write config that focuses on the _semantic_ aspects of the name change, not the syntactic ones.
-
 ### Features
 
 - Automatically set file names based on file content on a per-directory basis
-  - Set Markdown file names from frontmatter fields via easy string-based templates
-  - Set Markdown file name from content with [CSS-like selectors](https://github.com/syntax-tree/unist-util-select)
+  - Set Markdown file names from frontmatter fields via simple string-based templates
+  - Set Markdown file name from content with [CSS-like query selectors](https://github.com/syntax-tree/unist-util-select)
   - Set file names from file metadata like creation dates
 - Easily extensible / customizable
   - Simple cases can be managed with simple template strings
   - Complex cases are possible by implementing custom handlers right in the TypeScript configuration file
-  - Built-in support for additional additional file types is planned but not promised
-- File extension normalization (`.jpeg` --> `.jpg`, etc.)
+  - Built-in support for additional file types is planned but not promised
+- File extension normalization (`.jpeg` → `.jpg`, etc.)
 - Unicode normalization
 - Max-length name truncation with configurable `...` and support for breaking on words
-- Automatic deduplication with numeric increments
+- Automatic name collision resolution with numeric increments
 - All kinds of text case transformations
 - Support for formatting numbers and dates
 - Idempotent — stable, deterministic file name output across repeat invocations
@@ -70,7 +68,7 @@ The point is to write config that focuses on the _semantic_ aspects of the name 
 
 ### Dependencies
 
-The `renami` CLI tool requires Node 20+. The exported APIs are isomorphic, and should work in any relatively recent runtime environment — though in the browser you will need to implement your own file handling and glob matching logic to suit your use-case.
+The `renami` CLI tool requires Node 20+. The exported APIs are isomorphic, and should work in any relatively recent runtime environment — though in the browser you will need to implement your own file handling and glob matching logic to suit your environment.
 
 Renami is implemented in TypeScript and bundles a complete set of type definitions.
 
@@ -88,9 +86,9 @@ Or, install globally for access across your system:
 npm install --global renami
 ```
 
-## Usage
+See the sections below for details on configuration and available commands.
 
-### Configuration
+## Configuration
 
 Renami depends on configuration to describe how it should rename files when its run. Internally, it uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration in the usual locations.
 
@@ -181,16 +179,137 @@ export default defineRenamiConfig({
 })
 ```
 
-Once you have a configuration file, call `renami` from the command line or
-invoke the `renami()` function in the API to automatically discover and execute
+Once you have a configuration file, run `renami` from the command line or
+import and invoke the `renami()` function in the API to automatically discover and execute
 the renaming rules.
+
+### Configuration Options
+
+These may be applied globally at the top level of the configuration file, or on a per-rule basis.
+
+#### `caseType`
+
+Enforce a specific letter casing on the final filenames.
+
+#### `collapseDuplicateWhitespace`
+
+Replace duplicate whitespace with a single space.
+
+#### `collapseSurplusDelimiters`
+
+If a template is missing values and has sections like `bla - - bla - `, this will collapse extra delimiter strings to yield `bla - bla`.
+
+#### `defaultName`
+
+In rare cases where a path contains only unsafe characters, or when no transformations work in strict mode, this default name is used.
+
+#### `delimiter`
+
+The string used to join array values in templates and to collapse surplus delimiters in templates.
+
+#### `dryRun`
+
+When true, files aren't actually renamed; the operation is simulated only.
+
+#### `ignoreFolderNotes`
+
+Ignore notes matching the containing folder name, as may be the case when using the [obsidian-folder-notes](https://github.com/LostPaul/obsidian-folder-notes) plugin.
+
+#### `maxLength`
+
+Maximum number of characters in the file name, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum.
+
+#### `strict`
+
+If no user-provided transformations work (they all return undefined), then use the default name. Otherwise, the original name is preserved. Technically breaks idempotence.
+
+#### `trim`
+
+Trim leading and trailing white space from the file name.
+
+#### `truncateOnWordBoundary`
+
+Try to truncate the file name on a word boundary, which might result in file names shorter than the `maxLength` target.
+
+#### `truncationString`
+
+String (like `'...'`) to use when truncation is needed.
+
+#### `validateInput`
+
+Run checks to make sure the input file list is valid.
+
+#### `validateOutput`
+
+Make sure we're not overwriting a file that wasn't included in the input files.
+
+## Templates
+
+Renami implements a simple string-based filename templating system to cover most simple renaming scenarios. (And more complex behavior can always be implemented in JavaScript or TypeScript through a bespoke `transform` function.)
+
+Generally, `{single brackets}` denote _metadata_ placeholders related to the file, while `{{double brackets}}` denote _content_ placeholders from within the file, which might change subtly depending on file types.
+
+Either template style may contain `|` characters to delimit basic per-placeholder inline transformation commands. More details below.
+
+If a key in a template string placeholder cannot be resolved, it will be replaced with an empty string.
+
+### Supported file types
+
+Renami provides convenient template string behavior based on detected file types.
+
+Currently, only Markdown (`*.md`) support is implemented for string templates. For now, other file types may be renamed by defining a transform function in your Renami configuration.
+
+#### Markdown
+
+Single braces, `{` and `}`, surround accessors to the file's frontmatter object about the file, e.g. `File - {date.created}` or `Meeting about {tags[0]}`.
+
+Double braces, `{{` and `}}`, surround selector queries to an AST associated with the file, e.g. `{{heading}}`.
+
+If no object or selection path can be resolved, then an empty string `''` is returned.
+
+### Inline formatting
+
+Within either singe or double brace template keywords, an optional `|` character may be followed with a string to perform keyword-specific formatting. The interpolator will make a best-effort attempt to process the resolved value based on the string provided after the `|`. Multiple formatters may be chained.
+
+Given a string template like `'File {key|format}'`, the `format` string will be tested for a match against the following rules, in order:
+
+#### Case changes
+
+If the format string is a case type name, the content of the template key will be transformed accordingly. This happens before global "options" level case directives, and may be overwritten by global case transformation options.
+
+`'Note - {title|uppercase}'` → `Note - TITLE FROM FRONTMATTER.md`
+
+Supported strings are `'camel'`, `'kebab'`, `'lowercase'`, `'pascal'`, `'preserve'`, `'screaming-kebab'`, `'screaming-snake'`, `'sentence'`, `'slug'`, `'snake'`, `'title'`, `'uppercase'`.
+
+#### Number formatting
+
+Next, renami will attempt to parse the resolved value as a number and format it according to the [numerable](https://github.com/gastonmesseri/numerable) library's format syntax. (Similar to formats specified by [TR35](https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns) / [ICU 67](https://github.com/unicode-org/icu/blob/main/docs/userguide/format_parse/numbers/skeletons.md).)
+
+`I have {count|0,0.00}` → `TK.md`
+
+#### Date formatting
+
+Next, it will attempt to parse the resolved value as a date and format it, using [patterns](https://date-fns.org/v4.1.0/docs/format) based on [Unicode Technical Standard #35](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns). (See [here](https://toolboxpro.app/blog/unicode-cheatsheet) for a nice reference.)
+
+`'My Note about {{heading}} - {date|yyyy-MM-dd}'` → `My Note about Stuff - 2025-03-15.md`
+
+#### Truncation
+
+Passing a positive integer will trim the value:
+
+`'Note - {title|2}'` → `Note - Ti.md`
+
+_If none of the above value / format string combinations are valid, then the format string is ignored and the resolved value is returned as-is._
+
+## Usage
 
 ### Library
 
 ```ts
 import { renami } from 'renami'
 
-// Rename files based on local `renami.config.ts`
+// Rename files based on locally discoverable
+// configuration, e.g. `renami.config.ts`
 const report = await renami()
 
 console.log(report)
@@ -235,64 +354,6 @@ renami [options]
 | `--version`<br>`-v` | Show version number                                                                     | `boolean` |         |
 
 <!-- /cli-help -->
-
-## Options
-
-TK
-
-## Templates
-
-## Supported file types
-
-Renami provides convenient template string behavior based on detected file types.
-
-Currently, only Markdown (`*.md`) support is implemented for string templates. For now, other file types may be renamed by defining a transform function in your Renami configuration.
-
-### Markdown
-
-Single braces, `{` and `}`, surround accessors to the file's frontmatter object about the file, e.g. `File - {date.created}` or `Meeting about {tags[0]}`.
-
-Double braces, `{{` and `}}`, surround selector queries to an AST associated with the file, e.g. `{{heading}}`.
-
-If no object or selection path can be resolved, then an empty string `''` is returned.
-
-## Inline formatting
-
-Within either singe or double brace template keywords, an optional `|` character may be followed with a string to perform keyword-specific formatting. The interpolator will make a best-effort attempt to process the resolved value based on the string provided after the `|`. Multiple formatters may be chained.
-
-Given a string template like `'File {key|format}'`, the `format` string will be tested for a match against the following rules, in order:
-
-### Case changes
-
-If the format string is a case type name, the content of the template key will be transformed accordingly. This happens before global "options" level case directives, and may be overwritten by global case transformation options.
-
-`'Note - {title|uppercase}'` → `Note - TITLE FROM FRONTMATTER.md`
-
-Supported strings are `'camel'`, `'kebab'`, `'lowercase'`, `'pascal'`, `'preserve'`, `'screaming-kebab'`, `'screaming-snake'`, `'sentence'`, `'slug'`, `'snake'`, `'title'`, `'uppercase'`.
-
-### Number formatting
-
-Next, renami will attempt to parse the resolved value as a number and format it according to the [numerable](https://github.com/gastonmesseri/numerable) library's format syntax. (Similar to formats specified by [TR35](https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns) / [ICU 67](https://github.com/unicode-org/icu/blob/main/docs/userguide/format_parse/numbers/skeletons.md).)
-
-`I have {count|0,0.00}` → `TK.md`
-
-### Date formatting
-
-Next, it will attempt to parse the resolved value as a date and format it, using [patterns](https://date-fns.org/v4.1.0/docs/format) based on [Unicode Technical Standard #35](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns). (See [here](https://toolboxpro.app/blog/unicode-cheatsheet) for a nice reference.)
-
-`'My Note about {{heading}} - {date|yyyy-MM-dd}'` → `My Note about Stuff - 2025-03-15.md`
-
-### Truncation
-
-Passing a positive integer will trim the value:
-
-`'Note - {title|2}'` → `Note - Ti.md`
-
-_If none of the above value / format string combinations are valid, then the format string is ignored and the resolved value is returned as-is._
-
-## Delimiter collapse
-
-TK
 
 ## Background
 
