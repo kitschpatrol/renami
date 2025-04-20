@@ -10,6 +10,13 @@ title: My Document
 date:
   created: '2025-03-15T00:00:00.000'
   updated: '2025-03-16T00:00:00.000'
+basicDate: 2025-04-11
+dateWithTime: 2025-01-11T00:00:00.000
+dateWithTimeZone: 2025-01-11T00:00:00.000-0800
+dateWithUtcTimeZone: 2025-01-11T00:00:00.000Z
+dateWithTimeDst: 2025-04-11T00:00:00.000
+dateWithTimeZoneDst: 2025-04-11T00:00:00.000-0700
+dateWithUtcTimeZoneDst: 2025-04-11T00:00:00.000Z
 tags:
   - typescript
   - templates
@@ -483,6 +490,38 @@ Deep nested content.
 		expect(nonExistentResult).toBe(undefined)
 	})
 
+	it('should handle basic dates', () => {
+		const basicDateResult = interpolateDocument(
+			'{basicDate|yyyy-MM-dd}',
+			frontmatter,
+			ast,
+			defaultOptions,
+		)
+
+		expect(basicDateResult).toBe('2025-04-11')
+	})
+
+	it('should handle dates with time zones', () => {
+		const basicDateResult = interpolateDocument(
+			'{dateWithTime|MM-dd HH:mm x} - {dateWithTimeZone|MM-dd HH:mm x} - {dateWithUtcTimeZone|MM-dd HH:mm x} - {dateWithTimeDst|MM-dd HH:mm x} - {dateWithTimeZoneDst|MM-dd HH:mm x} - {dateWithUtcTimeZoneDst|MM-dd HH:mm x}',
+			frontmatter,
+			ast,
+			{ ...defaultOptions, timeZone: 'America/Los_Angeles' },
+		)
+		const resultArray = basicDateResult?.split(' - ')
+
+		expect(resultArray).toMatchInlineSnapshot(`
+			[
+			  "01-10 21:00 -08",
+			  "01-11 00:00 -08",
+			  "01-10 16:00 -08",
+			  "04-10 21:00 -07",
+			  "04-11 00:00 -07",
+			  "04-10 17:00 -07",
+			]
+		`)
+	})
+
 	it('should discard the frontmatter node from the ast', () => {
 		const firstChild = interpolateDocument('{{*:first-child}}', frontmatter, ast, defaultOptions)
 		expect(firstChild).toBe('Implementing a Template System')
@@ -499,13 +538,16 @@ Deep nested content.
 		expect(dateWithNumberFormat).toBe('2025-03-15T00:00:00.000')
 
 		// When applying a date format to a number, numerable should handle it appropriately
+		// Word count is 42, so this should be formatted as a date
 		const numberWithDateFormat = interpolateDocument(
 			'{stats.wordCount|yyyy-MM}',
 			frontmatter,
 			ast,
 			defaultOptions,
 		)
-		expect(numberWithDateFormat).toBe('2042-01')
+
+		// Note that date-fns `parseISO` ('4200-01') handles this differently from `new Date()` ('2042-01')
+		expect(numberWithDateFormat).toBe('4200-01')
 	})
 
 	it('should handle format strings containing braces and pipes', () => {

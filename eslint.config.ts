@@ -10,6 +10,12 @@ export default eslintConfig(
 						allowed: ['globby'],
 					},
 				],
+				'new-cap': [
+					'error',
+					{
+						capIsNewExceptionPattern: String.raw`^Intl\..`,
+					},
+				],
 				'ts/naming-convention': [
 					'error',
 					{

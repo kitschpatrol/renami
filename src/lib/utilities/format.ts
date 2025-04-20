@@ -8,9 +8,14 @@ import { FILENAME_MAX_LENGTH } from './platform'
 import { CASE_TYPE_NAMES, convertCase, truncate } from './string'
 
 // Shadows Options
-export type FormatOptions = Pick<Options, 'trim' | 'truncateOnWordBoundary' | 'truncationString'>
+export type FormatOptions = Pick<
+	Options,
+	'locale' | 'timeZone' | 'trim' | 'truncateOnWordBoundary' | 'truncationString'
+>
 
 const defaultFormatOptions: FormatOptions = {
+	locale: defaultOptions.locale,
+	timeZone: defaultOptions.timeZone,
 	trim: defaultOptions.trim,
 	truncateOnWordBoundary: defaultOptions.truncateOnWordBoundary,
 	truncationString: defaultOptions.truncationString,
@@ -40,7 +45,7 @@ function emptyCollectionToString(value: unknown): string {
  * Function to format a value based on a format string or an array of format strings
  * @param value - The value to format
  * @param format - Optional format string or array of format strings to be chained in series
- * @param options - Optional config options which can affect things like truncation
+ * @param options - Optional config options which can affect things like truncation and time zones
  * @returns - Formatted string
  */
 export function formatValue(
@@ -89,7 +94,7 @@ export function formatValue(
 	// e.g. 'Happy {birthday|YYYY-MM-DD}'
 
 	try {
-		return formatDate(value, format)
+		return formatDate(value, format, options?.timeZone, options?.locale)
 	} catch {
 		// Ignore errors and try the next format
 	}

@@ -5,11 +5,16 @@ import path from 'pathe'
 import { z } from 'zod'
 import type { Transform } from './transform'
 import type { CaseType } from './utilities/string'
+import type { TimeZone } from './utilities/time-zone'
 import { TransformSchema } from './transform'
 import log from './utilities/log'
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
 import { CASE_TYPE_NAMES } from './utilities/string'
+import { TIME_ZONES } from './utilities/time-zone'
 
+/**
+ * These globally and may also be overridden per-rule.
+ */
 export type Options = {
 	/** Enforce a specific letter casing on the final filenames. */
 	caseType: CaseType
@@ -23,12 +28,16 @@ export type Options = {
 	delimiter: string
 	/** Don't actually rename any files */
 	dryRun: boolean
-	/** Ignore notes matching the containing folder name, as may be the case when using the (obsidian-folder-notes)[https://github.com/LostPaul/obsidian-folder-notes] plugin. */
+	/** Ignore notes matching the containing folder name, as may be the case when using the [obsidian-folder-notes](https://github.com/LostPaul/obsidian-folder-notes) plugin. */
 	ignoreFolderNotes: boolean
+	/** Locale to use for date/time transformations. Takes a BCP-47 language tag like `"en-US"` */
+	locale: string
 	/** Maximum number of characters in the file, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum. */
 	maxLength: number
 	/** If no user-provided transformations work (they all return undefined), then use the default name. Otherwise, the original name is preserved. Technically breaks idempotence. */
 	strict: boolean
+	/** Timezone to use for date/time transformations. Takes an  [IANA tz value](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) like `"America/New_York"` */
+	timeZone: TimeZone
 	/** Trim leading and trailing white space */
 	trim: boolean
 	/** Try to truncate the file on a word boundary, might result in files shorter than the maxLength target. */
@@ -69,8 +78,12 @@ const OptionsSchema = z
 		delimiter: z.string(),
 		dryRun: z.boolean(),
 		ignoreFolderNotes: z.boolean(),
+		locale: z.string().refine(isValidLocale, {
+			message: 'Invalid BCP-47 locale tag',
+		}),
 		maxLength: z.number().int().positive().lte(1000),
 		strict: z.boolean(),
+		timeZone: z.enum(TIME_ZONES),
 		trim: z.boolean(),
 		truncateOnWordBoundary: z.boolean(),
 		truncationString: z.string(),
@@ -112,8 +125,10 @@ export const defaultOptions: Options = {
 	delimiter: ' - ',
 	dryRun: false,
 	ignoreFolderNotes: false,
+	locale: Intl.DateTimeFormat().resolvedOptions().locale,
 	maxLength: FILENAME_MAX_LENGTH,
 	strict: false,
+	timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone,
 	trim: true,
 	truncateOnWordBoundary: true,
 	truncationString: '...',
@@ -259,5 +274,39 @@ function parseConfig(config: unknown): RenamiConfig {
 			throw new Error(`Invalid RenamiConfig: \n${formattedErrors}`)
 		}
 		throw error
+	}
+}
+
+/**
+ * Returns true if `tz` is a known IANA time‑zone.
+ */
+export function isValidTimeZone(tz: string): boolean {
+	// Modern engines (Node v21+, recent browsers) support this:
+	if (typeof Intl.supportedValuesOf === 'function') {
+		return Intl.supportedValuesOf('timeZone').includes(tz)
+	}
+
+	// Fallback: constructing a formatter will throw if tz is unrecognized
+	try {
+		// `undefined` locale → use runtime default
+		// eslint-disable-next-line no-new
+		new Intl.DateTimeFormat(undefined, { timeZone: tz })
+		return true
+	} catch {
+		return false
+	}
+}
+
+/**
+ * Returns true if `tag` is a valid BCP 47 locale.
+ */
+export function isValidLocale(tag: string): boolean {
+	try {
+		// Will throw a RangeError if `tag` isn’t a valid BCP 47 identifier
+		// eslint-disable-next-line no-new
+		new Intl.Locale(tag)
+		return true
+	} catch {
+		return false
 	}
 }
