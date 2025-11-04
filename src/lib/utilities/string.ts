@@ -450,10 +450,16 @@ export function collapseSurplusDelimiters(text: string, delimiter: string) {
 	let newText = text
 
 	// Leading, possibly with extra leading spaces
-	newText = newText.replaceAll(new RegExp(`^\\s*(${escapeStringRegexp(delimiter)}){1,}`, 'g'), '')
+	newText = newText.replaceAll(
+		new RegExp(String.raw`^\s*(${escapeStringRegexp(delimiter)}){1,}`, 'g'),
+		'',
+	)
 
 	// Trailing, possibly with extra trailing spaces
-	newText = newText.replaceAll(new RegExp(`(${escapeStringRegexp(delimiter)}){1,}\\s*$`, 'g'), '')
+	newText = newText.replaceAll(
+		new RegExp(String.raw`(${escapeStringRegexp(delimiter)}){1,}\s*$`, 'g'),
+		'',
+	)
 	// NewText = newText.replace(new RegExp(`${escapeStringRegexp(delimiter)}\\s*$`), '')
 
 	// Middle
