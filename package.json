@@ -42,61 +42,55 @@
 		"coverage": "vitest run --coverage",
 		"fix": "kpi fix",
 		"lint": "kpi lint",
-		"release": "bumpp --commit 'Release: %s' && pnpm run build && pnpm publish --otp $(op read 'op://Personal/Npmjs/one-time password?attribute=otp')",
+		"release": "bumpp --commit 'Release: %s' && pnpm run build && NPM_AUTH_TOKEN=$(op read 'op://Personal/npm/token') && pnpm publish",
 		"test": "vitest"
 	},
 	"dependencies": {
 		"@types/mdast": "^4.0.4",
-		"@types/node": "^20.17.30",
-		"@types/yargs": "^17.0.33",
-		"chalk": "^5.4.1",
+		"@types/node": "^20.19.24",
+		"@types/yargs": "^17.0.34",
+		"chalk": "^5.6.2",
 		"cosmiconfig": "^9.0.0",
-		"cosmiconfig-typescript-loader": "^6.1.0",
-		"globby": "^13.2.2",
+		"cosmiconfig-typescript-loader": "^6.2.0",
+		"globby": "^15.0.0",
 		"unist-util-select": "^5.1.0",
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
-		"@kitschpatrol/shared-config": "^5.4.0",
-		"@sindresorhus/is": "^7.0.1",
+		"@kitschpatrol/shared-config": "^5.8.1",
+		"@sindresorhus/is": "^7.1.1",
 		"@stdlib/assert-is-absolute-path": "^0.2.2",
-		"@vvo/tzdb": "^6.161.0",
-		"bumpp": "^10.1.0",
+		"@vvo/tzdb": "^6.193.0",
+		"bumpp": "^10.3.1",
 		"date-fns": "^4.1.0",
 		"date-fns-tz": "^3.2.0",
 		"deepmerge-ts": "^7.1.5",
 		"escape-string-regexp": "^5.0.0",
-		"filenamify": "^6.0.0",
+		"filenamify": "^7.0.0",
 		"github-slugger": "^2.0.0",
 		"mdast-util-to-string": "^4.0.0",
-		"nanoid": "^5.1.5",
+		"nanoid": "^5.1.6",
 		"natural-orderby": "^5.0.0",
 		"numerable": "^0.3.15",
 		"pathe": "^2.0.3",
-		"pkgroll": "^2.12.1",
-		"pretty-ms": "^9.2.0",
+		"pkgroll": "^2.20.1",
+		"pretty-ms": "^9.3.0",
 		"property-expr": "^2.0.6",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
 		"remark-parse": "^11.0.0",
-		"typescript": "~5.8.3",
+		"typescript": "~5.9.3",
 		"unified": "^11.0.5",
 		"vfile": "^6.0.3",
 		"vfile-matter": "^5.0.1",
-		"vitest": "^3.1.1",
-		"zod": "^3.24.3"
+		"vitest": "^4.0.7",
+		"zod": "^3.25.76"
 	},
-	"packageManager": "pnpm@10.8.1",
+	"packageManager": "pnpm@10.20.0",
 	"engines": {
-		"node": ">=20.11.0"
+		"node": ">=20.19.0"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild",
-			"puppeteer"
-		]
 	}
 }

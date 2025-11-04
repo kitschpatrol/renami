@@ -404,6 +404,7 @@ Style...
 
 - <https://f2.freshman.tech/> Great! But tricky to integrate in Obsidian because it's implemented in Go.
 - <https://github.com/75lb/renamer> Close! Depends on Node. JS instead of TS. No config file.
+- <https://manytricks.com/namemangler/> Notable in this context for metadata integration.
 
 ## Maintainers
 
