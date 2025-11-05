@@ -53,6 +53,7 @@ export function collapseSurplusDelimitersTransform(delimiter: string): Transform
  * Collapses duplicate whitespace into a single space
  */
 export function collapseWhitespaceTransform(): Transform {
+	// eslint-disable-next-line unicorn/consistent-function-scoping
 	return async (context) => collapseDuplicateSpaces(context.filePath.name)
 }
 
@@ -60,6 +61,7 @@ export function collapseWhitespaceTransform(): Transform {
  * Trims leading and trailing whitespace
  */
 export function trimTransform(): Transform {
+	// eslint-disable-next-line unicorn/consistent-function-scoping
 	return async (context) => context.filePath.name.trim()
 }
 
@@ -101,6 +103,7 @@ export function truncateTransform(options: {
  * Removes increment like (1) from the filename
  */
 export function stripIncrementTransform(): Transform {
+	// eslint-disable-next-line unicorn/consistent-function-scoping
 	return async (context) => stripIncrement(context.filePath.name)
 }
 

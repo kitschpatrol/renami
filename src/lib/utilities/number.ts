@@ -7,7 +7,7 @@ import { format as numerableFormat } from 'numerable'
  * @param value - any value which might actually be a number
  * @param format - numerable format string, will be validated
  * @returns string
- * @throws if the number could not be formatted
+ * @throws {Error} if the number could not be formatted
  */
 export function formatNumber(value: unknown, format: string): string {
 	// Validate

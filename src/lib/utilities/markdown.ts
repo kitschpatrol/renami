@@ -36,6 +36,7 @@ export function getMarkdown(content: string): {
 
 	return {
 		ast,
+		// eslint-disable-next-line ts/no-unsafe-type-assertion
 		frontmatter: (file.data.matter ?? {}) as Record<string, unknown>,
 	}
 }

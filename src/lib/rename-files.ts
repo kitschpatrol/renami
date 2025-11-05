@@ -1,6 +1,6 @@
 /* eslint-disable max-depth */
 import { deepmerge } from 'deepmerge-ts'
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid/non-secure'
 import { orderBy } from 'natural-orderby'
 import path from 'pathe'
 import type { Options } from './config'

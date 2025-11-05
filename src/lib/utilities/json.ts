@@ -217,6 +217,7 @@ function stringifyCompactInternal(
 		}
 
 		// Handle any other objects
+		// eslint-disable-next-line ts/no-unsafe-type-assertion
 		const entries = Object.entries(value as Record<string, unknown>)
 			.map(([k, v]) => {
 				const flatValue = stringifyCompactInternal(v, options, [...path, k], seen, depth + 1)

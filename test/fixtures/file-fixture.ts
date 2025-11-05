@@ -11,13 +11,11 @@ type TempFilesOptions = {
 	 * @default true
 	 */
 	cleanup?: boolean
-
 	/**
 	 * Custom prefix for the temporary directory
 	 * @default 'vitest-'
 	 */
 	prefix?: string
-
 	/**
 	 * Source directory path containing files to copy
 	 */

@@ -7,7 +7,10 @@ import { formatNumber } from './number'
 import { FILENAME_MAX_LENGTH } from './platform'
 import { CASE_TYPE_NAMES, convertCase, truncate } from './string'
 
-// Shadows Options
+/**
+ * Shadows Options
+ * @public
+ */
 export type FormatOptions = Pick<
 	Options,
 	'locale' | 'timeZone' | 'trim' | 'truncateOnWordBoundary' | 'truncationString'
@@ -78,7 +81,9 @@ export function formatValue(
 	// Format implementations...
 
 	// Case change
+	// eslint-disable-next-line ts/no-unsafe-type-assertion
 	if (is.nonEmptyString(value) && CASE_TYPE_NAMES.includes(format.toLowerCase() as CaseType)) {
+		// eslint-disable-next-line ts/no-unsafe-type-assertion
 		return convertCase(value, format as CaseType)
 	}
 

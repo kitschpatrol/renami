@@ -14,7 +14,7 @@ import type { TimeZone } from './time-zone'
  * @param timeZone - IANA time zone string (e.g., 'America/New_York', 'Europe/London', 'UTC')
  * @param localeId - Optional BCP 47 locale identifier string (e.g., "en-US", "fr", "ja"). Defaults to 'en-US' if omitted or load fails.
  * @returns string - The formatted date string.
- * @throws If the date value is invalid, format string is invalid, timezone is invalid, or formatting fails unexpectedly.
+ * @throws {Error} If the date value is invalid, format string is invalid, timezone is invalid, or formatting fails unexpectedly.
  */
 export function formatDate(
 	value: unknown,
@@ -35,6 +35,7 @@ export function formatDate(
 		throw new Error(`Invalid date format string: ${format}`)
 	}
 
+	// eslint-disable-next-line ts/no-unsafe-type-assertion
 	timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone
 	localeId ??= Intl.DateTimeFormat().resolvedOptions().locale
 

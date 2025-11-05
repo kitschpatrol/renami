@@ -4,8 +4,9 @@ import { extractLinkLabel } from '../src/lib/utilities/markdown'
 describe('extractLinkLabel', () => {
 	// Test handling of null/empty values
 	it('should handle null and undefined values', () => {
-		// eslint-disable-next-line unicorn/no-null
+		// eslint-disable-next-line unicorn/no-null, ts/no-unsafe-type-assertion
 		expect(extractLinkLabel(null as unknown as string)).toBeNull()
+		// eslint-disable-next-line ts/no-unsafe-type-assertion
 		expect(extractLinkLabel(undefined as unknown as string)).toBeUndefined()
 	})
 

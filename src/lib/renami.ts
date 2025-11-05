@@ -37,7 +37,7 @@ async function getMaskedMatchedFiles(
 	const processedFiles = new Set<string>()
 
 	// Process rules in reverse order (last to first)
-	const reversedRules = [...rules].reverse()
+	const reversedRules = [...rules].toReversed()
 	const reversedResults: string[][] = []
 
 	for (const rule of reversedRules) {
@@ -63,7 +63,7 @@ async function getMaskedMatchedFiles(
 	}
 
 	// Reverse the results back to original rule order
-	return reversedResults.reverse()
+	return reversedResults.toReversed()
 }
 
 /**

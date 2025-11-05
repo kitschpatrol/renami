@@ -23,7 +23,7 @@ export const FileAdapterSchema = z.object({
 	readFileBuffer: z
 		.function()
 		.args(z.string())
-		.returns(z.promise(z.instanceof(Uint8Array))),
+		.returns(z.promise(z.custom<Uint8Array>((value) => value instanceof Uint8Array))),
 	rename: z.function().args(z.string(), z.string()).returns(z.promise(z.void())),
 	stat: z
 		.function()
