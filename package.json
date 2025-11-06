@@ -71,7 +71,7 @@
 		"filenamify": "^7.0.1",
 		"github-slugger": "^2.0.0",
 		"mdast-util-to-string": "^4.0.0",
-		"mdat-plugin-cli-help": "^1.0.1",
+		"mdat-plugin-cli-help": "^1.0.2",
 		"nanoid": "^5.1.6",
 		"numerable": "^0.3.15",
 		"pathe": "^2.0.3",
