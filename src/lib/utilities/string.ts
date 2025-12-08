@@ -338,10 +338,17 @@ export function getSafeFilename(
 	defaultEmptyFilename = 'Untitled',
 	preserveTrailingPeriods = true,
 ): string {
+	const replacement = ' '
 	let basicSafeFilename = filenamify(text, {
 		maxLength: Number.MAX_SAFE_INTEGER,
-		replacement: ' ',
+		replacement,
 	})
+
+	// Filenamify 7 work-around, since it does not respect blank replacement string
+	// when final result is ' ', it returns '!' instead
+	// if (basicSafeFilename === '!' && text !== '!') {
+	// 	basicSafeFilename = replacement
+	// }
 
 	if (preserveTrailingPeriods) {
 		// Get trailing periods from original text

@@ -44,6 +44,7 @@ export function isNumerableFormatString(input: string): boolean {
 	// Check ending patterns
 	const trimmedInput = input.trim().toLowerCase()
 	if (
+		// eslint-disable-next-line de-morgan/no-negated-disjunction
 		!(
 			trimmedInput.endsWith('bb') ||
 			trimmedInput.endsWith('bd') ||
