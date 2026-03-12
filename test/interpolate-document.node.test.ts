@@ -210,8 +210,6 @@ Deep nested content.
 			truncationString: '',
 		})
 
-		console.log(result)
-
 		expect(result).toBe('Title: My Doc')
 	})
 

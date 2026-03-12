@@ -11,7 +11,7 @@ import { format as numerableFormat } from 'numerable'
  */
 export function formatNumber(value: unknown, format: string): string {
 	// Validate
-	if (!is.number(value) || is.numericString(value)) {
+	if (!is.number(value) && !is.numericString(value)) {
 		throw new Error(`Invalid number: ${String(value)}`)
 	}
 
