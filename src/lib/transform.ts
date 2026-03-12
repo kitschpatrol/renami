@@ -4,8 +4,6 @@ import { z } from 'zod'
 import type { FileAdapter } from './utilities/file-adapter'
 import type { PathObject } from './utilities/path'
 import type { CaseType } from './utilities/string'
-import { FileAdapterSchema } from './utilities/file-adapter'
-import { PathObjectSchema } from './utilities/path'
 import {
 	collapseDuplicateSpaces,
 	collapseSurplusDelimiters,
@@ -25,19 +23,9 @@ export type Transform = (context: {
 }) => Promise<PathObject | string | undefined>
 
 /**
- * Zod schema for Transform function, satisfies instead of infers for cleaner type intellisense.
+ * Zod schema for Transform function, validates that the value is a function.
  */
-export const TransformSchema = z
-	.function()
-	.args(
-		z.object({
-			fileAdapter: FileAdapterSchema,
-			filePath: PathObjectSchema,
-		}),
-	)
-	.returns(
-		z.promise(z.union([PathObjectSchema, z.string(), z.undefined()])),
-	) satisfies z.ZodType<Transform>
+export const TransformSchema = z.custom<Transform>((value) => typeof value === 'function')
 
 /**
  * Collapses surplus delimiters (i.e. two or more consecutive delimiters)

@@ -69,53 +69,47 @@ export type RenamiConfig = {
 /**
  * Zod schema for validating the Options type
  */
-const OptionsSchema = z
-	.object({
-		caseType: z.enum(CASE_TYPE_NAMES),
-		collapseDuplicateWhitespace: z.boolean(),
-		collapseSurplusDelimiters: z.boolean(),
-		defaultName: z.string().min(1),
-		delimiter: z.string(),
-		dryRun: z.boolean(),
-		ignoreFolderNotes: z.boolean(),
-		locale: z.string().refine(isValidLocale, {
-			message: 'Invalid BCP-47 locale tag',
-		}),
-		maxLength: z.number().int().positive().lte(1000),
-		strict: z.boolean(),
-		timeZone: z.enum(TIME_ZONES),
-		trim: z.boolean(),
-		truncateOnWordBoundary: z.boolean(),
-		truncationString: z.string(),
-		validateInput: z.boolean(),
-		validateOutput: z.boolean(),
-	})
-	.strict() satisfies z.ZodType<Options>
+const OptionsSchema = z.strictObject({
+	caseType: z.enum(CASE_TYPE_NAMES),
+	collapseDuplicateWhitespace: z.boolean(),
+	collapseSurplusDelimiters: z.boolean(),
+	defaultName: z.string().min(1),
+	delimiter: z.string(),
+	dryRun: z.boolean(),
+	ignoreFolderNotes: z.boolean(),
+	locale: z.string().refine(isValidLocale, {
+		message: 'Invalid BCP-47 locale tag',
+	}),
+	maxLength: z.number().int().positive().lte(1000),
+	strict: z.boolean(),
+	timeZone: z.enum(TIME_ZONES),
+	trim: z.boolean(),
+	truncateOnWordBoundary: z.boolean(),
+	truncationString: z.string(),
+	validateInput: z.boolean(),
+	validateOutput: z.boolean(),
+}) satisfies z.ZodType<Options>
 
 /**
  * Zod schema for validating the Rule type
  */
-const RuleSchema = z
-	.object({
-		options: z.optional(OptionsSchema.partial()),
-		pattern: z.union([z.string(), z.array(z.string())]),
-		transform: z.optional(
-			z.union([z.string(), z.array(z.string()), TransformSchema, z.array(TransformSchema)]),
-		),
-	})
-	.strict() satisfies z.ZodType<Rule>
+const RuleSchema = z.strictObject({
+	options: z.optional(OptionsSchema.partial()),
+	pattern: z.union([z.string(), z.array(z.string())]),
+	transform: z.optional(
+		z.union([z.string(), z.array(z.string()), TransformSchema, z.array(TransformSchema)]),
+	),
+}) satisfies z.ZodType<Rule>
 
 /**
  * Zod schema for validating the RenamiConfig type
  */
-const RenamiConfigSchema = z
-	.object({
-		/** Default options for all tasks, may be overridden per-task */
-		options: z.optional(OptionsSchema.partial()),
-		/** List of tasks to perform */
-		rules: z.optional(z.array(RuleSchema)),
-	})
-	.strict() satisfies z.ZodType<RenamiConfig>
+const RenamiConfigSchema = z.strictObject({
+	/** Default options for all tasks, may be overridden per-task */
+	options: z.optional(OptionsSchema.partial()),
+	/** List of tasks to perform */
+	rules: z.optional(z.array(RuleSchema)),
+}) satisfies z.ZodType<RenamiConfig>
 
 export const defaultOptions: Options = {
 	caseType: 'preserve',
@@ -268,18 +262,16 @@ export async function loadConfig(
  * @throws {Error} if the configuration is invalid
  */
 function parseConfig(config: unknown): RenamiConfig {
-	try {
-		return RenamiConfigSchema.parse(config)
-	} catch (error) {
-		if (error instanceof z.ZodError) {
-			const formattedErrors = error.errors
-				.map((error_) => `${error_.path.join('.')}: ${error_.message}`)
-				.join('\n')
-
-			throw new Error(`Invalid RenamiConfig: \n${formattedErrors}`)
-		}
-		throw error
+	const result = RenamiConfigSchema.safeParse(config)
+	if (result.success) {
+		return result.data
 	}
+
+	const formattedErrors = result.error.issues
+		.map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+		.join('\n')
+
+	throw new Error(`Invalid RenamiConfig: \n${formattedErrors}`)
 }
 
 /**

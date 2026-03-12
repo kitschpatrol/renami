@@ -1,3 +1,4 @@
+import is from '@sindresorhus/is'
 import { z } from 'zod'
 import { ENVIRONMENT } from './platform'
 
@@ -16,30 +17,19 @@ export type FileAdapter = {
 }
 
 /**
- * Zod schema for FileAdapter, satisfies instead of infers for cleaner type intellisense.
+ * Zod schema for FileAdapter, validates that the value has the expected function properties.
+ * @public
  */
-export const FileAdapterSchema = z.object({
-	readFile: z.function().args(z.string()).returns(z.promise(z.string())),
-	readFileBuffer: z
-		.function()
-		.args(z.string())
-		.returns(z.promise(z.custom<Uint8Array>((value) => value instanceof Uint8Array))),
-	rename: z.function().args(z.string(), z.string()).returns(z.promise(z.void())),
-	stat: z
-		.function()
-		.args(z.string())
-		.returns(
-			z.promise(
-				z.object({
-					// Require only the fields we can also get in Obsidian
-					ctimeMs: z.number(), // Time of creation, represented as a unix timestamp, in milliseconds.
-					mtimeMs: z.number(), // Time of last modification, represented as a unix timestamp, in milliseconds.
-					size: z.number(), // Size on disk, as bytes.
-				}),
-			),
-		),
-	writeFile: z.function().args(z.string(), z.string()).returns(z.promise(z.void())), // Not used, yet
-}) satisfies z.ZodType<FileAdapter>
+export const FileAdapterSchema = z.custom<FileAdapter>((value) => {
+	if (!is.plainObject(value)) return false
+	return (
+		is.function(value.readFile) &&
+		is.function(value.readFileBuffer) &&
+		is.function(value.rename) &&
+		is.function(value.stat) &&
+		is.function(value.writeFile)
+	)
+})
 
 /**
  * Wrapper around the file system stat function to check if a file exists.
