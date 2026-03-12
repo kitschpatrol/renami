@@ -1,5 +1,5 @@
 {
-	"name": "renami",
+	"name": "@kitschpatrol/renami",
 	"version": "0.0.0",
 	"description": "A CLI tool and TypeScript library for config-driven and content-aware automatic filename management.",
 	"keywords": [
@@ -91,5 +91,8 @@
 	"packageManager": "pnpm@10.32.1",
 	"engines": {
 		"node": ">=20.19.0"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
