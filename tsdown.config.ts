@@ -15,8 +15,10 @@ export default defineConfig([
 			// Polyfill for filenamify's use of node:path
 			'node:path': 'pathe',
 		},
+		deps: {
+			neverBundle: ['node:fs/promises'],
+		},
 		entry: 'src/lib/index.ts',
-		external: ['node:fs/promises'],
 		outDir: 'dist/lib',
 		platform: 'neutral',
 		tsconfig: 'tsconfig.build.json',

@@ -8,55 +8,18 @@ importers:
 
   .:
     dependencies:
+      '@sindresorhus/is':
+        specifier: ^7.2.0
+        version: 7.2.0
       '@stdlib/assert-is-absolute-path':
         specifier: ^0.2.3
         version: 0.2.3
-      '@types/mdast':
-        specifier: ^4.0.4
-        version: 4.0.4
-      '@types/node':
-        specifier: ^20.19.37
-        version: 20.19.37
-      '@types/yargs':
-        specifier: ^17.0.35
-        version: 17.0.35
       cosmiconfig:
         specifier: ^9.0.1
         version: 9.0.1(typescript@5.9.3)
       cosmiconfig-typescript-loader:
         specifier: ^6.2.0
         version: 6.2.0(@types/node@20.19.37)(cosmiconfig@9.0.1(typescript@5.9.3))(typescript@5.9.3)
-      format:
-        specifier: ^0.2.2
-        version: 0.2.2
-      globby:
-        specifier: ^16.1.1
-        version: 16.1.1
-      natural-orderby:
-        specifier: ^5.0.0
-        version: 5.0.0
-      picocolors:
-        specifier: ^1.1.1
-        version: 1.1.1
-      unist-util-select:
-        specifier: ^5.1.0
-        version: 5.1.0
-      yargs:
-        specifier: ^18.0.0
-        version: 18.0.0
-    devDependencies:
-      '@kitschpatrol/shared-config':
-        specifier: ^6.0.3
-        version: 6.0.3(@pnpm/logger@1001.0.1)(@types/estree@1.0.8)(@types/node@20.19.37)(@typescript-eslint/utils@8.57.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(jiti@2.6.1)(postcss-html@1.8.1)(stylelint-order@8.0.0(stylelint@17.4.0(typescript@5.9.3)))(svelte@5.53.11)(typescript@5.9.3)(vitest@4.1.0(@types/node@20.19.37)(vite@8.0.0(@types/node@20.19.37)(jiti@2.6.1)(yaml@2.8.2)))
-      '@sindresorhus/is':
-        specifier: ^7.2.0
-        version: 7.2.0
-      '@vvo/tzdb':
-        specifier: ^6.198.0
-        version: 6.198.0
-      bumpp:
-        specifier: ^10.4.1
-        version: 10.4.1
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -75,21 +38,27 @@ importers:
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
+      globby:
+        specifier: ^16.1.1
+        version: 16.1.1
       mdast-util-to-string:
         specifier: ^4.0.0
         version: 4.0.0
-      mdat-plugin-cli-help:
-        specifier: ^1.0.7
-        version: 1.0.7(mdat@1.4.1(@types/node@20.19.37)(typescript@5.9.3))(remark-mdat@1.2.4)
       nanoid:
         specifier: ^5.1.6
         version: 5.1.6
+      natural-orderby:
+        specifier: ^5.0.0
+        version: 5.0.0
       numerable:
         specifier: ^0.3.15
         version: 0.3.15
       pathe:
         specifier: ^2.0.3
         version: 2.0.3
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
       pretty-ms:
         specifier: ^9.3.0
         version: 9.3.0
@@ -105,27 +74,55 @@ importers:
       remark-parse:
         specifier: ^11.0.0
         version: 11.0.0
-      tsdown:
-        specifier: ^0.21.2
-        version: 0.21.2(oxc-resolver@11.19.1)(synckit@0.11.12)(typescript@5.9.3)
-      typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
       unified:
         specifier: ^11.0.5
         version: 11.0.5
+      unist-util-select:
+        specifier: ^5.1.0
+        version: 5.1.0
       vfile:
         specifier: ^6.0.3
         version: 6.0.3
       vfile-matter:
         specifier: ^5.0.1
         version: 5.0.1
-      vitest:
-        specifier: ^4.1.0
-        version: 4.1.0(@types/node@20.19.37)(vite@8.0.0(@types/node@20.19.37)(jiti@2.6.1)(yaml@2.8.2))
+      yargs:
+        specifier: ^18.0.0
+        version: 18.0.0
       zod:
         specifier: ^3.25.76
         version: 3.25.76
+    devDependencies:
+      '@kitschpatrol/shared-config':
+        specifier: ^6.0.3
+        version: 6.0.3(@pnpm/logger@1001.0.1)(@types/estree@1.0.8)(@types/node@20.19.37)(@typescript-eslint/utils@8.57.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(jiti@2.6.1)(postcss-html@1.8.1)(stylelint-order@8.0.0(stylelint@17.4.0(typescript@5.9.3)))(svelte@5.53.11)(typescript@5.9.3)(vitest@4.1.0(@types/node@20.19.37)(vite@8.0.0(@types/node@20.19.37)(jiti@2.6.1)(yaml@2.8.2)))
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
+      '@types/node':
+        specifier: ^20.19.37
+        version: 20.19.37
+      '@types/yargs':
+        specifier: ^17.0.35
+        version: 17.0.35
+      '@vvo/tzdb':
+        specifier: ^6.198.0
+        version: 6.198.0
+      bumpp:
+        specifier: ^10.4.1
+        version: 10.4.1
+      mdat-plugin-cli-help:
+        specifier: ^1.0.7
+        version: 1.0.7(mdat@1.4.1(@types/node@20.19.37)(typescript@5.9.3))(remark-mdat@1.2.4)
+      tsdown:
+        specifier: ^0.21.2
+        version: 0.21.2(oxc-resolver@11.19.1)(synckit@0.11.12)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.0
+        version: 4.1.0(@types/node@20.19.37)(vite@8.0.0(@types/node@20.19.37)(jiti@2.6.1)(yaml@2.8.2))
 
 packages:
 
