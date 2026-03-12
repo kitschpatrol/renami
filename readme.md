@@ -27,7 +27,7 @@
 
 ## Overview
 
-Let your files tell you their true names.
+Your files already know their names.
 
 Renami generates file names as a function of file content. It provides a configuration-driven and deterministic approach to automated filename management. Specify how you want certain folders of files to be named in the root of your project, and then run `renami` to keep all the filenames consistent and up-to-date.
 
@@ -90,7 +90,7 @@ See the sections below for details on configuration and available commands.
 
 ## Configuration
 
-Renami depends on configuration to describe how it should rename files when its run. Internally, it uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration in the usual locations.
+Renami depends on configuration to describe how it should rename files when it's run. Internally, it uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to search for and find relevant configuration in the usual locations.
 
 The library also exports a typed configuration factory function to provide type hinting when authoring configurations.
 
@@ -131,7 +131,7 @@ export default defineRenamiConfig({
     maxLength: 50,
   },
   // Each rule targets a group of files with a glob pattern, and specifies how
-  // matching filenames should be managed If a file matches multiple rules, only
+  // matching filenames should be managed. If a file matches multiple rules, only
   // the LAST rule in the array is applied to the file.
   rules: [
     {
@@ -269,7 +269,7 @@ If no object or selection path can be resolved, then an empty string `''` is ret
 
 ### Inline formatting
 
-Within either singe or double brace template keywords, an optional `|` character may be followed with a string to perform keyword-specific formatting. The interpolator will make a best-effort attempt to process the resolved value based on the string provided after the `|`. Multiple formatters may be chained.
+Within either single or double brace template keywords, an optional `|` character may be followed with a string to perform keyword-specific formatting. The interpolator will make a best-effort attempt to process the resolved value based on the string provided after the `|`. Multiple formatters may be chained.
 
 Given a string template like `'File {key|format}'`, the `format` string will be tested for a match against the following rules, in order:
 
@@ -362,49 +362,50 @@ renami [options]
 Case sensitivity...
 
 - Will change case as requested, but doesn't allow identically named but differently-cased files.
-- <https://unjs.io/packages/scule>
+- [scule](https://unjs.io/packages/scule)
 
 Template expansion...
 
-- <https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914>
-- <https://github.com/josh-hemphill/subslate>
-- <https://github.com/sindresorhus/pupa>
-- <https://github.com/sevensc/typescript-string-operations>
+- [lxghtless/subslate-gist](https://gist.github.com/lxghtless/262c2c1193e2a9055bc7ca4ae9ab5914)
+- [josh-hemphill/subslate](https://github.com/josh-hemphill/subslate)
+- [sindresorhus/pupa](https://github.com/sindresorhus/pupa)
+- [sevensc/typescript-string-operations](https://github.com/sevensc/typescript-string-operations)
 
 Inline formatting syntax...
 
-- ICU formatting standard (UTS #35)
-- <https://formatjs.github.io/>
+- [ICU formatting standard (UTS #35)](https://unicode.org/reports/tr35/)
+- [FormatJS](https://formatjs.github.io/)
 
 Number formatting...
 
-- <https://zuji-ts.vercel.app/>
-- <https://numbrojs.com/>
-- <https://github.com/gastonmesseri/numerable>
+- [zuji-ts](https://zuji-ts.vercel.app/)
+- [Numbro](https://numbrojs.com/)
+- [gastonmesseri/numerable](https://github.com/gastonmesseri/numerable)
 
 Renaming...
 
-- <https://github.com/vfile/vfile-rename>
+- [vfile/vfile-rename](https://github.com/vfile/vfile-rename)
 
 Markdown body selection...
 
-- <https://github.com/syntax-tree/unist-util-select>
-- <https://github.com/yshavit/mdq>
-
-Dependencies...
-
-- [`globby`](https://github.com/sindresorhus/globby) is currently restricted to `<14` due to [this issue](https://github.com/sindresorhus/globby/issues/260).
+- [syntax-tree/unist-util-select](https://github.com/syntax-tree/unist-util-select)
+- [yshavit/mdq](https://github.com/yshavit/mdq)
 
 Style...
 
 - Should we use "file name" or "filename"? Usually prefer "filename".
-- <https://english.stackexchange.com/questions/5366/which-is-correct-filename-file-name-or-filename>
+- [StackExchange: filename vs file name](https://english.stackexchange.com/questions/5366/which-is-correct-filename-file-name-or-filename)
 
 ### Similar projects
 
-- <https://f2.freshman.tech/> Great! But tricky to integrate in Obsidian because it's implemented in Go.
-- <https://github.com/75lb/renamer> Close! Depends on Node. JS instead of TS. No config file.
-- <https://manytricks.com/namemangler/> Notable in this context for metadata integration.
+- [F2](https://f2.freshman.tech/)\
+  Great! But tricky to integrate in Obsidian because it's implemented in Go.
+- [75lb/renamer](https://github.com/75lb/renamer)\
+  Close! Depends on Node. Written in JS instead of TS. No config file.
+- [Name Mangler](https://manytricks.com/namemangler/)
+  Notable in this context for metadata integration.
+- [vidir](https://joeyh.name/code/moreutils/)\
+  Edit a directory of filenames in your text editor. Part of moreutils. Not exactly similar, but very useful.
 
 ## Maintainers
 
