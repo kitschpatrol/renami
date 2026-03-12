@@ -20,6 +20,7 @@
 		"email": "eric@ericmika.com",
 		"url": "https://ericmika.com"
 	},
+	"sideEffects": false,
 	"type": "module",
 	"exports": {
 		".": {
@@ -40,30 +41,30 @@
 		"build": "tsdown",
 		"clean": "git rm -f pnpm-lock.yaml ; git clean -fdX",
 		"coverage": "vitest run --coverage",
-		"fix": "kpi fix",
-		"lint": "kpi lint",
+		"fix": "ksc fix",
+		"lint": "ksc lint",
 		"release": "bumpp --commit 'Release: %s' && pnpm run build && NPM_AUTH_TOKEN=$(op read 'op://Personal/npm/token') && pnpm publish",
 		"test": "vitest"
 	},
 	"dependencies": {
-		"@stdlib/assert-is-absolute-path": "^0.2.2",
+		"@stdlib/assert-is-absolute-path": "^0.2.3",
 		"@types/mdast": "^4.0.4",
-		"@types/node": "^20.19.25",
+		"@types/node": "^20.19.37",
 		"@types/yargs": "^17.0.35",
-		"cosmiconfig": "^9.0.0",
+		"cosmiconfig": "^9.0.1",
 		"cosmiconfig-typescript-loader": "^6.2.0",
 		"format": "^0.2.2",
-		"globby": "^13.2.2",
+		"globby": "^16.1.1",
 		"natural-orderby": "^5.0.0",
 		"picocolors": "^1.1.1",
 		"unist-util-select": "^5.1.0",
 		"yargs": "^18.0.0"
 	},
 	"devDependencies": {
-		"@kitschpatrol/shared-config": "^5.10.0",
-		"@sindresorhus/is": "^7.1.1",
+		"@kitschpatrol/shared-config": "^6.0.3",
+		"@sindresorhus/is": "^7.2.0",
 		"@vvo/tzdb": "^6.198.0",
-		"bumpp": "^10.3.2",
+		"bumpp": "^10.4.1",
 		"date-fns": "^4.1.0",
 		"date-fns-tz": "^3.2.0",
 		"deepmerge-ts": "^7.1.5",
@@ -71,7 +72,7 @@
 		"filenamify": "^6.0.0",
 		"github-slugger": "^2.0.0",
 		"mdast-util-to-string": "^4.0.0",
-		"mdat-plugin-cli-help": "^1.0.4",
+		"mdat-plugin-cli-help": "^1.0.7",
 		"nanoid": "^5.1.6",
 		"numerable": "^0.3.15",
 		"pathe": "^2.0.3",
@@ -80,15 +81,15 @@
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
 		"remark-parse": "^11.0.0",
-		"tsdown": "^0.17.1",
+		"tsdown": "^0.21.2",
 		"typescript": "~5.9.3",
 		"unified": "^11.0.5",
 		"vfile": "^6.0.3",
 		"vfile-matter": "^5.0.1",
-		"vitest": "^4.0.15",
+		"vitest": "^4.1.0",
 		"zod": "^3.25.76"
 	},
-	"packageManager": "pnpm@10.25.0",
+	"packageManager": "pnpm@10.32.1",
 	"engines": {
 		"node": ">=20.19.0"
 	}

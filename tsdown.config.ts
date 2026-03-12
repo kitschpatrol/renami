@@ -1,6 +1,7 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig([
+	// CLI
 	{
 		dts: false,
 		entry: 'src/bin/cli.ts',
@@ -8,6 +9,7 @@ export default defineConfig([
 		outDir: 'dist/bin',
 		platform: 'node',
 	},
+	// Library
 	{
 		alias: {
 			// Polyfill for filenamify's use of node:path
