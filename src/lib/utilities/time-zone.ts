@@ -419,6 +419,7 @@ export const TIME_ZONES = [
 	'Pacific/Tongatapu',
 	'Pacific/Wake',
 	'Pacific/Wallis',
+	'UTC',
 ] as const
 
 export type TimeZone = (typeof TIME_ZONES)[number]

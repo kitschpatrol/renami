@@ -1,20 +1,27 @@
 import type { Locale } from 'date-fns'
 import is from '@sindresorhus/is'
 import { parseISO } from 'date-fns'
-import { formatInTimeZone } from 'date-fns-tz'
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
 import * as locales from 'date-fns/locale'
 import type { TimeZone } from './time-zone'
 
+const TIMEZONE_OFFSET_REGEX = /(?:Z|[+-]\d{2}:?\d{2})$/i
+
 /**
  * Tries to format and value as a date using date-fns-tz
+ *
+ * @param value - Any value which might actually be a date
+ * @param format - Date-fns format string, will be validated
+ * @param timeZone - IANA time zone string (e.g., 'America/New_York',
+ *   'Europe/London', 'UTC')
+ * @param localeId - Optional BCP 47 locale identifier string (e.g., "en-US",
+ *   "fr", "ja"). Defaults to 'en-US' if omitted or load fails.
+ *
+ * @returns String - The formatted date string.
+ * @throws {Error} If the date value is invalid, format string is invalid,
+ *   timezone is invalid, or formatting fails unexpectedly.
  * @see https://date-fns.org/v4.1.0/docs/format
  * @see https://github.com/marnusw/date-fns-tz#formatintimezone
- * @param value - any value which might actually be a date
- * @param format - date-fns format string, will be validated
- * @param timeZone - IANA time zone string (e.g., 'America/New_York', 'Europe/London', 'UTC')
- * @param localeId - Optional BCP 47 locale identifier string (e.g., "en-US", "fr", "ja"). Defaults to 'en-US' if omitted or load fails.
- * @returns string - The formatted date string.
- * @throws {Error} If the date value is invalid, format string is invalid, timezone is invalid, or formatting fails unexpectedly.
  */
 export function formatDate(
 	value: unknown,
@@ -22,10 +29,25 @@ export function formatDate(
 	timeZone?: TimeZone,
 	localeId?: string, // Accept BCP 47 string, optional
 ): string {
-	// Use parseISO instead of new Date() to avoid timezone issues
-	// new Date('2025-04-11') // 2025-04-11T00:00:00.000Z
-	// parseISO('2025-04-11') // 2025-04-11T04:00:00.000Z
-	const dateValueLocal = is.date(value) ? value : parseISO(String(value))
+	// Resolve timezone and locale first since we need them for parsing TZ-less dates
+	// eslint-disable-next-line ts/no-unsafe-type-assertion
+	timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone
+	localeId ??= Intl.DateTimeFormat().resolvedOptions().locale
+
+	let dateValueLocal: Date
+	if (is.date(value)) {
+		dateValueLocal = value
+	} else {
+		const stringValue = String(value)
+		// If the date string has an explicit timezone offset (Z, +HH:MM, -HHMM, etc.),
+		// parseISO handles it correctly. Otherwise, interpret it as wall-clock time
+		// in the configured timezone using fromZonedTime, so results are consistent
+		// regardless of the system timezone.
+		const hasTimezoneOffset = TIMEZONE_OFFSET_REGEX.test(stringValue)
+		dateValueLocal = hasTimezoneOffset
+			? parseISO(stringValue)
+			: fromZonedTime(stringValue, timeZone)
+	}
 
 	if (!is.validDate(dateValueLocal)) {
 		throw new Error(`Invalid date: ${String(value)}`)
@@ -34,10 +56,6 @@ export function formatDate(
 	if (!isDateFnsFormatString(format)) {
 		throw new Error(`Invalid date format string: ${format}`)
 	}
-
-	// eslint-disable-next-line ts/no-unsafe-type-assertion
-	timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone
-	localeId ??= Intl.DateTimeFormat().resolvedOptions().locale
 
 	// Change to target time zone, if applicable...
 	// This might throw
@@ -64,6 +82,7 @@ const DATE_FNS_FORMAT_CHARS_REGEX = /^[abBcdDeEfFGhHiIkKLmMNoOpPqQrRsStTuUVwxXyY
 
 /**
  * Check if a string is a valid date-fns format string (basic check).
+ *
  * @see https://date-fns.org/v4.1.0/docs/format#
  */
 export function isDateFnsFormatString(input: string): boolean {
@@ -71,10 +90,11 @@ export function isDateFnsFormatString(input: string): boolean {
 }
 
 /**
- * Map a BCP 47 locale tag (e.g. "en-US", "pt-br", "zh-Hant-TW")
- * to the date‑fns locale key style:
- *  - language only → "en"
- *  - language + region → "enUS", "ptBR", "zhTW"
+ * Map a BCP 47 locale tag (e.g. "en-US", "pt-br", "zh-Hant-TW") to the date‑fns
+ * locale key style:
+ *
+ * - Language only → "en"
+ * - Language + region → "enUS", "ptBR", "zhTW"
  */
 const BCP47_SEPARATOR_REGEX = /[-_]/
 const REGION_SUBTAG_REGEX = /^[A-Z]{2}$/i
@@ -111,7 +131,9 @@ function bcp47ToDateFnsKey(tag: string): string {
 
 /**
  * Attempts to load a date-fns Locale object based on a BCP 47 string.
+ *
  * @param localeId - The BCP 47 locale identifier (e.g., "en-US", "fr", "ja").
+ *
  * @returns The Locale object or the default locale (enUS) if loading fails.
  */
 function getLocaleObject(localeId: string): Locale {
