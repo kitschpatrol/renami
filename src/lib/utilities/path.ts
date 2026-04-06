@@ -24,7 +24,7 @@ export type PathObject = z.infer<typeof PathObjectSchema>
  * @returns Whether the path is absolute
  */
 export function isAbsolute(filePath: string): boolean {
-	return isAbsolutePath.posix(filePath)
+	return isAbsolutePath.posix(filePath) || WINDOWS_DRIVE_LETTER_REGEX.test(filePath)
 }
 
 /**

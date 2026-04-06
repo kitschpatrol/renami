@@ -3,6 +3,7 @@ import { globby } from 'globby'
 import { cp, mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { normalize } from 'pathe'
 import { afterEach, beforeEach } from 'vitest'
 
 type TempFilesOptions = {
@@ -33,7 +34,8 @@ export function useTempFiles(options: TempFilesOptions) {
 
 	beforeEach(async () => {
 		// Create temporary directory with provided prefix
-		tempDirectoryPath = await mkdtemp(join(tmpdir(), prefix))
+		// Normalize to forward slashes so glob patterns work on Windows
+		tempDirectoryPath = normalize(await mkdtemp(join(tmpdir(), prefix)))
 
 		// Copy all files from source to the temp directory
 		await cp(sourcePath, tempDirectoryPath, { recursive: true })
