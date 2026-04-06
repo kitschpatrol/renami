@@ -2,6 +2,16 @@ import escapeStringRegexp from 'escape-string-regexp'
 import filenamify from 'filenamify'
 import { slug } from 'github-slugger'
 
+const LOWERCASE_OR_DIGIT_REGEX = /[a-z0-9]/
+const UPPERCASE_LETTER_REGEX = /[A-Z]/
+const NEWLINE_REGEX = /\r?\n/
+// eslint-disable-next-line regexp/no-unused-capturing-group
+const LEADING_SPACES_REGEX = /^( *)/
+const WORD_DELIMITER_REGEX = /[\s\-_]+/
+const TRAILING_PERIODS_REGEX = /\.{2,}$/
+const TRAILING_INCREMENT_REGEX = /\s\(\d+\)$/
+const INCREMENT_CAPTURE_REGEX = /\s\((\d+)\)$/
+
 /**
  * Determines if a position in a string is a word boundary.
  * @param text - The string to check
@@ -20,7 +30,7 @@ function isWordBoundary(text: string, index: number): boolean {
 	}
 
 	// Check for camelCase boundary: previous is lowercase letter/digit and current is uppercase
-	if (/[a-z0-9]/.test(previous) && /[A-Z]/.test(current)) {
+	if (LOWERCASE_OR_DIGIT_REGEX.test(previous) && UPPERCASE_LETTER_REGEX.test(current)) {
 		return true
 	}
 
@@ -131,7 +141,7 @@ export function trimLeadingIndentation(
 	raw = raw.replaceAll('\t', '  ')
 
 	// Split into lines.
-	const lines = raw.split(/\r?\n/)
+	const lines = raw.split(NEWLINE_REGEX)
 
 	// Remove leading/trailing blank lines.
 	while (lines.length > 0 && lines[0].trim() === '') {
@@ -145,8 +155,7 @@ export function trimLeadingIndentation(
 	let minIndent = Infinity
 	for (const line of lines) {
 		if (line.trim() === '') continue
-		// eslint-disable-next-line regexp/no-unused-capturing-group
-		const match = /^( *)/.exec(line)
+		const match = LEADING_SPACES_REGEX.exec(line)
 		if (match) {
 			minIndent = Math.min(minIndent, match[0].length)
 		}
@@ -228,7 +237,7 @@ export function convertCase(text: string, caseType: CaseType): string {
 		// Insert a space before any uppercase letter that follows a lowercase letter or number
 		.replaceAll(/([a-z0-9])([A-Z])/g, '$1 $2')
 		// Split on common delimiters and remove empty entries
-		.split(/[\s\-_]+/)
+		.split(WORD_DELIMITER_REGEX)
 		.filter((word) => word.length > 0)
 
 	switch (caseType) {
@@ -352,7 +361,7 @@ export function getSafeFilename(
 
 	if (preserveTrailingPeriods) {
 		// Get trailing periods from original text
-		const trailingPeriods = /\.{2,}$/.exec(text)
+		const trailingPeriods = TRAILING_PERIODS_REGEX.exec(text)
 		if (trailingPeriods) {
 			// Append the trailing periods to the safe filename
 			basicSafeFilename = `${basicSafeFilename}${trailingPeriods[0]}`
@@ -377,7 +386,7 @@ export function getSafeFilename(
  * @returns filename without the increment
  */
 export function stripIncrement(filename: string): string {
-	return filename.replace(/\s\(\d+\)$/, '')
+	return filename.replace(TRAILING_INCREMENT_REGEX, '')
 }
 
 /**
@@ -395,7 +404,7 @@ export function appendIncrement(filename: string, index: number): string {
  * @returns The increment as a number, or undefined if there is no increment
  */
 export function getIncrement(filename: string): number | undefined {
-	const match = /\s\((\d+)\)$/.exec(filename)
+	const match = INCREMENT_CAPTURE_REGEX.exec(filename)
 	if (match) {
 		return Number.parseInt(match[1], 10)
 	}

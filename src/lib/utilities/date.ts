@@ -57,15 +57,17 @@ export function formatDate(
 	return result
 }
 
+// Spell-checker: disable
+// eslint-disable-next-line regexp/prefer-range
+const DATE_FNS_FORMAT_CHARS_REGEX = /^[abBcdDeEfFGhHiIkKLmMNoOpPqQrRsStTuUVwxXyYzZ':\-+/\\\s.,]+$/
+// Spell-checker: enable
+
 /**
  * Check if a string is a valid date-fns format string (basic check).
  * @see https://date-fns.org/v4.1.0/docs/format#
  */
 export function isDateFnsFormatString(input: string): boolean {
-	// Spell-checker: disable
-	// eslint-disable-next-line regexp/prefer-range
-	return /^[abBcdDeEfFGhHiIkKLmMNoOpPqQrRsStTuUVwxXyYzZ':\-+/\\\s.,]+$/.test(input)
-	// Spell-checker: enable
+	return DATE_FNS_FORMAT_CHARS_REGEX.test(input)
 }
 
 /**
@@ -74,8 +76,12 @@ export function isDateFnsFormatString(input: string): boolean {
  *  - language only → "en"
  *  - language + region → "enUS", "ptBR", "zhTW"
  */
+const BCP47_SEPARATOR_REGEX = /[-_]/
+const REGION_SUBTAG_REGEX = /^[A-Z]{2}$/i
+const SCRIPT_SUBTAG_REGEX = /^[A-Z]{4}$/i
+
 function bcp47ToDateFnsKey(tag: string): string {
-	const parts = tag.split(/[-_]/)
+	const parts = tag.split(BCP47_SEPARATOR_REGEX)
 	const language = parts[0].toLowerCase()
 
 	let script: string | undefined
@@ -83,12 +89,12 @@ function bcp47ToDateFnsKey(tag: string): string {
 
 	for (let i = 1; i < parts.length; i++) {
 		const p = parts[i]
-		if (/^[A-Z]{2}$/i.test(p)) {
+		if (REGION_SUBTAG_REGEX.test(p)) {
 			// Region sub tag (2 letters)
 			region = p.toUpperCase()
 			break
 		}
-		if (!script && /^[A-Z]{4}$/i.test(p)) {
+		if (!script && SCRIPT_SUBTAG_REGEX.test(p)) {
 			// Script sub tag (4 letters)
 			script = p[0].toUpperCase() + p.slice(1).toLowerCase()
 		}

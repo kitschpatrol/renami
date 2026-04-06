@@ -3,6 +3,8 @@ import path from 'pathe'
 import { z } from 'zod'
 import log from './log'
 
+const WINDOWS_DRIVE_LETTER_REGEX = /^[A-Z]:/i
+
 /**
  * Zod schema for PathObject, which is a copy of the Node.js PathObject.
  */
@@ -70,7 +72,7 @@ export function resolveWithBasePath(
 		// Path is absolute by drive letter on Windows, or there's not base path to prepend
 		if (
 			basePath === undefined ||
-			/^[A-Z]:/i.test(filePath) ||
+			WINDOWS_DRIVE_LETTER_REGEX.test(filePath) ||
 			(!compoundBase && filePath.startsWith(basePath))
 		) {
 			return filePath

@@ -1,13 +1,17 @@
 import is from '@sindresorhus/is'
 import { format as numerableFormat } from 'numerable'
 
+const NUMERABLE_ALLOWED_CHARS_REGEX = /^[0()[\],.+#X$\s:\-%abdo]*$/
+
 /**
  * Try to format an unknown value as a number using numerable
+ *
+ * @param value - Any value which might actually be a number
+ * @param format - Numerable format string, will be validated
+ *
+ * @returns String
+ * @throws {Error} If the number could not be formatted
  * @see https://github.com/gastonmesseri/numerable#1234-formatting-numbers
- * @param value - any value which might actually be a number
- * @param format - numerable format string, will be validated
- * @returns string
- * @throws {Error} if the number could not be formatted
  */
 export function formatNumber(value: unknown, format: string): string {
 	// Validate
@@ -32,6 +36,7 @@ export function formatNumber(value: unknown, format: string): string {
 
 /**
  * Check if a string is a valid numerable format string
+ *
  * @see https://github.com/gastonmesseri/numerable#1234-formatting-numbers
  */
 // eslint-disable-next-line complexity
@@ -65,9 +70,7 @@ export function isNumerableFormatString(input: string): boolean {
 	}
 
 	// Check for allowed characters first (early return for better performance)
-	// spell-checker: disable-next-line
-	const allowedPattern = /^[0()[\],.+#X$\s:\-%abdo]*$/
-	if (!allowedPattern.test(input)) {
+	if (!NUMERABLE_ALLOWED_CHARS_REGEX.test(input)) {
 		return false
 	}
 

@@ -172,35 +172,31 @@ function stringifyCompactInternal(
 
 		// Handle Map objects
 		if (value instanceof Map) {
-			const entries = [...value.entries()]
-				.map(([k, v]) => {
-					const keyString = typeof k === 'object' && k !== null ? '[Object]' : String(k)
+			const entries = Array.from(value.entries(), ([k, v]) => {
+				const keyString = typeof k === 'object' && k !== null ? '[Object]' : String(k)
 
-					const flatValue = stringifyCompactInternal(
-						v,
-						options,
-						[...path, keyString],
-						seen,
-						depth + 1,
-					)
+				const flatValue = stringifyCompactInternal(
+					v,
+					options,
+					[...path, keyString],
+					seen,
+					depth + 1,
+				)
 
-					// Skip this entry if the value should be skipped
-					if (flatValue === '__SKIP_THIS_VALUE__') return ''
+				// Skip this entry if the value should be skipped
+				if (flatValue === '__SKIP_THIS_VALUE__') return ''
 
-					return includeKeys ? `${keyString}${keyValueSeparator}${flatValue}` : flatValue
-				})
-				.filter((v) => v !== '')
+				return includeKeys ? `${keyString}${keyValueSeparator}${flatValue}` : flatValue
+			}).filter((v) => v !== '')
 
 			return entries.join(delimiter)
 		}
 
 		// Handle Set objects
 		if (value instanceof Set) {
-			const values = [...value.values()]
-				.map((v, i) =>
-					stringifyCompactInternal(v, options, [...path, i.toString()], seen, depth + 1),
-				)
-				.filter((v) => v !== '__SKIP_THIS_VALUE__')
+			const values = Array.from(value.values(), (v, i) =>
+				stringifyCompactInternal(v, options, [...path, i.toString()], seen, depth + 1),
+			).filter((v) => v !== '__SKIP_THIS_VALUE__')
 
 			return values.join(delimiter)
 		}

@@ -2,6 +2,7 @@ import { cspellConfig } from '@kitschpatrol/cspell-config'
 
 export default cspellConfig({
 	words: [
+		'abdo',
 		'Coyhaique',
 		'français',
 		'gastonmesseri',
@@ -13,6 +14,7 @@ export default cspellConfig({
 		'sevensc',
 		'subslate',
 		'subslate',
+		'subtag',
 		'vidir',
 		'yshavit',
 		'zuji',

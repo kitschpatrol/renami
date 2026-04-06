@@ -3,6 +3,8 @@ import { defaultOptions } from '../src/lib'
 import { interpolateDocument } from '../src/lib/utilities/interpolate/document'
 import { getMarkdown } from '../src/lib/utilities/markdown'
 
+const SCIENTIFIC_NOTATION_REGEX = /2.55e\+0/
+
 describe('Document Interpolation', () => {
 	// Sample markdown content
 	const markdown = `---
@@ -187,7 +189,7 @@ Deep nested content.
 			ast,
 			defaultOptions,
 		)
-		expect(scientificResult).toMatch(/2.55e\+0/)
+		expect(scientificResult).toMatch(SCIENTIFIC_NOTATION_REGEX)
 	})
 
 	it('should format truncated strings with default options', () => {

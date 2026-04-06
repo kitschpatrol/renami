@@ -1,4 +1,7 @@
 import { describe, expect, test } from 'vitest'
+
+const SAFE_FILENAME_PATTERN_REGEX = /file.+name.+with.+invalid.+chars/
+const PRESERVED_CASE_REGEX = /File-NAME_example/
 import { isDateFnsFormatString } from '../src/lib/utilities/date'
 import { isNumerableFormatString } from '../src/lib/utilities/number'
 import {
@@ -18,9 +21,7 @@ import {
 describe('getSafeFilename', () => {
 	test('returns safe filename by replacing invalid characters', () => {
 		expect(getSafeFilename('file:name?with*invalid/chars')).not.toContain(':?*/')
-		expect(getSafeFilename('file:name?with*invalid/chars')).toMatch(
-			/file.+name.+with.+invalid.+chars/,
-		)
+		expect(getSafeFilename('file:name?with*invalid/chars')).toMatch(SAFE_FILENAME_PATTERN_REGEX)
 	})
 
 	test('returns default name when input is empty', () => {
@@ -49,7 +50,7 @@ describe('getSafeFilename', () => {
 
 	test('preserves case when sanitizing', () => {
 		const mixedCase = 'File-NAME_example'
-		expect(getSafeFilename(mixedCase)).toMatch(/File-NAME_example/)
+		expect(getSafeFilename(mixedCase)).toMatch(PRESERVED_CASE_REGEX)
 	})
 })
 

@@ -41,6 +41,11 @@ export function getMarkdown(content: string): {
 	}
 }
 
+const FULL_URL_REGEX = /^https?:\/\/\S+$/
+const URL_PART_SEPARATOR_REGEX = /[.?#]/
+const MD_LINK_REGEX = /\[([^\]]*)\]\(([^)]+)\)/
+const WIKI_LINK_REGEX = /\[\[([^|\]]+)(?:\|([^\]]+))?\]\]?/
+
 /**
  * Creates nice readable labels from Markdown links
  * Might be better to use the micromark parser for this, but this is a good start
@@ -58,8 +63,7 @@ export function extractLinkLabel(markdown: string): string {
 	if (!trimmedMarkdown) return markdown // Return original if trimmed is empty
 
 	// Full URL pattern - if the entire string is a URL
-	const fullUrlRegex = /^https?:\/\/\S+$/
-	if (fullUrlRegex.test(trimmedMarkdown)) {
+	if (FULL_URL_REGEX.test(trimmedMarkdown)) {
 		// Extract everything after the last slash, remove file extensions and query parameters
 		const urlParts = trimmedMarkdown.split('/')
 
@@ -81,15 +85,14 @@ export function extractLinkLabel(markdown: string): string {
 		}
 
 		// Remove file extensions and query parameters
-		const cleanLastPart = lastPart.split(/[.?#]/)[0]
+		const cleanLastPart = lastPart.split(URL_PART_SEPARATOR_REGEX)[0]
 
 		// Return the part as is, or the original if extraction gives empty string
 		return cleanLastPart || markdown
 	}
 
 	// Regular Markdown link pattern [label](url)
-	const mdLinkRegex = /\[([^\]]*)\]\(([^)]+)\)/
-	const mdLinkMatch = mdLinkRegex.exec(trimmedMarkdown)
+	const mdLinkMatch = MD_LINK_REGEX.exec(trimmedMarkdown)
 	if (mdLinkMatch) {
 		const label = mdLinkMatch[1]
 		const url = mdLinkMatch[2]
@@ -104,8 +107,7 @@ export function extractLinkLabel(markdown: string): string {
 
 	// Wiki-style Markdown link pattern [[url|label]] or [[path/to/page]]
 	// Handle both cases with or without the label part
-	const wikiLinkRegex = /\[\[([^|\]]+)(?:\|([^\]]+))?\]\]?/
-	const wikiLinkMatch = wikiLinkRegex.exec(trimmedMarkdown)
+	const wikiLinkMatch = WIKI_LINK_REGEX.exec(trimmedMarkdown)
 	if (wikiLinkMatch) {
 		// If it has a label (part after |), use it
 		if (wikiLinkMatch[2]) {
