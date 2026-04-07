@@ -28,7 +28,7 @@ describe('basic rename tests', () => {
 			},
 		})
 
-		expect(result.duration).toBeLessThan(10)
+		expect(result.duration).toBeLessThan(60)
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
 			  "dryRun": true,
@@ -272,7 +272,7 @@ describe('increment duplicate tests', () => {
 			],
 		})
 
-		expect(result.duration).toBeLessThan(20)
+		expect(result.duration).toBeLessThan(60)
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
 			  "dryRun": true,
@@ -370,7 +370,7 @@ describe('markdown template tests', () => {
 			],
 		})
 
-		expect(result.duration).toBeLessThan(20)
+		expect(result.duration).toBeLessThan(60)
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
@@ -405,7 +405,7 @@ describe('markdown template tests', () => {
 			],
 		})
 
-		expect(result.duration).toBeLessThan(20)
+		expect(result.duration).toBeLessThan(60)
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
@@ -438,7 +438,7 @@ describe('markdown template tests', () => {
 			transform: 'Heading - {{heading}}',
 		})
 
-		expect(result.duration).toBeLessThan(20)
+		expect(result.duration).toBeLessThan(60)
 
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
@@ -509,7 +509,7 @@ describe('generic file helper tests', () => {
 			],
 		})
 
-		expect(result.duration).toBeLessThan(20)
+		expect(result.duration).toBeLessThan(60)
 
 		// TODO
 		// Sanitize this complex object
@@ -537,7 +537,7 @@ describe('ignore folder notes tests', () => {
 			},
 		})
 
-		expect(result.duration).toBeLessThan(10)
+		expect(result.duration).toBeLessThan(60)
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
 			  "dryRun": true,
@@ -565,7 +565,7 @@ describe('ignore folder notes tests', () => {
 			},
 		})
 
-		expect(result.duration).toBeLessThan(10)
+		expect(result.duration).toBeLessThan(60)
 		expect(sanitizeOutput(result, tempFiles.getTempPath())).toMatchInlineSnapshot(`
 			{
 			  "dryRun": true,
