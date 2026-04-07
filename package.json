@@ -83,7 +83,7 @@
 		"@types/yargs": "^17.0.35",
 		"@vvo/tzdb": "^6.198.0",
 		"bumpp": "^11.0.1",
-		"mdat-plugin-cli-help": "^2.0.2",
+		"mdat-plugin-cli-help": "^2.1.1",
 		"tsdown": "^0.21.7",
 		"typescript": "~5.9.3",
 		"vitest": "^4.1.2"
