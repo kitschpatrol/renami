@@ -1,5 +1,4 @@
 import { globby } from 'globby'
-// eslint-disable-next-line node/no-unsupported-features/node-builtins
 import { cp, mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -9,11 +8,13 @@ import { afterEach, beforeEach } from 'vitest'
 type TempFilesOptions = {
 	/**
 	 * Whether to clean up the temporary directory after tests
+	 *
 	 * @default true
 	 */
 	cleanup?: boolean
 	/**
 	 * Custom prefix for the temporary directory
+	 *
 	 * @default 'vitest-'
 	 */
 	prefix?: string
@@ -24,8 +25,8 @@ type TempFilesOptions = {
 }
 
 /**
- * Creates a fixture that copies files from a source path to a temporary directory
- * and provides the path to tests. Optionally cleans up after tests.
+ * Creates a fixture that copies files from a source path to a temporary
+ * directory and provides the path to tests. Optionally cleans up after tests.
  */
 export function useTempFiles(options: TempFilesOptions) {
 	const { cleanup = true, prefix = 'vitest-', sourcePath } = options

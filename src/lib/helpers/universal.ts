@@ -5,7 +5,8 @@ import { markdownTemplate } from './markdown'
 
 /**
  * Delegates to the appropriate template handler based on the file type
- * @returns renami transform function
+ *
+ * @returns Renami transform function
  */
 export function universalTemplate(template: string, options: Options): Transform {
 	return async (context) => {

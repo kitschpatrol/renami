@@ -3,7 +3,10 @@ import { ENVIRONMENT } from './platform'
 type GlobAdapterOptions = {
 	/** Whether to return absolute paths or not, default false */
 	absolute?: boolean
-	/** The current working directory to resolve the patterns against, default detected cwd */
+	/**
+	 * The current working directory to resolve the patterns against, default
+	 * detected cwd
+	 */
 	cwd?: string
 	/** Whether to match only files (not directories), default false */
 	onlyFiles?: boolean
@@ -24,8 +27,9 @@ export type GlobAdapter = {
 // }) satisfies z.ZodType<GlobAdapterOptions>
 
 /**
- * Zod schema for FileAdapter, satisfies instead of infers for cleaner type intellisense.
- * Currently unused since it's not part of the config file specification.
+ * Zod schema for FileAdapter, satisfies instead of infers for cleaner type
+ * intellisense. Currently unused since it's not part of the config file
+ * specification.
  */
 // export const GlobAdapterSchema = z.object({
 // 	globMatch: z.function(

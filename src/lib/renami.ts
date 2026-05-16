@@ -19,10 +19,13 @@ export type RenamiReport = {
 }
 
 /**
- * Gets all files matching the pattern(s) in the rules and ensures each file
- * is only processed ONCE by the last rule that matches it.
+ * Gets all files matching the pattern(s) in the rules and ensures each file is
+ * only processed ONCE by the last rule that matches it.
+ *
  * @param rules - The rules from the Renami configuration
- * @returns A 2D array where each inner array contains the files exclusively matched by a rule, in the same order as the passed-in rules
+ *
+ * @returns A 2D array where each inner array contains the files exclusively
+ *   matched by a rule, in the same order as the passed-in rules
  */
 async function getMaskedMatchedFiles(
 	rules: RenamiConfig['rules'],
@@ -67,14 +70,21 @@ async function getMaskedMatchedFiles(
 }
 
 /**
- * Rename files according to the provided configuration.
- * If a string is provided, it will be used as the config file path.
+ * Rename files according to the provided configuration. If a string is
+ * provided, it will be used as the config file path.
+ *
  * @returns A report of the renaming process
  */
 export async function renami(options?: {
-	/** Can be a path to config file, a config object, or undefined to attempt config discovery in accordance with Cosmiconfig's resolution strategy. */
+	/**
+	 * Can be a path to config file, a config object, or undefined to attempt
+	 * config discovery in accordance with Cosmiconfig's resolution strategy.
+	 */
 	config?: Partial<RenamiConfig> | string
-	/** Path to search for config file from. Defaults to the current working directory. */
+	/**
+	 * Path to search for config file from. Defaults to the current working
+	 * directory.
+	 */
 	configSearchFrom?: string
 	/** File adapter to use for file operations in non-Node environments. */
 	fileAdapter?: FileAdapter

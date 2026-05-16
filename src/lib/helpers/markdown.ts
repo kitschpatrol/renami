@@ -7,9 +7,14 @@ import { interpolateDocument } from '../utilities/interpolate/document'
 import { getMarkdown } from '../utilities/markdown'
 
 /**
- * Compose a filename from a Unified Markdown AST and / or frontmatter object using a callback function
- * @param callback Function that takes the Markdown object (AST + frontmatter) and returns a string or undefined if no transform is possible. Can be sync or async.
- * @returns renami transform function
+ * Compose a filename from a Unified Markdown AST and / or frontmatter object
+ * using a callback function
+ *
+ * @param callback Function that takes the Markdown object (AST + frontmatter)
+ *   and returns a string or undefined if no transform is possible. Can be sync
+ *   or async.
+ *
+ * @returns Renami transform function
  */
 export function markdownCallback(
 	callback: (markdown: {
@@ -33,9 +38,13 @@ export function markdownCallback(
 }
 
 /**
- * Compose a filename from frontmatter or a Unified Markdown AST using a template string with `unist-util-select` selectors
- * @param template Template string with {key} for frontmatter and {{select}} for `unist-util-select` selectors (Uses the Pupa micro-template library)
- * @returns renami transform function
+ * Compose a filename from frontmatter or a Unified Markdown AST using a
+ * template string with `unist-util-select` selectors
+ *
+ * @param template Template string with {key} for frontmatter and {{select}} for
+ *   `unist-util-select` selectors (Uses the Pupa micro-template library)
+ *
+ * @returns Renami transform function
  */
 export function markdownTemplate(template: string, options: Options): Transform {
 	return markdownCallback(({ ast, frontmatter }) =>

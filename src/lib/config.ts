@@ -18,35 +18,71 @@ import { TIME_ZONES } from './utilities/time-zone'
 export type Options = {
 	/** Enforce a specific letter casing on the final filenames. */
 	caseType: CaseType
-	/** Replace duplicate whitespace with a single space  */
+	/** Replace duplicate whitespace with a single space */
 	collapseDuplicateWhitespace: boolean
-	/** If a template is missing values and has sections like `bla - - bla - `, this will collapse extra delimiter strings to yield `bla - bla` */
+	/**
+	 * If a template is missing values and has sections like `bla - - bla - `,
+	 * this will collapse extra delimiter strings to yield `bla - bla`
+	 */
 	collapseSurplusDelimiters: boolean
-	/** In rare cases a path that's all unsafe characters, or that has no will become zero-length... and in strict mode, if no transformations work, then this default is used in such cases. */
+	/**
+	 * In rare cases a path that's all unsafe characters, or that has no will
+	 * become zero-length... and in strict mode, if no transformations work, then
+	 * this default is used in such cases.
+	 */
 	defaultName: string
-	/** Delimiter to use to join array values in templates, and used to collapse surplus delimiters in templates */
+	/**
+	 * Delimiter to use to join array values in templates, and used to collapse
+	 * surplus delimiters in templates
+	 */
 	delimiter: string
 	/** Don't actually rename any files */
 	dryRun: boolean
-	/** Ignore notes matching the containing folder name, as may be the case when using the [obsidian-folder-notes](https://github.com/LostPaul/obsidian-folder-notes) plugin. */
+	/**
+	 * Ignore notes matching the containing folder name, as may be the case when
+	 * using the
+	 * [obsidian-folder-notes](https://github.com/LostPaul/obsidian-folder-notes)
+	 * plugin.
+	 */
 	ignoreFolderNotes: boolean
-	/** Locale to use for date/time transformations. Takes a BCP-47 language tag like `"en-US"` */
+	/**
+	 * Locale to use for date/time transformations. Takes a BCP-47 language tag
+	 * like `"en-US"`
+	 */
 	locale: string
-	/** Maximum number of characters in the file, including file extension but excluding base path. Any automatic truncation strings or increments will count towards this maximum. */
+	/**
+	 * Maximum number of characters in the file, including file extension but
+	 * excluding base path. Any automatic truncation strings or increments will
+	 * count towards this maximum.
+	 */
 	maxLength: number
-	/** If no user-provided transformations work (they all return undefined), then use the default name. Otherwise, the original name is preserved. Technically breaks idempotence. */
+	/**
+	 * If no user-provided transformations work (they all return undefined), then
+	 * use the default name. Otherwise, the original name is preserved.
+	 * Technically breaks idempotence.
+	 */
 	strict: boolean
-	/** Timezone to use for date/time transformations. Takes an  [IANA tz value](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) like `"America/New_York"` */
+	/**
+	 * Timezone to use for date/time transformations. Takes an [IANA tz
+	 * value](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) like
+	 * `"America/New_York"`
+	 */
 	timeZone: TimeZone
 	/** Trim leading and trailing white space */
 	trim: boolean
-	/** Try to truncate the file on a word boundary, might result in files shorter than the maxLength target. */
+	/**
+	 * Try to truncate the file on a word boundary, might result in files shorter
+	 * than the maxLength target.
+	 */
 	truncateOnWordBoundary: boolean
 	/** String like '...' to use when truncation is needed */
 	truncationString: string
 	/** Run some checks to make sure the input file list is sane */
 	validateInput: boolean
-	/** Make sure we're not overwriting a file that wasn't included in the files argument */
+	/**
+	 * Make sure we're not overwriting a file that wasn't included in the files
+	 * argument
+	 */
 	validateOutput: boolean
 }
 
@@ -55,7 +91,10 @@ export type Rule = {
 	options?: Partial<Options>
 	/** Glob pattern(s) of files to match relative to the config file location */
 	pattern: string | string[]
-	/** Transform(s) for the filenames, or plain strings(s) to use the Universal Template */
+	/**
+	 * Transform(s) for the filenames, or plain strings(s) to use the Universal
+	 * Template
+	 */
 	transform?: string | string[] | Transform | Transform[]
 }
 
@@ -136,8 +175,11 @@ export const defaultRenamiConfig: RenamiConfig = {
 }
 
 /**
- * Factory function to help create a Renami configuration object with type safety.
+ * Factory function to help create a Renami configuration object with type
+ * safety.
+ *
  * @param config - Partial Config object with custom configuration
+ *
  * @returns RenamiConfig object merged with defaults
  */
 export function defineRenamiConfig(config: Partial<RenamiConfig>): RenamiConfig {
@@ -145,14 +187,15 @@ export function defineRenamiConfig(config: Partial<RenamiConfig>): RenamiConfig 
 }
 
 /**
- * Load and validate a Renami configuration from an object, useful in Obsidian plugin
+ * Load and validate a Renami configuration from an object, useful in Obsidian
+ * plugin
  */
 export function loadConfigObject(config: Partial<RenamiConfig>): RenamiConfig | undefined {
 	if (typeof config === 'object') {
 		try {
 			// Set defaults, validate and parse the config
 			const validatedConfig = parseConfig(
-				// eslint-disable-next-line ts/no-unsafe-type-assertion
+				// eslint-disable-next-line ts/no-unsafe-type-assertion, ts/no-unnecessary-type-assertion
 				defineRenamiConfig(config as unknown as Partial<RenamiConfig>),
 			)
 			return validatedConfig
@@ -163,6 +206,7 @@ export function loadConfigObject(config: Partial<RenamiConfig>): RenamiConfig | 
 			}
 		}
 	}
+
 	return undefined
 }
 
@@ -208,7 +252,7 @@ export async function loadConfig(
 			try {
 				// Validate and parse the config
 				const validatedConfig = parseConfig(
-					// eslint-disable-next-line ts/no-unsafe-type-assertion
+					// eslint-disable-next-line ts/no-unsafe-type-assertion, ts/no-unnecessary-type-assertion
 					defineRenamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
 				)
 
@@ -231,7 +275,7 @@ export async function loadConfig(
 		try {
 			// Validate and parse the config
 			const validatedConfig = parseConfig(
-				// eslint-disable-next-line ts/no-unsafe-type-assertion
+				// eslint-disable-next-line ts/no-unsafe-type-assertion, ts/no-unnecessary-type-assertion
 				defineRenamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
 			)
 
@@ -257,9 +301,11 @@ export async function loadConfig(
 
 /**
  * Parses and validates a configuration object against the RenamiConfig schema
+ *
  * @param config - The configuration object to validate
+ *
  * @returns The validated RenamiConfig object
- * @throws {Error} if the configuration is invalid
+ * @throws {Error} If the configuration is invalid
  */
 function parseConfig(config: unknown): RenamiConfig {
 	const result = RenamiConfigSchema.safeParse(config)

@@ -149,6 +149,7 @@ describe('basic rename tests', () => {
 					if (name === 'basic') {
 						return 'camelCaseFile'
 					}
+
 					if (name === 'camelCaseFile') {
 						return 'basic'
 					}

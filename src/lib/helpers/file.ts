@@ -5,8 +5,10 @@ import type { PathObject } from '../utilities/path'
 
 /**
  * Generic callback function with access to the file being renamed
+ *
  * @param callback Function that takes file-related args and returns a string or
- * undefined if no transform is possible. Can be sync or async.
+ *   undefined if no transform is possible. Can be sync or async.
+ *
  * @returns Renami transform function
  */
 export function fileCallback(

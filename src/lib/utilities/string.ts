@@ -14,12 +14,16 @@ const INCREMENT_CAPTURE_REGEX = /\s\((\d+)\)$/
 
 /**
  * Determines if a position in a string is a word boundary.
+ *
  * @param text - The string to check
  * @param index - The position in the string to check
+ *
  * @returns Whether the position is a word boundary
  */
 function isWordBoundary(text: string, index: number): boolean {
-	if (index <= 0 || index >= text.length) return false
+	if (index <= 0 || index >= text.length) {
+		return false
+	}
 
 	const previous = text.charAt(index - 1)
 	const current = text.charAt(index)
@@ -38,14 +42,21 @@ function isWordBoundary(text: string, index: number): boolean {
 }
 
 /**
- * Truncates a string to a specified maximum length, optionally respecting word boundaries.
+ * Truncates a string to a specified maximum length, optionally respecting word
+ * boundaries.
+ *
  * @param text - The string to truncate
- * @param maxLength - The maximum desired length of the result (including truncation string)
- * @param fileSystemMaxLength - The absolute maximum length permitted (e.g., by a file system)
+ * @param maxLength - The maximum desired length of the result (including
+ *   truncation string)
+ * @param fileSystemMaxLength - The absolute maximum length permitted (e.g., by
+ *   a file system)
  * @param truncateOnWordBoundary - Whether to truncate at a word boundary
- * @param trim - Whether to trim leading and trailing white space (before the truncation string is appended)
+ * @param trim - Whether to trim leading and trailing white space (before the
+ *   truncation string is appended)
  * @param truncationString - The string to append after truncation (e.g., "...")
- * @returns The truncated string with the truncation string appended if truncation occurred
+ *
+ * @returns The truncated string with the truncation string appended if
+ *   truncation occurred
  */
 export function truncate(
 	text: string,
@@ -93,6 +104,7 @@ export function truncate(
 			while (boundary > 0 && isWordBoundary(text, boundary)) {
 				boundary--
 			}
+
 			// Now we're on the last character of the word, so add 1 to include it
 			boundary++
 			break
@@ -106,7 +118,9 @@ export function truncate(
 
 /**
  * Converts empty strings to undefined
+ *
  * @param text - The input value to check
+ *
  * @returns The input value if it is not an empty string, otherwise undefined
  * @public
  */
@@ -121,11 +135,13 @@ export function emptyIsUndefined(text?: string): string | undefined {
 /**
  * Removes leading indentation from template literals.
  *
- * This function trims consistent leading whitespace from multiline template strings,
- * making it easier to include properly formatted text in code without having to
- * manually remove indentation.
+ * This function trims consistent leading whitespace from multiline template
+ * strings, making it easier to include properly formatted text in code without
+ * having to manually remove indentation.
+ *
  * @param strings - Template string array from a tagged template literal
  * @param values - Values interpolated into the template string
+ *
  * @returns A string with consistent leading indentation removed from each line
  * @public
  */
@@ -147,6 +163,7 @@ export function trimLeadingIndentation(
 	while (lines.length > 0 && lines[0].trim() === '') {
 		lines.shift()
 	}
+
 	while (lines.length > 0 && lines.at(-1)?.trim() === '') {
 		lines.pop()
 	}
@@ -154,12 +171,16 @@ export function trimLeadingIndentation(
 	// Determine the minimum indentation across non-blank lines.
 	let minIndent = Infinity
 	for (const line of lines) {
-		if (line.trim() === '') continue
+		if (line.trim() === '') {
+			continue
+		}
+
 		const match = LEADING_SPACES_REGEX.exec(line)
 		if (match) {
 			minIndent = Math.min(minIndent, match[0].length)
 		}
 	}
+
 	if (minIndent === Infinity) {
 		minIndent = 0
 	}
@@ -175,10 +196,14 @@ export function trimLeadingIndentation(
  * Currently used for testing only
  *
  * This function takes a string and returns an array where each element is the
- * hexadecimal representation of the corresponding Unicode code point in the original string.
- * Uses Intl.Segmenter for proper handling of grapheme clusters (emojis, combined characters).
+ * hexadecimal representation of the corresponding Unicode code point in the
+ * original string. Uses Intl.Segmenter for proper handling of grapheme clusters
+ * (emojis, combined characters).
+ *
  * @param text - The input string to convert to Unicode code points
- * @returns An array of strings, each representing a Unicode code point in hexadecimal format
+ *
+ * @returns An array of strings, each representing a Unicode code point in
+ *   hexadecimal format
  */
 export function getUnicodeCodePoints(text: string): string[] {
 	const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
@@ -192,6 +217,7 @@ export function getUnicodeCodePoints(text: string): string[] {
 			codePoints.push(cp.toString(16))
 		}
 	}
+
 	return codePoints
 }
 
@@ -216,20 +242,31 @@ export type CaseType = (typeof CASE_TYPE_NAMES)[number]
  * Converts a string to the specified case format
  *
  * Also look at: https://unjs.io/packages/scule
+ *
  * @param text - The input string to convert
  * @param caseType - The case format to convert to
+ *
  * @returns The converted string in the specified case format
  */
 export function convertCase(text: string, caseType: CaseType): string {
 	// Handle empty strings
-	if (!text) return text
+	if (!text) {
+		return text
+	}
 
 	// Early return for preserve case
-	if (caseType === 'preserve') return text
+	if (caseType === 'preserve') {
+		return text
+	}
 
 	// Early optimization for simple full-string transforms
-	if (caseType === 'lowercase') return text.toLowerCase()
-	if (caseType === 'uppercase') return text.toUpperCase()
+	if (caseType === 'lowercase') {
+		return text.toLowerCase()
+	}
+
+	if (caseType === 'uppercase') {
+		return text.toUpperCase()
+	}
 
 	// More robust word separation that detects camelCase and PascalCase
 	// as well as the usual delimiters
@@ -247,6 +284,7 @@ export function convertCase(text: string, caseType: CaseType): string {
 					if (index === 0) {
 						return word.toLowerCase()
 					}
+
 					return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
 				})
 				.join('')
@@ -282,6 +320,7 @@ export function convertCase(text: string, caseType: CaseType): string {
 					if (index === 0) {
 						return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
 					}
+
 					return word.toLowerCase()
 				})
 				.join(' ')
@@ -326,6 +365,7 @@ export function convertCase(text: string, caseType: CaseType): string {
 					if (index === 0 || index === words.length - 1 || !smallWords.has(lowerWord)) {
 						return word.charAt(0).toUpperCase() + lowerWord.slice(1)
 					}
+
 					return lowerWord
 				})
 				.join(' ')
@@ -335,11 +375,15 @@ export function convertCase(text: string, caseType: CaseType): string {
 
 /**
  * Ensures that the filename is filesystem-safe and Unicode normalized
- * @param text Text to be converted to a safe filename, just the extension-less name NOT the full path
- * @param defaultEmptyFilename Default filename to use if the text is empty or all whitespace
+ *
+ * @param text Text to be converted to a safe filename, just the extension-less
+ *   name NOT the full path
+ * @param defaultEmptyFilename Default filename to use if the text is empty or
+ *   all whitespace
  * @param preserveTrailingPeriods Whether to preserve trailing periods in the
- * filename, technically reserve on Windows... single periods are still
- * stripped.
+ *   filename, technically reserve on Windows... single periods are still
+ *   stripped.
+ *
  * @returns A safe filename
  */
 export function getSafeFilename(
@@ -382,8 +426,10 @@ export function getSafeFilename(
 
 /**
  * Strip the trailing increment from a filename
+ *
  * @param filename Filename only, without an extension
- * @returns filename without the increment
+ *
+ * @returns Filename without the increment
  */
 export function stripIncrement(filename: string): string {
 	return filename.replace(TRAILING_INCREMENT_REGEX, '')
@@ -391,8 +437,10 @@ export function stripIncrement(filename: string): string {
 
 /**
  * Strip the trailing increment from a filename
+ *
  * @param filename Filename only, without an extension
- * @returns filename with the increment
+ *
+ * @returns Filename with the increment
  */
 export function appendIncrement(filename: string, index: number): string {
 	return `${filename} (${index})`
@@ -400,7 +448,9 @@ export function appendIncrement(filename: string, index: number): string {
 
 /**
  * Get the increment from a filename as a number
+ *
  * @param filename Filename only, without an extension
+ *
  * @returns The increment as a number, or undefined if there is no increment
  */
 export function getIncrement(filename: string): number | undefined {
@@ -408,13 +458,17 @@ export function getIncrement(filename: string): number | undefined {
 	if (match) {
 		return Number.parseInt(match[1], 10)
 	}
+
 	return undefined
 }
 
 /**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * Mainly for nice formatting with prettier. But the line wrapping means we have
+ * to strip surplus whitespace.
+ *
  * @param strings - Template string array from a tagged template literal
  * @param values - Values interpolated into the template string
+ *
  * @returns A string which will be formatted correctly by prettier
  * @public
  */
@@ -423,9 +477,12 @@ export function markdown(strings: TemplateStringsArray, ...values: unknown[]): s
 }
 
 /**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * Mainly for nice formatting with prettier. But the line wrapping means we have
+ * to strip surplus whitespace.
+ *
  * @param strings - Template string array from a tagged template literal
  * @param values - Values interpolated into the template string
+ *
  * @returns A string which will be formatted correctly by prettier
  * @public
  */
@@ -434,9 +491,12 @@ export function md(strings: TemplateStringsArray, ...values: unknown[]): string 
 }
 
 /**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * Mainly for nice formatting with prettier. But the line wrapping means we have
+ * to strip surplus whitespace.
+ *
  * @param strings - Template string array from a tagged template literal
  * @param values - Values interpolated into the template string
+ *
  * @returns A string which will be formatted correctly by prettier
  * @public
  */
@@ -445,9 +505,12 @@ export function html(strings: TemplateStringsArray, ...values: unknown[]): strin
 }
 
 /**
- * Mainly for nice formatting with prettier. But the line wrapping means we have to strip surplus whitespace.
+ * Mainly for nice formatting with prettier. But the line wrapping means we have
+ * to strip surplus whitespace.
+ *
  * @param strings - Template string array from a tagged template literal
  * @param values - Values interpolated into the template string
+ *
  * @returns A string which will be formatted correctly by prettier
  * @public
  */

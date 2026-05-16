@@ -134,9 +134,18 @@ describe('Core Interpolation', () => {
 		let callCount = 0
 		const result = interpolate(template, (context) => {
 			callCount++
-			if (context.value === 'one') return 'A'
-			if (context.value === 'two') return 'B'
-			if (context.value === 'three') return 'C'
+			if (context.value === 'one') {
+				return 'A'
+			}
+
+			if (context.value === 'two') {
+				return 'B'
+			}
+
+			if (context.value === 'three') {
+				return 'C'
+			}
+
 			return ''
 		})
 		expect(result).toBe('ABC')

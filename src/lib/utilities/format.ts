@@ -9,6 +9,7 @@ import { CASE_TYPE_NAMES, convertCase, truncate } from './string'
 
 /**
  * Shadows Options
+ *
  * @public
  */
 export type FormatOptions = Pick<
@@ -26,8 +27,11 @@ const defaultFormatOptions: FormatOptions = {
 
 /**
  * Helper to convert array or object to empty string
+ *
  * @param value - The value to convert to string if it's a primitive
- * @returns - Empty string for arrays/objects, string representation for primitives
+ *
+ * @returns - Empty string for arrays/objects, string representation for
+ *   primitives
  */
 function emptyCollectionToString(value: unknown): string {
 	if (
@@ -45,10 +49,15 @@ function emptyCollectionToString(value: unknown): string {
 }
 
 /**
- * Function to format a value based on a format string or an array of format strings
+ * Function to format a value based on a format string or an array of format
+ * strings
+ *
  * @param value - The value to format
- * @param format - Optional format string or array of format strings to be chained in series
- * @param options - Optional config options which can affect things like truncation and time zones
+ * @param format - Optional format string or array of format strings to be
+ *   chained in series
+ * @param options - Optional config options which can affect things like
+ *   truncation and time zones
+ *
  * @returns - Formatted string
  */
 export function formatValue(

@@ -114,6 +114,7 @@ function bcp47ToDateFnsKey(tag: string): string {
 			region = p.toUpperCase()
 			break
 		}
+
 		if (!script && SCRIPT_SUBTAG_REGEX.test(p)) {
 			// Script sub tag (4 letters)
 			script = p[0].toUpperCase() + p.slice(1).toLowerCase()
@@ -123,9 +124,11 @@ function bcp47ToDateFnsKey(tag: string): string {
 	if (region) {
 		return language + region
 	}
+
 	if (script) {
 		return language + script
 	}
+
 	return language
 }
 
@@ -143,6 +146,7 @@ function getLocaleObject(localeId: string): Locale {
 	if (localeKey in locales) {
 		return (locales as Record<string, Locale>)[localeKey]
 	}
+
 	// Use default
 	return locales.enUS // Fallback to enUS if not found
 }

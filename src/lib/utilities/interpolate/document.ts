@@ -13,9 +13,11 @@ import { interpolate } from './core'
 
 /**
  * Interpolates a template string with metadata and AST tree
+ *
  * @param template - The template string to process
  * @param metadata - Object containing metadata for single-brace interpolation
  * @param tree - Unified AST for double-brace query interpolation
+ *
  * @returns - The processed string with interpolations replaced
  */
 export function interpolateDocument(
@@ -42,6 +44,7 @@ export function interpolateDocument(
 								if (typeof value === 'string') {
 									return extractLinkLabel(value)
 								}
+
 								return value
 							},
 						})

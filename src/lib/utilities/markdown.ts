@@ -8,7 +8,9 @@ import { matter } from 'vfile-matter'
 
 /**
  * Internal helper to extract AST from a Markdown string
+ *
  * @param content The string content containing markdown
+ *
  * @returns Object containing the AST and frontmatter
  */
 export function getMarkdown(content: string): {
@@ -47,20 +49,26 @@ const MD_LINK_REGEX = /\[([^\]]*)\]\(([^)]+)\)/
 const WIKI_LINK_REGEX = /\[\[([^|\]]+)(?:\|([^\]]+))?\]\]?/
 
 /**
- * Creates nice readable labels from Markdown links
- * Might be better to use the micromark parser for this, but this is a good start
+ * Creates nice readable labels from Markdown links Might be better to use the
+ * micromark parser for this, but this is a good start
+ *
  * @param markdown The string content containing markdown or a URL
- * @returns label string, or the original string if no links or URLs are found
+ *
+ * @returns Label string, or the original string if no links or URLs are found
  */
 export function extractLinkLabel(markdown: string): string {
 	// If the string is empty or null, return it as is
-	if (!markdown) return markdown
+	if (!markdown) {
+		return markdown
+	}
 
 	// Trim the string first
 	const trimmedMarkdown = markdown.trim()
 
 	// Check again after trimming in case it's now empty
-	if (!trimmedMarkdown) return markdown // Return original if trimmed is empty
+	if (!trimmedMarkdown) {
+		return markdown
+	} // Return original if trimmed is empty
 
 	// Full URL pattern - if the entire string is a URL
 	if (FULL_URL_REGEX.test(trimmedMarkdown)) {
@@ -101,6 +109,7 @@ export function extractLinkLabel(markdown: string): string {
 		if (label) {
 			return label
 		}
+
 		// This handles the case of [](url) by processing the URL recursively
 		return extractLinkLabel(url)
 	}
@@ -113,6 +122,7 @@ export function extractLinkLabel(markdown: string): string {
 		if (wikiLinkMatch[2]) {
 			return wikiLinkMatch[2]
 		}
+
 		// Extract the last part of the path for wiki links without labels
 		const path = wikiLinkMatch[1]
 		const pathParts = path.split('/')

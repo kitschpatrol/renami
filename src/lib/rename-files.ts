@@ -78,18 +78,23 @@ function validationStatusMessage(status: FilePathValidationStatus): string {
 		case 'empty': {
 			return 'Empty file path'
 		}
+
 		case 'nonexistent': {
 			return 'File does not exist'
 		}
+
 		case 'not-absolute': {
 			return 'File path is not absolute'
 		}
+
 		case 'not-normalized': {
 			return 'File path is not normalized'
 		}
+
 		case 'not-string': {
 			return 'File path is not a string'
 		}
+
 		case 'valid': {
 			return 'Valid file path'
 		}
@@ -194,6 +199,7 @@ export async function renameFiles(options: {
 			if (typeof transformItem === 'string') {
 				return universalTemplate(transformItem, localOptions)
 			}
+
 			return transformItem
 		})
 
@@ -277,6 +283,7 @@ export async function renameFiles(options: {
 						break
 					}
 				}
+
 				if (!alreadyInDuplicateGroup) {
 					duplicateGroup.push(nextTask)
 				}
@@ -436,6 +443,7 @@ export async function renameFiles(options: {
 				if (!dryRun) {
 					await fileAdapter.rename(sourcePath, filePathRenamed!)
 				}
+
 				task.status = 'renamed'
 			} catch {
 				task.status = 'error'

@@ -7,6 +7,8 @@ const WINDOWS_DRIVE_LETTER_REGEX = /^[A-Z]:/i
 
 /**
  * Zod schema for PathObject, which is a copy of the Node.js PathObject.
+ *
+ * @public
  */
 export const PathObjectSchema = z.object({
 	base: z.string(),
@@ -20,7 +22,9 @@ export type PathObject = z.infer<typeof PathObjectSchema>
 
 /**
  * The browserify polyfill doesn't implement win32 absolute path detection...
+ *
  * @param filePath POSIX-Normalized path
+ *
  * @returns Whether the path is absolute
  */
 export function isAbsolute(filePath: string): boolean {
@@ -28,12 +32,15 @@ export function isAbsolute(filePath: string): boolean {
 }
 
 /**
- * Special handling for `/absolute-path.md` style links in Obsidian
- * and static site generators, where absolute paths are relative to a base path
- * instead of the volume root.
+ * Special handling for `/absolute-path.md` style links in Obsidian and static
+ * site generators, where absolute paths are relative to a base path instead of
+ * the volume root.
  *
- * Paths starting with Windows drive letters, while technically absolute, are _not_ prepended with the base:
- * - If no base path is provided, paths are resolved relative to the the provided CWD.
+ * Paths starting with Windows drive letters, while technically absolute, are
+ * _not_ prepended with the base:
+ *
+ * - If no base path is provided, paths are resolved relative to the the provided
+ *   CWD.
  * - If paths are relative, the base paths are ignored and the CWD is used.
  *
  * All path values are normalized and in 'mixed' platform style.
@@ -41,11 +48,21 @@ export function isAbsolute(filePath: string): boolean {
 export function resolveWithBasePath(
 	filePath: string,
 	options: {
-		/** Relative, absolute, or drive-letter absolute path. Normalized and in the 'mixed' platform style. */
+		/**
+		 * Relative, absolute, or drive-letter absolute path. Normalized and in the
+		 * 'mixed' platform style.
+		 */
 		basePath?: string | undefined
-		/** Whether to keep prepend the base if the file path already starts with it. Useful for pseudo-idempotence, but will get it wrong in some edge cases with duplicative path segments. Defaults to false. */
+		/**
+		 * Whether to keep prepend the base if the file path already starts with it.
+		 * Useful for pseudo-idempotence, but will get it wrong in some edge cases
+		 * with duplicative path segments. Defaults to false.
+		 */
 		compoundBase?: boolean | undefined
-		/** Relative to the volume root. Normalized and in the 'mixed' platform style. */
+		/**
+		 * Relative to the volume root. Normalized and in the 'mixed' platform
+		 * style.
+		 */
 		cwd: string
 	},
 ): string {
@@ -87,9 +104,9 @@ export function resolveWithBasePath(
 }
 
 /**
- * Sets the name of the path object and updates the base property.
- * Works around base not updating when changing the name or extension.
- * DO NOT SET NAME DIRECTLY
+ * Sets the name of the path object and updates the base property. Works around
+ * base not updating when changing the name or extension. DO NOT SET NAME
+ * DIRECTLY
  */
 export function pathObjectSetName(pathObject: PathObject, name: string): void {
 	pathObject.name = name
@@ -108,8 +125,8 @@ export function pathObjectSetAll(source: PathObject, target: PathObject): void {
 }
 
 /**
- * Helper for https://github.com/LostPaul/obsidian-folder-notes
- * Case-insensitive
+ * Helper for https://github.com/LostPaul/obsidian-folder-notes Case-insensitive
+ *
  * @param filePath Absolute path to file
  */
 export function pathIsFolderNote(filePath: string): boolean {

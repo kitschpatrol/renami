@@ -14,8 +14,8 @@ import {
 } from './utilities/string'
 
 /**
- * Can return either JUST the filename, with no path or extension, OR a PathObject...
- * If it returns undefined, the next action will be used
+ * Can return either JUST the filename, with no path or extension, OR a
+ * PathObject... If it returns undefined, the next action will be used
  */
 export type Transform = (context: {
 	fileAdapter: FileAdapter
@@ -28,9 +28,10 @@ export type Transform = (context: {
 export const TransformSchema = z.custom<Transform>((value) => typeof value === 'function')
 
 /**
- * Collapses surplus delimiters (i.e. two or more consecutive delimiters)
- * into a single space, then removes any delimiter tokens at the boundaries.
- * When only a single delimiter occurs, its surrounding whitespace is preserved.
+ * Collapses surplus delimiters (i.e. two or more consecutive delimiters) into a
+ * single space, then removes any delimiter tokens at the boundaries. When only
+ * a single delimiter occurs, its surrounding whitespace is preserved.
+ *
  * @param delimiter - Array of delimiters to collapse (only the first is used)
  */
 export function collapseSurplusDelimitersTransform(delimiter: string): Transform {
@@ -61,8 +62,9 @@ export function safeTransform(defaultEmptyFilename: string): Transform {
 }
 
 /**
- * Truncates a filename at word boundaries and adds an ellipsis
- * Word boundaries include spaces, case changes (camelCase/PascalCase), hyphens, and underscores.
+ * Truncates a filename at word boundaries and adds an ellipsis Word boundaries
+ * include spaces, case changes (camelCase/PascalCase), hyphens, and
+ * underscores.
  */
 export function truncateTransform(options: {
 	fileSystemMaxLength: number

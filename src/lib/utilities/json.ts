@@ -18,8 +18,8 @@ type StringifyCompactOptions = {
 	/** Maximum depth for recursion. Defaults to 100 */
 	maxDepth?: number
 	/**
-	 * Optional callback to transform values. Works bottom-up, taking keyOrIndex and value,
-	 * returning transformed value.
+	 * Optional callback to transform values. Works bottom-up, taking keyOrIndex
+	 * and value, returning transformed value.
 	 */
 	replacer?: (keyOrIndex: number | string | undefined, value: unknown) => unknown
 }
@@ -27,31 +27,46 @@ type StringifyCompactOptions = {
 /**
  * Compactly stringifies any JavaScript value into a single-line representation.
  *
- * This function recursively traverses a data structure and converts it
- * to a single string with values separated by the specified delimiter.
- * Unlike JSON.stringify, this function attempts to serialize any JavaScript
- * value, including Maps, Sets, functions, Symbols, etc.
+ * This function recursively traverses a data structure and converts it to a
+ * single string with values separated by the specified delimiter. Unlike
+ * JSON.stringify, this function attempts to serialize any JavaScript value,
+ * including Maps, Sets, functions, Symbols, etc.
  *
  * Note: This is a one-way conversion intended for display or logging purposes.
  * The resulting string is not designed to be parsed back into the original
  * structure, as type information and structural relationships may be lost
  * during serialization.
+ *
+ * @example
+ * 	// Returns: "yes,no,1,2,3"
+ * 	stringifyCompact({ a: 'yes', b: 'no', d: [1, 2, 3] })
+ *
+ * @example
+ * 	// Returns: "a:YES - b:NO - d:1 - 2 - 3"
+ * 	stringifyCompact(
+ * 		{ a: 'yes', b: 'no', d: [1, 2, 3] },
+ * 		{
+ * 			delimiter: ' - ',
+ * 			includeKeys: true,
+ * 			replacer: (keyOrIndex, value) =>
+ * 				typeof value === 'string' ? value.toUpperCase() : value,
+ * 		},
+ * 	)
+ *
+ * @example
+ * 	// Returns: "1,2,3,a,b,c"
+ * 	stringifyCompact(
+ * 		new Map([
+ * 			[1, 'a'],
+ * 			[2, 'b'],
+ * 			[3, 'c'],
+ * 		]),
+ * 	)
+ *
  * @param value - The value to stringify
  * @param options - Configuration options
+ *
  * @returns A compact string representation of the input
- * @example
- * // Returns: "yes,no,1,2,3"
- * stringifyCompact({ a: 'yes', b: 'no', d: [1, 2, 3] });
- * @example
- * // Returns: "a:YES - b:NO - d:1 - 2 - 3"
- * stringifyCompact({ a: 'yes', b: 'no', d: [1, 2, 3] }, {
- *   delimiter: ' - ',
- *   includeKeys: true,
- *   replacer: (keyOrIndex, value) => typeof value === 'string' ? value.toUpperCase() : value
- * });
- * @example
- * // Returns: "1,2,3,a,b,c"
- * stringifyCompact(new Map([[1, 'a'], [2, 'b'], [3, 'c']]));
  */
 export function stringifyCompact(value: unknown, options: StringifyCompactOptions = {}): string {
 	const result = stringifyCompactInternal(value, options, [], new WeakSet(), 0)
@@ -60,12 +75,15 @@ export function stringifyCompact(value: unknown, options: StringifyCompactOption
 }
 
 /**
- * Internal implementation of stringifyCompact with additional parameters for recursion.
+ * Internal implementation of stringifyCompact with additional parameters for
+ * recursion.
+ *
  * @param value - The value to stringify
  * @param options - Configuration options
  * @param path - Current path in the object structure (for error reporting)
  * @param seen - WeakSet of already processed objects (for cycle detection)
  * @param depth - Current recursion depth
+ *
  * @returns A compact string representation of the input
  */
 function stringifyCompactInternal(
@@ -135,18 +153,23 @@ function stringifyCompactInternal(
 		if (typeof value === 'string') {
 			return value
 		}
+
 		if (typeof value === 'number') {
 			return String(value)
 		}
+
 		if (typeof value === 'boolean') {
 			return value ? 'true' : 'false'
 		}
+
 		if (typeof value === 'symbol') {
 			return value.toString()
 		}
+
 		if (typeof value === 'bigint') {
 			return value.toString()
 		}
+
 		if (typeof value === 'function') {
 			return value.name.length === 0
 				? includeUndefined
@@ -184,7 +207,9 @@ function stringifyCompactInternal(
 				)
 
 				// Skip this entry if the value should be skipped
-				if (flatValue === '__SKIP_THIS_VALUE__') return ''
+				if (flatValue === '__SKIP_THIS_VALUE__') {
+					return ''
+				}
 
 				return includeKeys ? `${keyString}${keyValueSeparator}${flatValue}` : flatValue
 			}).filter((v) => v !== '')
@@ -219,7 +244,9 @@ function stringifyCompactInternal(
 				const flatValue = stringifyCompactInternal(v, options, [...path, k], seen, depth + 1)
 
 				// Skip this entry if the value should be skipped
-				if (flatValue === '__SKIP_THIS_VALUE__') return ''
+				if (flatValue === '__SKIP_THIS_VALUE__') {
+					return ''
+				}
 
 				return includeKeys ? `${k}${keyValueSeparator}${flatValue}` : flatValue
 			})

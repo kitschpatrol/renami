@@ -17,11 +17,16 @@ export type FileAdapter = {
 }
 
 /**
- * Zod schema for FileAdapter, validates that the value has the expected function properties.
+ * Zod schema for FileAdapter, validates that the value has the expected
+ * function properties.
+ *
  * @public
  */
 export const FileAdapterSchema = z.custom<FileAdapter>((value) => {
-	if (!is.plainObject(value)) return false
+	if (!is.plainObject(value)) {
+		return false
+	}
+
 	return (
 		is.function(value.readFile) &&
 		is.function(value.readFileBuffer) &&

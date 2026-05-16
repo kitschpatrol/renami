@@ -3,8 +3,8 @@ import type { RenamiReport } from '../../src/lib'
 import type { FileRenameReport } from '../../src/lib/rename-files'
 
 /**
- * Remove the duration and temp path from the report.
- * Normalizes tempPath to forward slashes so replacements work on Windows.
+ * Remove the duration and temp path from the report. Normalizes tempPath to
+ * forward slashes so replacements work on Windows.
  */
 export function sanitizeOutput(report: FileRenameReport, tempPath: string): FileRenameReport {
 	const normalizedTempPath = normalize(tempPath)
@@ -20,8 +20,8 @@ export function sanitizeOutput(report: FileRenameReport, tempPath: string): File
 }
 
 /**
- * Remove the duration and temp path from the report.
- * Normalizes tempPath to forward slashes so replacements work on Windows.
+ * Remove the duration and temp path from the report. Normalizes tempPath to
+ * forward slashes so replacements work on Windows.
  */
 export function sanitizeRenameReport(report: RenamiReport, tempPath: string): RenamiReport {
 	const normalizedTempPath = normalize(tempPath)
