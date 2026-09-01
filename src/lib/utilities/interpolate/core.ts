@@ -1,5 +1,4 @@
 /* eslint-disable max-depth */
-/* eslint-disable complexity */
 
 export type InterpolationContext = {
 	braceCount: number
@@ -9,6 +8,97 @@ export type InterpolationContext = {
 
 // A constant empty array to ensure reference equality when needed.
 const EMPTY_ARRAY: string[] = []
+
+// A unique placeholder used to protect escaped pipes during splitting.
+const ESCAPED_PIPE = '\u{1}'
+
+/**
+ * Scans the template from `startIndex` for the closing delimiter of a token
+ * opened by `braceCount` consecutive braces. Scanning stops at the end of the
+ * template, or at an unescaped `{` once at least one candidate has been found,
+ * so candidates from later tokens do not leak into the current one.
+ *
+ * @returns The index of the last candidate run of closing braces and its
+ *   length, or a `candidateIndex` of -1 if no valid closing delimiter exists.
+ */
+function findClosingDelimiter(
+	template: string,
+	startIndex: number,
+	braceCount: number,
+): { candidateIndex: number; candidateRun: number } {
+	let candidateIndex = -1
+	let candidateRun = 0
+	let pos = startIndex
+
+	while (pos < template.length) {
+		if (template[pos] === '\\') {
+			// Skip escaped characters.
+			pos += 2
+			continue
+		}
+
+		if (template[pos] === '}') {
+			// Count the run of consecutive closing braces.
+			let temp = pos
+			let run = 0
+			while (temp < template.length && template[temp] === '}') {
+				run++
+				temp++
+			}
+
+			// If the run is long enough, record/update the candidate.
+			if (run >= braceCount) {
+				candidateIndex = pos
+				candidateRun = run
+			}
+
+			pos = temp
+			continue
+		}
+
+		// If we've already seen a valid candidate and now encounter an unescaped '{',
+		// break to prevent later tokens from interfering.
+		if (candidateIndex !== -1 && template[pos] === '{') {
+			break
+		}
+
+		pos++
+	}
+
+	return { candidateIndex, candidateRun }
+}
+
+/**
+ * Processes escape sequences inside a token's raw content. Escaped pipes are
+ * temporarily replaced with a placeholder so splitting on literal pipes is
+ * safe, and escaped braces and backslashes are unescaped.
+ */
+function processTokenEscapes(tokenRaw: string): string {
+	let processedToken = ''
+	let j = 0
+
+	while (j < tokenRaw.length) {
+		const nextChar = tokenRaw[j + 1]
+		if (nextChar !== undefined && tokenRaw[j] === '\\') {
+			if (nextChar === '|') {
+				processedToken += ESCAPED_PIPE
+				j += 2
+				continue
+			}
+
+			if ('{}|\\'.includes(nextChar)) {
+				processedToken += nextChar
+				j += 2
+				continue
+			}
+		}
+
+		processedToken += tokenRaw[j]
+		j++
+	}
+
+	return processedToken
+}
 
 /**
  * Interpolates a template string by replacing tokens with handler‐generated
@@ -86,8 +176,6 @@ export function interpolate(
 	template: string,
 	handler: (context: InterpolationContext) => string,
 ): string {
-	// A unique placeholder used to protect escaped pipes during splitting.
-	const ESCAPED_PIPE = '\u0001'
 	let result = ''
 	let i = 0
 
@@ -97,9 +185,11 @@ export function interpolate(
 
 		// Handle escape sequences outside tokens.
 		if (char === '\\') {
+			const nextChar = template[i + 1]
+
 			// If the next character is escapable, output it literally.
-			if (i + 1 < template.length && '{}|\\'.includes(template[i + 1])) {
-				result += template[i + 1]
+			if (nextChar !== undefined && '{}|\\'.includes(nextChar)) {
+				result += nextChar
 				i += 2
 			} else {
 				result += char
@@ -119,48 +209,12 @@ export function interpolate(
 			// Mark where the token’s raw content begins.
 			const contentStart = i
 
-			// ------------------------------------------------------------
 			// Search for the closing delimiter candidate.
-			// We scan from the content start until (a) the end of the template,
-			// or (b) we encounter an unescaped '{' after having found at least one valid candidate.
-			// ------------------------------------------------------------
-			let candidateIndex = -1
-			let candidateRun = 0
-			let pos = i
-			while (pos < template.length) {
-				if (template[pos] === '\\') {
-					// Skip escaped characters.
-					pos += 2
-					continue
-				}
-
-				if (template[pos] === '}') {
-					// Count the run of consecutive closing braces.
-					let temp = pos
-					let run = 0
-					while (temp < template.length && template[temp] === '}') {
-						run++
-						temp++
-					}
-
-					// If the run is long enough, record/update the candidate.
-					if (run >= braceCount) {
-						candidateIndex = pos
-						candidateRun = run
-					}
-
-					pos = temp
-					continue
-				}
-
-				// If we've already seen a valid candidate and now encounter an unescaped '{',
-				// break to prevent later tokens from interfering.
-				if (candidateIndex !== -1 && template[pos] === '{') {
-					break
-				}
-
-				pos++
-			}
+			const { candidateIndex, candidateRun } = findClosingDelimiter(
+				template,
+				contentStart,
+				braceCount,
+			)
 
 			// If a valid closing delimiter candidate was found...
 			if (candidateIndex === -1) {
@@ -173,35 +227,14 @@ export function interpolate(
 				// Advance the main index past the entire closing delimiter.
 				i = candidateIndex + candidateRun
 
-				// ------------------------------------------------------------
 				// Process escape sequences inside the token content.
-				// Escaped pipes are temporarily replaced with a placeholder.
-				// ------------------------------------------------------------
-				let processedToken = ''
-				let j = 0
-				while (j < tokenRaw.length) {
-					if (tokenRaw[j] === '\\' && j + 1 < tokenRaw.length) {
-						const nextChar = tokenRaw[j + 1]
-						if (nextChar === '|') {
-							processedToken += ESCAPED_PIPE
-							j += 2
-							continue
-						} else if ('{}|\\'.includes(nextChar)) {
-							processedToken += nextChar
-							j += 2
-							continue
-						}
-					}
-
-					processedToken += tokenRaw[j]
-					j++
-				}
+				const processedToken = processTokenEscapes(tokenRaw)
 
 				// Split the processed token on literal pipe characters.
 				let parts = processedToken.split('|')
 				// Restore any escaped pipes.
 				parts = parts.map((part) => part.replaceAll(ESCAPED_PIPE, '|'))
-				const value = parts[0]
+				const value = parts[0] ?? ''
 				let pipeValues: string | string[] | undefined
 				if (parts.length > 1) {
 					if (parts.length === 2 && parts[1] === '') {

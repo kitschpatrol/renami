@@ -5,7 +5,7 @@ import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
 import * as locales from 'date-fns/locale'
 import type { TimeZone } from './time-zone'
 
-const TIMEZONE_OFFSET_REGEX = /(?:Z|[+-]\d{2}:?\d{2})$/i
+const TIMEZONE_OFFSET_REGEX = /(?:Z|[+\-]\d{2}:?\d{2})$/iv
 
 /**
  * Tries to format and value as a date using date-fns-tz
@@ -30,9 +30,9 @@ export function formatDate(
 	localeId?: string, // Accept BCP 47 string, optional
 ): string {
 	// Resolve timezone and locale first since we need them for parsing TZ-less dates
-	// eslint-disable-next-line ts/no-unsafe-type-assertion
-	timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone
-	localeId ??= Intl.DateTimeFormat().resolvedOptions().locale
+
+	timeZone ??= new Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone
+	localeId ??= new Intl.DateTimeFormat().resolvedOptions().locale
 
 	let dateValueLocal: Date
 	if (is.date(value)) {
@@ -77,7 +77,7 @@ export function formatDate(
 
 // Spell-checker: disable
 // eslint-disable-next-line regexp/prefer-range
-const DATE_FNS_FORMAT_CHARS_REGEX = /^[abBcdDeEfFGhHiIkKLmMNoOpPqQrRsStTuUVwxXyYzZ':\-+/\\\s.,]+$/
+const DATE_FNS_FORMAT_CHARS_REGEX = /^[abBcdDeEfFGhHiIkKLmMNoOpPqQrRsStTuUVwxXyYzZ':\-+\/\\\s.,]+$/v
 // Spell-checker: enable
 
 /**
@@ -96,36 +96,35 @@ export function isDateFnsFormatString(input: string): boolean {
  * - Language only → "en"
  * - Language + region → "enUS", "ptBR", "zhTW"
  */
-const BCP47_SEPARATOR_REGEX = /[-_]/
-const REGION_SUBTAG_REGEX = /^[A-Z]{2}$/i
-const SCRIPT_SUBTAG_REGEX = /^[A-Z]{4}$/i
+const BCP47_SEPARATOR_REGEX = /[\-_]/v
+const REGION_SUBTAG_REGEX = /^[A-Z]{2}$/iv
+const SCRIPT_SUBTAG_REGEX = /^[A-Z]{4}$/iv
 
 function bcp47ToDateFnsKey(tag: string): string {
 	const parts = tag.split(BCP47_SEPARATOR_REGEX)
-	const language = parts[0].toLowerCase()
+	const language = parts[0]?.toLowerCase() ?? ''
 
 	let script: string | undefined
 	let region: string | undefined
 
-	for (let i = 1; i < parts.length; i++) {
-		const p = parts[i]
-		if (REGION_SUBTAG_REGEX.test(p)) {
+	for (const part of parts.slice(1)) {
+		if (REGION_SUBTAG_REGEX.test(part)) {
 			// Region sub tag (2 letters)
-			region = p.toUpperCase()
+			region = part.toUpperCase()
 			break
 		}
 
-		if (!script && SCRIPT_SUBTAG_REGEX.test(p)) {
+		if (script === undefined && SCRIPT_SUBTAG_REGEX.test(part)) {
 			// Script sub tag (4 letters)
-			script = p[0].toUpperCase() + p.slice(1).toLowerCase()
+			script = part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
 		}
 	}
 
-	if (region) {
+	if (region !== undefined) {
 		return language + region
 	}
 
-	if (script) {
+	if (script !== undefined) {
 		return language + script
 	}
 
@@ -143,10 +142,8 @@ function getLocaleObject(localeId: string): Locale {
 	const localeKey = bcp47ToDateFnsKey(localeId)
 
 	// Check if the locale is available in the statically imported locales
-	if (localeKey in locales) {
-		return (locales as Record<string, Locale>)[localeKey]
-	}
+	const locale = (locales as Record<string, Locale>)[localeKey]
 
-	// Use default
-	return locales.enUS // Fallback to enUS if not found
+	// Fallback to enUS if not found
+	return locale ?? locales.enUS
 }

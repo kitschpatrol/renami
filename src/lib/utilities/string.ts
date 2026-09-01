@@ -2,15 +2,15 @@ import escapeStringRegexp from 'escape-string-regexp'
 import filenamify from 'filenamify'
 import { slug } from 'github-slugger'
 
-const LOWERCASE_OR_DIGIT_REGEX = /[a-z0-9]/
-const UPPERCASE_LETTER_REGEX = /[A-Z]/
-const NEWLINE_REGEX = /\r?\n/
+const LOWERCASE_OR_DIGIT_REGEX = /[a-z0-9]/v
+const UPPERCASE_LETTER_REGEX = /[A-Z]/v
+const NEWLINE_REGEX = /\r?\n/v
 // eslint-disable-next-line regexp/no-unused-capturing-group
-const LEADING_SPACES_REGEX = /^( *)/
-const WORD_DELIMITER_REGEX = /[\s\-_]+/
-const TRAILING_PERIODS_REGEX = /\.{2,}$/
-const TRAILING_INCREMENT_REGEX = /\s\(\d+\)$/
-const INCREMENT_CAPTURE_REGEX = /\s\((\d+)\)$/
+const LEADING_SPACES_REGEX = /^( *)/v
+const WORD_DELIMITER_REGEX = /[\s\-_]+/v
+const TRAILING_PERIODS_REGEX = /\.{2,}$/v
+const TRAILING_INCREMENT_REGEX = /\s\(\d+\)$/v
+const INCREMENT_CAPTURE_REGEX = /\s\((\d+)\)$/v
 
 /**
  * Determines if a position in a string is a word boundary.
@@ -74,12 +74,13 @@ export function truncate(
 
 	// Calculate available length for the content before appending truncation string
 	const effectiveMaxLength = Math.min(maxLength, fileSystemMaxLength)
-	const safeMaxLength = effectiveMaxLength - truncationString.length
 
 	// No need to truncate if the text is already short enough
 	if (text.length <= effectiveMaxLength) {
 		return trim ? text.trim() : text
 	}
+
+	const safeMaxLength = effectiveMaxLength - truncationString.length
 
 	// If we can't fit any content plus the truncation string, return just the truncation string
 	if (safeMaxLength <= 0) {
@@ -160,7 +161,7 @@ export function trimLeadingIndentation(
 	const lines = raw.split(NEWLINE_REGEX)
 
 	// Remove leading/trailing blank lines.
-	while (lines.length > 0 && lines[0].trim() === '') {
+	while (lines[0]?.trim() === '') {
 		lines.shift()
 	}
 
@@ -250,7 +251,7 @@ export type CaseType = (typeof CASE_TYPE_NAMES)[number]
  */
 export function convertCase(text: string, caseType: CaseType): string {
 	// Handle empty strings
-	if (!text) {
+	if (text === '') {
 		return text
 	}
 
@@ -272,7 +273,7 @@ export function convertCase(text: string, caseType: CaseType): string {
 	// as well as the usual delimiters
 	const words = text
 		// Insert a space before any uppercase letter that follows a lowercase letter or number
-		.replaceAll(/([a-z0-9])([A-Z])/g, '$1 $2')
+		.replaceAll(/([a-z0-9])([A-Z])/gv, '$1 $2')
 		// Split on common delimiters and remove empty entries
 		.split(WORD_DELIMITER_REGEX)
 		.filter((word) => word.length > 0)
@@ -408,7 +409,7 @@ export function getSafeFilename(
 		const trailingPeriods = TRAILING_PERIODS_REGEX.exec(text)
 		if (trailingPeriods) {
 			// Append the trailing periods to the safe filename
-			basicSafeFilename = `${basicSafeFilename}${trailingPeriods[0]}`
+			basicSafeFilename += trailingPeriods[0]
 		}
 	}
 
@@ -455,8 +456,8 @@ export function appendIncrement(filename: string, index: number): string {
  */
 export function getIncrement(filename: string): number | undefined {
 	const match = INCREMENT_CAPTURE_REGEX.exec(filename)
-	if (match) {
-		return Number.parseInt(match[1], 10)
+	if (match?.[1] !== undefined) {
+		return Number(match[1])
 	}
 
 	return undefined
@@ -530,19 +531,22 @@ export function collapseSurplusDelimiters(text: string, delimiter: string) {
 
 	// Leading, possibly with extra leading spaces
 	newText = newText.replaceAll(
-		new RegExp(String.raw`^\s*(${escapeStringRegexp(delimiter)}){1,}`, 'g'),
+		new RegExp(String.raw`^\s*(${escapeStringRegexp(delimiter)}){1,}`, 'gv'),
 		'',
 	)
 
 	// Trailing, possibly with extra trailing spaces
 	newText = newText.replaceAll(
-		new RegExp(String.raw`(${escapeStringRegexp(delimiter)}){1,}\s*$`, 'g'),
+		new RegExp(String.raw`(${escapeStringRegexp(delimiter)}){1,}\s*$`, 'gv'),
 		'',
 	)
 	// NewText = newText.replace(new RegExp(`${escapeStringRegexp(delimiter)}\\s*$`), '')
 
 	// Middle
-	newText = newText.replaceAll(new RegExp(`(${escapeStringRegexp(delimiter)}){2,}`, 'g'), delimiter)
+	newText = newText.replaceAll(
+		new RegExp(`(${escapeStringRegexp(delimiter)}){2,}`, 'gv'),
+		() => delimiter,
+	)
 
 	return newText
 }
@@ -551,5 +555,5 @@ export function collapseSurplusDelimiters(text: string, delimiter: string) {
  * Collapse multiple spaces into a single space
  */
 export function collapseDuplicateSpaces(text: string): string {
-	return text.replaceAll(/\s+/g, ' ')
+	return text.replaceAll(/\s+/gv, ' ')
 }

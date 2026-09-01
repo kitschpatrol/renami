@@ -4,21 +4,21 @@ import { extractLinkLabel } from '../src/lib/utilities/markdown'
 describe('extractLinkLabel', () => {
 	// Test handling of null/empty values
 	it('should handle null and undefined values', () => {
-		// eslint-disable-next-line unicorn/no-null, ts/no-unsafe-type-assertion
+		// eslint-disable-next-line unicorn/no-null
 		expect(extractLinkLabel(null as unknown as string)).toBeNull()
-		// eslint-disable-next-line ts/no-unsafe-type-assertion
+
 		expect(extractLinkLabel(undefined as unknown as string)).toBeUndefined()
 	})
 
 	it('should handle empty and whitespace strings', () => {
 		expect(extractLinkLabel('')).toBe('')
-		expect(extractLinkLabel('   ')).toBe('   ') // Returns original when trimmed is empty
+		expect(extractLinkLabel(' '.repeat(3))).toBe(' '.repeat(3)) // Returns original when trimmed is empty
 	})
 
 	// Test URL extraction
 	it('should extract label from full URLs', () => {
 		expect(extractLinkLabel('https://example.com/page')).toBe('page')
-		expect(extractLinkLabel('http://example.com/path/to/page')).toBe('page')
+		expect(extractLinkLabel('https://example.com/path/to/page')).toBe('page')
 		expect(extractLinkLabel('https://example.com/file.html')).toBe('file')
 		expect(extractLinkLabel('https://example.com/document.pdf?query=123')).toBe('document')
 		expect(extractLinkLabel('https://example.com/page#section')).toBe('page')

@@ -158,11 +158,10 @@ export const defaultOptions: Options = {
 	delimiter: ' - ',
 	dryRun: false,
 	ignoreFolderNotes: false,
-	locale: Intl.DateTimeFormat().resolvedOptions().locale,
+	locale: new Intl.DateTimeFormat().resolvedOptions().locale,
 	maxLength: FILENAME_MAX_LENGTH,
 	strict: false,
-	// eslint-disable-next-line ts/no-unsafe-type-assertion
-	timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone,
+	timeZone: new Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone,
 	trim: true,
 	truncateOnWordBoundary: true,
 	truncationString: '...',
@@ -195,7 +194,7 @@ export function loadConfigObject(config: Partial<RenamiConfig>): RenamiConfig | 
 		try {
 			// Set defaults, validate and parse the config
 			const validatedConfig = parseConfig(
-				// eslint-disable-next-line ts/no-unsafe-type-assertion, ts/no-unnecessary-type-assertion
+				// eslint-disable-next-line ts/no-unnecessary-type-assertion
 				defineRenamiConfig(config as unknown as Partial<RenamiConfig>),
 			)
 			return validatedConfig
@@ -224,7 +223,7 @@ export async function loadConfig(
 	  }
 > {
 	// Load config from passed object
-	// eslint-disable-next-line ts/no-unsafe-type-assertion
+
 	const maybeConfig = loadConfigObject(config as unknown as Partial<RenamiConfig>)
 	if (maybeConfig !== undefined) {
 		return {
@@ -252,7 +251,7 @@ export async function loadConfig(
 			try {
 				// Validate and parse the config
 				const validatedConfig = parseConfig(
-					// eslint-disable-next-line ts/no-unsafe-type-assertion, ts/no-unnecessary-type-assertion
+					// eslint-disable-next-line ts/no-unnecessary-type-assertion
 					defineRenamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
 				)
 
@@ -275,7 +274,7 @@ export async function loadConfig(
 		try {
 			// Validate and parse the config
 			const validatedConfig = parseConfig(
-				// eslint-disable-next-line ts/no-unsafe-type-assertion, ts/no-unnecessary-type-assertion
+				// eslint-disable-next-line ts/no-unnecessary-type-assertion
 				defineRenamiConfig(loadedConfig.config as unknown as Partial<RenamiConfig>),
 			)
 

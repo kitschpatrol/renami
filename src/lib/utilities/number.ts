@@ -1,7 +1,7 @@
 import is from '@sindresorhus/is'
 import { format as numerableFormat } from 'numerable'
 
-const NUMERABLE_ALLOWED_CHARS_REGEX = /^[0()[\],.+#X$\s:\-%abdo]*$/
+const NUMERABLE_ALLOWED_CHARS_REGEX = /^[0\(\)\[\],.+#X$\s:\-%abdo]*$/v
 
 /**
  * Try to format an unknown value as a number using numerable
@@ -24,7 +24,7 @@ export function formatNumber(value: unknown, format: string): string {
 	}
 
 	// Convert to number
-	const numberValue = is.string(value) ? Number.parseFloat(value) : value
+	const numberValue = is.string(value) ? Number(value) : value
 
 	if (is.nan(numberValue)) {
 		throw new Error(`Invalid number conversion: ${String(value)}`)
@@ -75,18 +75,14 @@ export function isNumerableFormatString(input: string): boolean {
 	}
 
 	// Check balanced parentheses/brackets
-	const openParenCount = (input.match(/\(/g) ?? []).length
-	const closeParenCount = (input.match(/\)/g) ?? []).length
-	const openBracketCount = (input.match(/\[/g) ?? []).length
-	const closeBracketCount = (input.match(/\]/g) ?? []).length
+	const openParenCount = (input.match(/\(/gv) ?? []).length
+	const closeParenCount = (input.match(/\)/gv) ?? []).length
+	const openBracketCount = (input.match(/\[/gv) ?? []).length
+	const closeBracketCount = (input.match(/\]/gv) ?? []).length
 
 	// Must have balanced parentheses and brackets
 	const hasValidParentheses = openParenCount === closeParenCount
 	const hasValidBrackets = openBracketCount === closeBracketCount
 
-	if (!hasValidParentheses || !hasValidBrackets) {
-		return false
-	}
-
-	return true
+	return hasValidParentheses && hasValidBrackets
 }

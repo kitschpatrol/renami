@@ -18,12 +18,9 @@ export function universalTemplate(template: string, options: Options): Transform
 			// TODO more file type template handlers!
 
 			default: {
-				// eslint-disable-next-line ts/require-await
-				return (async (context) => {
-					log.warn(`No universal template handler for this file type yet: ${context.filePath.ext}`)
-					// eslint-disable-next-line unicorn/no-useless-undefined
-					return undefined
-				})(context)
+				log.warn(`No universal template handler for this file type yet: ${context.filePath.ext}`)
+				// eslint-disable-next-line unicorn/no-useless-undefined
+				return undefined
 			}
 		}
 	}

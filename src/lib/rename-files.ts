@@ -1,4 +1,3 @@
-/* eslint-disable max-depth */
 import { deepmerge } from 'deepmerge-ts'
 import { nanoid } from 'nanoid/non-secure'
 import { orderBy } from 'natural-orderby'
@@ -38,12 +37,7 @@ export type FileRenameReport = {
 }
 
 type FilePathValidationStatus =
-	| 'empty'
-	| 'nonexistent'
-	| 'not-absolute'
-	| 'not-normalized'
-	| 'not-string'
-	| 'valid'
+	'empty' | 'nonexistent' | 'not-absolute' | 'not-normalized' | 'not-string' | 'valid'
 
 async function validateFilePath(
 	filePath: string,
@@ -102,15 +96,17 @@ function validationStatusMessage(status: FilePathValidationStatus): string {
 }
 
 async function validateFiles(filePaths: string[], fileAdapter: FileAdapter): Promise<void> {
-	const statuses = await Promise.all(
-		filePaths.map(async (filePath) => validateFilePath(filePath, fileAdapter)),
+	const validations = await Promise.all(
+		filePaths.map(async (filePath) => ({
+			filePath,
+			status: await validateFilePath(filePath, fileAdapter),
+		})),
 	)
 
 	let invalidFilesFound = false
 	const validFiles: string[] = []
 
-	for (const [index, filePath] of filePaths.entries()) {
-		const status = statuses[index]
+	for (const { filePath, status } of validations) {
 		if (status === 'valid') {
 			if (validFiles.includes(filePath.toLowerCase())) {
 				log.error(`Duplicate file: "${filePath}"`)
@@ -230,8 +226,8 @@ export async function renameFiles(options: {
 		let undefinedCount = 0
 
 		// Run actions, in order, passing along transformed output, skipping any that return undefined
-		for (const [index, transform] of transformArray.entries()) {
-			let result = await transform({ fileAdapter, filePath: pathObject })
+		for (const [index, transformFunction] of transformArray.entries()) {
+			let result = await transformFunction({ fileAdapter, filePath: pathObject })
 
 			if (result === undefined) {
 				undefinedCount += 1
@@ -243,15 +239,13 @@ export async function renameFiles(options: {
 					undefinedCount === userTransformArray.length
 				) {
 					result = defaultName
-				} else {
-					continue
 				}
 			}
 
 			if (typeof result === 'string') {
 				// Ensure whole object is updated to reflect name
 				pathObjectSetName(pathObject, result)
-			} else {
+			} else if (result !== undefined) {
 				// Use the whole returned path object
 				// TODO validate, and warn about messing with directories?
 				pathObjectSetAll(result, pathObject)
@@ -270,39 +264,29 @@ export async function renameFiles(options: {
 		const duplicateGroup = [task]
 
 		// Look forward for duplicates, we're trusting in the sort
-		for (let i = index + 1; i < fileRenamePlan.length; i++) {
-			const nextTask = fileRenamePlan[i]
-			if (nextTask.filePathRenamed!.toLowerCase() === task.filePathRenamed!.toLowerCase()) {
-				// But only push if it's not in a previous group of duplicateGroups
-				// Skip this file if it's already been identified as a duplicate earlier
+		// Skip files already identified as duplicates in a previous group
+		const duplicates = fileRenamePlan
+			.slice(index + 1)
+			.filter(
+				(nextTask) =>
+					nextTask.filePathRenamed!.toLowerCase() === task.filePathRenamed!.toLowerCase() &&
+					duplicateGroups.every((group) => !group.includes(nextTask)),
+			)
 
-				let alreadyInDuplicateGroup = false
-				for (const group of duplicateGroups) {
-					if (group.includes(nextTask)) {
-						alreadyInDuplicateGroup = true
-						break
-					}
-				}
-
-				if (!alreadyInDuplicateGroup) {
-					duplicateGroup.push(nextTask)
-				}
-			}
-		}
+		duplicateGroup.push(...duplicates)
 
 		if (duplicateGroup.length > 1) {
 			// First, identify items with increments and their target positions
 			const incrementedItems = []
 
-			for (let i = 0; i < duplicateGroup.length; i++) {
-				const task = duplicateGroup[i]
-				const originalIncrement = getIncrement(path.parse(task.filePathOriginal).name)
+			for (const [i, duplicateTask] of duplicateGroup.entries()) {
+				const originalIncrement = getIncrement(path.parse(duplicateTask.filePathOriginal).name)
 
 				if (originalIncrement !== undefined && originalIncrement - 1 < duplicateGroup.length) {
 					incrementedItems.push({
 						originalIndex: i,
 						targetIndex: originalIncrement - 1,
-						task,
+						task: duplicateTask,
 					})
 				}
 			}
@@ -317,21 +301,17 @@ export async function renameFiles(options: {
 				reorderedGroup[item.targetIndex] = item.task
 			}
 
-			// Then fill in the remaining positions with unused items
-			let nextUnusedItem = 0
-			for (let i = 0; i < reorderedGroup.length; i++) {
-				if (reorderedGroup[i] === undefined) {
-					// Find the next unused item
-					while (nextUnusedItem < duplicateGroup.length) {
-						const candidate = duplicateGroup[nextUnusedItem++]
-						const increment = getIncrement(path.parse(candidate.filePathOriginal).name)
+			// Then fill in the remaining positions with unused items,
+			// skipping items that already have increments and were placed
+			const unplacedTasks = duplicateGroup.filter((candidate) => {
+				const increment = getIncrement(path.parse(candidate.filePathOriginal).name)
+				return increment === undefined || increment - 1 >= duplicateGroup.length
+			})
 
-						// Skip items that already have increments and were placed
-						if (increment === undefined || increment - 1 >= duplicateGroup.length) {
-							reorderedGroup[i] = candidate
-							break
-						}
-					}
+			let nextUnusedItem = 0
+			for (const [i, item] of reorderedGroup.entries()) {
+				if (item === undefined) {
+					reorderedGroup[i] = unplacedTasks[nextUnusedItem++]
 				}
 			}
 
@@ -369,17 +349,16 @@ export async function renameFiles(options: {
 
 	// Check for conflicts between original and final paths, setting intermediate filename if needed
 	for (const task of fileRenamePlan) {
-		for (const otherTask of fileRenamePlan) {
-			if (task === otherTask) {
-				continue
-			}
+		const hasConflict = fileRenamePlan.some(
+			(otherTask) =>
+				task !== otherTask &&
+				task.filePathRenamed!.toLowerCase() === otherTask.filePathOriginal.toLowerCase(),
+		)
 
-			if (task.filePathRenamed!.toLowerCase() === otherTask.filePathOriginal.toLowerCase()) {
-				const tempPathObject = path.parse(task.filePathRenamed!)
-				pathObjectSetName(tempPathObject, nanoid())
-				task.filePathIntermediate = path.format(tempPathObject)
-				break
-			}
+		if (hasConflict) {
+			const tempPathObject = path.parse(task.filePathRenamed!)
+			pathObjectSetName(tempPathObject, nanoid())
+			task.filePathIntermediate = path.format(tempPathObject)
 		}
 	}
 

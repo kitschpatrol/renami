@@ -2,8 +2,8 @@
 
 <!-- badges -->
 
-[![NPM Package @kitschpatrol/renami](https://img.shields.io/npm/v/@kitschpatrol/renami.svg)](https://npmjs.com/package/@kitschpatrol/renami)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/mit/)
+[![NPM Package @kitschpatrol/renami](https://img.shields.io/npm/v/@kitschpatrol/renami.svg)](https://www.npmjs.com/package/@kitschpatrol/renami)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/mit)
 [![CI](https://github.com/kitschpatrol/renami/actions/workflows/ci.yml/badge.svg)](https://github.com/kitschpatrol/renami/actions/workflows/ci.yml)
 
 <!-- /badges -->

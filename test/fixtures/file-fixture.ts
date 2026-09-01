@@ -31,7 +31,7 @@ type TempFilesOptions = {
 export function useTempFiles(options: TempFilesOptions) {
 	const { cleanup = true, prefix = 'vitest-', sourcePath } = options
 
-	let tempDirectoryPath: string
+	let tempDirectoryPath = ''
 
 	beforeEach(async () => {
 		// Create temporary directory with provided prefix
@@ -46,7 +46,7 @@ export function useTempFiles(options: TempFilesOptions) {
 
 	afterEach(async () => {
 		// Clean up the temporary directory if cleanup is enabled
-		if (cleanup && tempDirectoryPath) {
+		if (cleanup && tempDirectoryPath !== '') {
 			await rm(tempDirectoryPath, { force: true, recursive: true })
 		}
 	})
@@ -56,7 +56,7 @@ export function useTempFiles(options: TempFilesOptions) {
 		 * Manually clean up the temporary directory
 		 */
 		async cleanup() {
-			if (tempDirectoryPath) {
+			if (tempDirectoryPath !== '') {
 				await rm(tempDirectoryPath, { force: true, recursive: true })
 			}
 		},

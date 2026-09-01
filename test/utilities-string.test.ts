@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-const SAFE_FILENAME_PATTERN_REGEX = /file.+name.+with.+invalid.+chars/
-const PRESERVED_CASE_REGEX = /File-NAME_example/
+const SAFE_FILENAME_PATTERN_REGEX = /file.+name.+with.+invalid.+chars/v
+const PRESERVED_CASE_REGEX = /File-NAME_example/v
 import { isDateFnsFormatString } from '../src/lib/utilities/date'
 import { isNumerableFormatString } from '../src/lib/utilities/number'
 import {
@@ -34,7 +34,7 @@ describe('getSafeFilename', () => {
 
 	test('applies Unicode normalization', () => {
 		// Create a string with a combining character that should be normalized
-		const nonNormalizedString = 'cafe\u0301' // Café with combining acute accent
+		const nonNormalizedString = 'cafe\u{301}' // Café with combining acute accent
 		const result = getSafeFilename(nonNormalizedString)
 
 		// The result should be the NFC normalized form
@@ -371,15 +371,15 @@ describe('getUnicodeCodePoints', () => {
 		expect(getUnicodeCodePoints('é')).toEqual(['e9'])
 
 		// E with combining acute accent
-		expect(getUnicodeCodePoints('e\u0301')).toEqual(['65', '301'])
+		expect(getUnicodeCodePoints('e\u{301}')).toEqual(['65', '301'])
 	})
 
 	test('handles special Unicode characters', () => {
 		// Zero-width joiner
-		expect(getUnicodeCodePoints('\u200D')).toEqual(['200d'])
+		expect(getUnicodeCodePoints('\u{200D}')).toEqual(['200d'])
 
 		// Non-breaking space
-		expect(getUnicodeCodePoints('\u00A0')).toEqual(['a0'])
+		expect(getUnicodeCodePoints('\u{A0}')).toEqual(['a0'])
 	})
 
 	test('handles multi-code point characters', () => {

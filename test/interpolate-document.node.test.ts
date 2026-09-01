@@ -3,10 +3,11 @@ import { defaultOptions } from '../src/lib'
 import { interpolateDocument } from '../src/lib/utilities/interpolate/document'
 import { getMarkdown } from '../src/lib/utilities/markdown'
 
-const SCIENTIFIC_NOTATION_REGEX = /2.55e\+0/
+const SCIENTIFIC_NOTATION_REGEX = /2.55e\+0/v
 
 describe('Document Interpolation', () => {
 	// Sample markdown content
+	/* eslint-disable unicorn/no-incorrect-template-string-interpolation -- Braces are literal test content, not interpolations */
 	const markdown = `---
 title: My Document
 date:
@@ -72,6 +73,7 @@ This is a subsection with additional content.
 
 Deep nested content.
 `
+	/* eslint-enable unicorn/no-incorrect-template-string-interpolation */
 
 	// Use the getMarkdown helper to parse the markdown
 	const { ast, frontmatter } = getMarkdown(markdown)
@@ -182,7 +184,7 @@ Deep nested content.
 	})
 
 	// Not supported by Numerable
-	it.skip('should format numbers with scientific notation', () => {
+	it.todo('should format numbers with scientific notation', () => {
 		const scientificResult = interpolateDocument(
 			'{stats.readingTime|0.00e+0}',
 			frontmatter,
@@ -385,7 +387,7 @@ Deep nested content.
 	})
 
 	// These are a bit too special to be handled by the current implementation
-	it.skip('should handle property names with very special characters', () => {
+	it.todo('should handle property names with very special characters', () => {
 		const dotInNameResult = interpolateDocument(
 			'{objects.complex["b.c"]}',
 			frontmatter,
@@ -618,6 +620,7 @@ Deep nested content.
 		`
 		const result = interpolateDocument(complexNestedTemplate, frontmatter, ast, defaultOptions)
 
+		/* eslint-disable unicorn/no-incorrect-template-string-interpolation -- Braces are literal snapshot content, not interpolations */
 		expect(result).toMatchInlineSnapshot(`
 			"
 						My Document has properties with special chars:
@@ -631,5 +634,6 @@ Deep nested content.
 						AST selector for heading and then paragraph: THIS IS A DOCUMENT ABOUT IMPLEMENTING A TEMPLATING SYSTEM IN TYPESCRIPT.
 					"
 		`)
+		/* eslint-enable unicorn/no-incorrect-template-string-interpolation */
 	})
 })

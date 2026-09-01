@@ -195,7 +195,7 @@ function stringifyCompactInternal(
 
 		// Handle Map objects
 		if (value instanceof Map) {
-			const entries = Array.from(value.entries(), ([k, v]) => {
+			const entries = Array.from(value, ([k, v]) => {
 				const keyString = typeof k === 'object' && k !== null ? '[Object]' : String(k)
 
 				const flatValue = stringifyCompactInternal(
@@ -219,7 +219,7 @@ function stringifyCompactInternal(
 
 		// Handle Set objects
 		if (value instanceof Set) {
-			const values = Array.from(value.values(), (v, i) =>
+			const values = Array.from(value, (v, i) =>
 				stringifyCompactInternal(v, options, [...path, i.toString()], seen, depth + 1),
 			).filter((v) => v !== '__SKIP_THIS_VALUE__')
 
@@ -238,7 +238,7 @@ function stringifyCompactInternal(
 		}
 
 		// Handle any other objects
-		// eslint-disable-next-line ts/no-unsafe-type-assertion
+
 		const entries = Object.entries(value as Record<string, unknown>)
 			.map(([k, v]) => {
 				const flatValue = stringifyCompactInternal(v, options, [...path, k], seen, depth + 1)

@@ -40,12 +40,12 @@ export function interpolateDocument(
 				isString(resolvedValue) || isArray(resolvedValue) || isObject(resolvedValue)
 					? stringifyCompact(resolvedValue, {
 							delimiter: options.delimiter,
-							replacer(_, value) {
-								if (typeof value === 'string') {
-									return extractLinkLabel(value)
+							replacer(_, propertyValue) {
+								if (typeof propertyValue === 'string') {
+									return extractLinkLabel(propertyValue)
 								}
 
-								return value
+								return propertyValue
 							},
 						})
 					: resolvedValue

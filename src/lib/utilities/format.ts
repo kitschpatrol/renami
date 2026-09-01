@@ -90,9 +90,8 @@ export function formatValue(
 	// Format implementations...
 
 	// Case change
-	// eslint-disable-next-line ts/no-unsafe-type-assertion
+
 	if (is.nonEmptyString(value) && CASE_TYPE_NAMES.includes(format.toLowerCase() as CaseType)) {
-		// eslint-disable-next-line ts/no-unsafe-type-assertion
 		return convertCase(value, format as CaseType)
 	}
 
@@ -121,7 +120,7 @@ export function formatValue(
 	// will be taken by NumberFormatter since zero-length truncation doesn't make sense
 	// e.g. 'I love {name|10}'
 	if (is.nonEmptyString(stringValue) && format.length < 4) {
-		const maxLength = Number.parseInt(format, 10)
+		const maxLength = Number(format)
 		if (is.safeInteger(maxLength) && maxLength >= 1 && maxLength < 1000) {
 			return truncate(
 				stringValue,

@@ -150,9 +150,7 @@ describe('basic rename tests', () => {
 						return 'camelCaseFile'
 					}
 
-					if (name === 'camelCaseFile') {
-						return 'basic'
-					}
+					return name === 'camelCaseFile' ? 'basic' : undefined
 				},
 			],
 		})
@@ -265,11 +263,7 @@ describe('increment duplicate tests', () => {
 				dryRun: true,
 			},
 			transform: [
-				async ({ filePath: { name } }) => {
-					if (name.startsWith('rename')) {
-						return 'Basic'
-					}
-				},
+				async ({ filePath: { name } }) => (name.startsWith('rename') ? 'Basic' : undefined),
 			],
 		})
 
@@ -367,7 +361,10 @@ describe('markdown template tests', () => {
 				dryRun: true,
 			},
 			transform: [
-				markdownCallback(async ({ frontmatter }) => String(frontmatter.title) || 'Untitled'),
+				markdownCallback(async ({ frontmatter }) => {
+					const title = String(frontmatter.title)
+					return title === '' ? 'Untitled' : title
+				}),
 			],
 		})
 

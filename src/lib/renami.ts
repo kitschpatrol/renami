@@ -132,13 +132,13 @@ export async function renami(options?: {
 	const maskedMatches = await getMaskedMatchedFiles(rules, configCwd, globAdapter)
 
 	for (const [index, { options: transformOptions, pattern, transform }] of rules.entries()) {
-		const filePaths = maskedMatches[index]
-		const options = deepmerge(defaultTransformOptions, transformOptions ?? {})
+		const filePaths = maskedMatches[index] ?? []
+		const ruleOptions = deepmerge(defaultTransformOptions, transformOptions ?? {})
 
 		const report = await renameFiles({
 			fileAdapter,
 			filePaths,
-			options,
+			options: ruleOptions,
 			transform,
 		})
 

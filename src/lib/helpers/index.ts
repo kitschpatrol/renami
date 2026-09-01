@@ -9,9 +9,7 @@ export const transformHelper = {
 }
 
 export type TransformHelper =
-	| typeof fileCallback
-	| typeof markdownCallback
-	| typeof universalTemplate
+	typeof fileCallback | typeof markdownCallback | typeof universalTemplate
 
 // TODO explore typed tuples for better config autocomplete...
 // A generic type that produces a tuple of [Name, ArgumentType]

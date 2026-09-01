@@ -3,7 +3,7 @@ import path from 'pathe'
 import { z } from 'zod'
 import log from './log'
 
-const WINDOWS_DRIVE_LETTER_REGEX = /^[A-Z]:/i
+const WINDOWS_DRIVE_LETTER_REGEX = /^[A-Z]:/iv
 
 /**
  * Zod schema for PathObject, which is a copy of the Node.js PathObject.
