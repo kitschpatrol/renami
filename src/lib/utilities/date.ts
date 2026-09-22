@@ -124,11 +124,7 @@ function bcp47ToDateFnsKey(tag: string): string {
 		return language + region
 	}
 
-	if (script !== undefined) {
-		return language + script
-	}
-
-	return language
+	return script === undefined ? language : language + script
 }
 
 /**

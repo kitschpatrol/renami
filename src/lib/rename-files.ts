@@ -60,11 +60,7 @@ async function validateFilePath(
 		return 'not-absolute'
 	}
 
-	if (!(await exists(filePath, fileAdapter))) {
-		return 'nonexistent'
-	}
-
-	return 'valid'
+	return (await exists(filePath, fileAdapter)) ? 'valid' : 'nonexistent'
 }
 
 function validationStatusMessage(status: FilePathValidationStatus): string {
@@ -190,14 +186,12 @@ export async function renameFiles(options: {
 
 	const userTransformArray =
 		// Wrap user-provided transforms in an array if necessary
-		ensureArray(transform).map((transformItem) => {
+		ensureArray(transform).map((transformItem) =>
 			// Turn any plain string values into Universal Template functions
-			if (typeof transformItem === 'string') {
-				return universalTemplate(transformItem, localOptions)
-			}
-
-			return transformItem
-		})
+			typeof transformItem === 'string'
+				? universalTemplate(transformItem, localOptions)
+				: transformItem,
+		)
 
 	const standardTransformArray = [
 		// Standard transforms
@@ -275,51 +269,53 @@ export async function renameFiles(options: {
 
 		duplicateGroup.push(...duplicates)
 
-		if (duplicateGroup.length > 1) {
-			// First, identify items with increments and their target positions
-			const incrementedItems = []
-
-			for (const [i, duplicateTask] of duplicateGroup.entries()) {
-				const originalIncrement = getIncrement(path.parse(duplicateTask.filePathOriginal).name)
-
-				if (originalIncrement !== undefined && originalIncrement - 1 < duplicateGroup.length) {
-					incrementedItems.push({
-						originalIndex: i,
-						targetIndex: originalIncrement - 1,
-						task: duplicateTask,
-					})
-				}
-			}
-
-			// Create a new array to hold the reordered items
-			const reorderedGroup: Array<FileRenameTask | undefined> = Array.from({
-				length: duplicateGroup.length,
-			})
-
-			// First place all the incremented items at their target positions
-			for (const item of incrementedItems) {
-				reorderedGroup[item.targetIndex] = item.task
-			}
-
-			// Then fill in the remaining positions with unused items,
-			// skipping items that already have increments and were placed
-			const unplacedTasks = duplicateGroup.filter((candidate) => {
-				const increment = getIncrement(path.parse(candidate.filePathOriginal).name)
-				return increment === undefined || increment - 1 >= duplicateGroup.length
-			})
-
-			let nextUnusedItem = 0
-			for (const [i, item] of reorderedGroup.entries()) {
-				if (item === undefined) {
-					reorderedGroup[i] = unplacedTasks[nextUnusedItem++]
-				}
-			}
-
-			// Remove any undefined entries (should not happen, but just in case)
-			const finalGroup = reorderedGroup.filter((item) => item !== undefined)
-
-			duplicateGroups.push(finalGroup)
+		if (duplicateGroup.length <= 1) {
+			continue
 		}
+
+		// First, identify items with increments and their target positions
+		const incrementedItems = []
+
+		for (const [i, duplicateTask] of duplicateGroup.entries()) {
+			const originalIncrement = getIncrement(path.parse(duplicateTask.filePathOriginal).name)
+
+			if (originalIncrement !== undefined && originalIncrement - 1 < duplicateGroup.length) {
+				incrementedItems.push({
+					originalIndex: i,
+					targetIndex: originalIncrement - 1,
+					task: duplicateTask,
+				})
+			}
+		}
+
+		// Create a new array to hold the reordered items
+		const reorderedGroup: Array<FileRenameTask | undefined> = Array.from({
+			length: duplicateGroup.length,
+		})
+
+		// First place all the incremented items at their target positions
+		for (const item of incrementedItems) {
+			reorderedGroup[item.targetIndex] = item.task
+		}
+
+		// Then fill in the remaining positions with unused items,
+		// skipping items that already have increments and were placed
+		const unplacedTasks = duplicateGroup.filter((candidate) => {
+			const increment = getIncrement(path.parse(candidate.filePathOriginal).name)
+			return increment === undefined || increment - 1 >= duplicateGroup.length
+		})
+
+		let nextUnusedItem = 0
+		for (const [i, item] of reorderedGroup.entries()) {
+			if (item === undefined) {
+				reorderedGroup[i] = unplacedTasks[nextUnusedItem++]
+			}
+		}
+
+		// Remove any undefined entries (should not happen, but just in case)
+		const finalGroup = reorderedGroup.filter((item) => item !== undefined)
+
+		duplicateGroups.push(finalGroup)
 	}
 
 	// Increment duplicates, truncating first to make room for the max increment width
@@ -355,11 +351,13 @@ export async function renameFiles(options: {
 				task.filePathRenamed!.toLowerCase() === otherTask.filePathOriginal.toLowerCase(),
 		)
 
-		if (hasConflict) {
-			const tempPathObject = path.parse(task.filePathRenamed!)
-			pathObjectSetName(tempPathObject, nanoid())
-			task.filePathIntermediate = path.format(tempPathObject)
+		if (!hasConflict) {
+			continue
 		}
+
+		const tempPathObject = path.parse(task.filePathRenamed!)
+		pathObjectSetName(tempPathObject, nanoid())
+		task.filePathIntermediate = path.format(tempPathObject)
 	}
 
 	// Sort the paths based on final filenames
@@ -410,23 +408,25 @@ export async function renameFiles(options: {
 	// Now do a pass for the final files
 	for (const task of fileRenamePlan) {
 		const { filePathIntermediate, filePathOriginal, filePathRenamed, status } = task
-		if (status === 'scheduled') {
-			const sourcePath = filePathIntermediate ?? filePathOriginal
+		if (status !== 'scheduled') {
+			continue
+		}
 
-			if (sourcePath === filePathRenamed) {
-				task.status = 'unchanged'
-				continue
+		const sourcePath = filePathIntermediate ?? filePathOriginal
+
+		if (sourcePath === filePathRenamed) {
+			task.status = 'unchanged'
+			continue
+		}
+
+		try {
+			if (!dryRun) {
+				await fileAdapter.rename(sourcePath, filePathRenamed!)
 			}
 
-			try {
-				if (!dryRun) {
-					await fileAdapter.rename(sourcePath, filePathRenamed!)
-				}
-
-				task.status = 'renamed'
-			} catch {
-				task.status = 'error'
-			}
+			task.status = 'renamed'
+		} catch {
+			task.status = 'error'
 		}
 	}
 

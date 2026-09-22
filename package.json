@@ -39,7 +39,7 @@
 	],
 	"scripts": {
 		"build": "tsdown",
-		"clean": "shx rm -f pnpm-lock.yaml && git clean -fdX -e !.claude/",
+		"clean-deep": "shx rm -f pnpm-lock.yaml && git clean -fdX -e !.claude/",
 		"coverage": "vitest run --coverage",
 		"fix": "ksc fix",
 		"lint": "ksc lint",
@@ -50,7 +50,7 @@
 		"@sindresorhus/is": "^8.1.0",
 		"@stdlib/assert-is-absolute-path": "^0.2.3",
 		"@types/mdast": "^4.0.4",
-		"cosmiconfig": "^10.0.0",
+		"cosmiconfig": "^10.0.1",
 		"cosmiconfig-typescript-loader": "^6.3.0",
 		"date-fns": "^4.4.0",
 		"date-fns-tz": "^3.2.0",
@@ -74,22 +74,22 @@
 		"unist-util-select": "^5.1.0",
 		"vfile": "^6.0.3",
 		"vfile-matter": "^5.0.1",
-		"yargs": "^18.1.0",
-		"zod": "^4.5.4"
+		"yargs": "^18.2.0",
+		"zod": "^4.6.5"
 	},
 	"devDependencies": {
-		"@kitschpatrol/shared-config": "^8.7.0",
-		"@types/node": "~24.13.3",
+		"@kitschpatrol/shared-config": "^8.10.0",
+		"@types/node": "~24.13.4",
 		"@types/yargs": "^17.0.35",
 		"@vvo/tzdb": "^6.198.0",
-		"bumpp": "^12.2.2",
+		"bumpp": "^12.3.0",
 		"mdat-plugin-cli-help": "^3.2.0",
 		"shx": "^0.4.0",
-		"tsdown": "^0.22.14",
+		"tsdown": "^0.23.0",
 		"typescript": "~6.0.3",
-		"vitest": "^4.1.11"
+		"vitest": "^5.0.1"
 	},
-	"packageManager": "pnpm@11.24.0",
+	"packageManager": "pnpm@12.4.1",
 	"engines": {
 		"node": ">=24.16.0"
 	},

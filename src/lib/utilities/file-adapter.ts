@@ -22,19 +22,15 @@ export type FileAdapter = {
  *
  * @public
  */
-export const FileAdapterSchema = z.custom<FileAdapter>((value) => {
-	if (!is.plainObject(value)) {
-		return false
-	}
-
-	return (
+export const FileAdapterSchema = z.custom<FileAdapter>(
+	(value) =>
+		is.plainObject(value) &&
 		is.function(value.readFile) &&
 		is.function(value.readFileBuffer) &&
 		is.function(value.rename) &&
 		is.function(value.stat) &&
-		is.function(value.writeFile)
-	)
-})
+		is.function(value.writeFile),
+)
 
 /**
  * Wrapper around the file system stat function to check if a file exists.

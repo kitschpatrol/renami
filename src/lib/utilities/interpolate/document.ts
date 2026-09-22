@@ -41,11 +41,9 @@ export function interpolateDocument(
 					? stringifyCompact(resolvedValue, {
 							delimiter: options.delimiter,
 							replacer(_, propertyValue) {
-								if (typeof propertyValue === 'string') {
-									return extractLinkLabel(propertyValue)
-								}
-
-								return propertyValue
+								return typeof propertyValue === 'string'
+									? extractLinkLabel(propertyValue)
+									: propertyValue
 							},
 						})
 					: resolvedValue

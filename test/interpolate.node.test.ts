@@ -142,11 +142,7 @@ describe('Core Interpolation', () => {
 				return 'B'
 			}
 
-			if (context.value === 'three') {
-				return 'C'
-			}
-
-			return ''
+			return context.value === 'three' ? 'C' : ''
 		})
 		expect(result).toBe('ABC')
 		expect(callCount).toBe(3)

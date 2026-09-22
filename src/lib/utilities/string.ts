@@ -281,13 +281,11 @@ export function convertCase(text: string, caseType: CaseType): string {
 	switch (caseType) {
 		case 'camel': {
 			return words
-				.map((word, index) => {
-					if (index === 0) {
-						return word.toLowerCase()
-					}
-
-					return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-				})
+				.map((word, index) =>
+					index === 0
+						? word.toLowerCase()
+						: word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+				)
 				.join('')
 		}
 
@@ -317,13 +315,11 @@ export function convertCase(text: string, caseType: CaseType): string {
 
 			// For sentence case, capitalize first word, lowercase the rest
 			return words
-				.map((word, index) => {
-					if (index === 0) {
-						return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-					}
-
-					return word.toLowerCase()
-				})
+				.map((word, index) =>
+					index === 0
+						? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+						: word.toLowerCase(),
+				)
 				.join(' ')
 		}
 
@@ -363,11 +359,9 @@ export function convertCase(text: string, caseType: CaseType): string {
 				.map((word, index) => {
 					const lowerWord = word.toLowerCase()
 					// Always capitalize first and last words, and longer words
-					if (index === 0 || index === words.length - 1 || !smallWords.has(lowerWord)) {
-						return word.charAt(0).toUpperCase() + lowerWord.slice(1)
-					}
-
-					return lowerWord
+					return index === 0 || index === words.length - 1 || !smallWords.has(lowerWord)
+						? word.charAt(0).toUpperCase() + lowerWord.slice(1)
+						: lowerWord
 				})
 				.join(' ')
 		}
@@ -456,11 +450,7 @@ export function appendIncrement(filename: string, index: number): string {
  */
 export function getIncrement(filename: string): number | undefined {
 	const match = INCREMENT_CAPTURE_REGEX.exec(filename)
-	if (match?.[1] !== undefined) {
-		return Number(match[1])
-	}
-
-	return undefined
+	return match?.[1] === undefined ? undefined : Number(match[1])
 }
 
 /**
