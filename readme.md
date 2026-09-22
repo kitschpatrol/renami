@@ -69,16 +69,16 @@ Renami is implemented in TypeScript and bundles a complete set of type definitio
 
 ### Installation
 
-Install locally to access the CLI commands in a single project or to import the provided APIs:
+Install the CLI tool globally via Homebrew:
+
+```sh
+brew install kitschpatrol/tap/renami
+```
+
+Or, install locally to access the CLI commands in a single project or to import the provided TypeScript library APIs:
 
 ```sh
 npm install @kitschpatrol/renami
-```
-
-Or, install globally for access across your system:
-
-```sh
-npm install --global renami
 ```
 
 See the sections below for details on configuration and available commands.

@@ -35,6 +35,8 @@ minimumReleaseAgeExclude:
   - eslint-plugin-react-rsc@5.20.5
   - eslint-plugin-react-web-api@5.20.5
   - eslint-plugin-react-x@5.20.5
+  - brewpub@0.3.0
+  - lognow@0.8.4
 publicHoistPattern:
   - '@kitschpatrol/repo-config'
   - '@kitschpatrol/typescript-config'
