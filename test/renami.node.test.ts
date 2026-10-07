@@ -32,7 +32,7 @@ describe('renami tests', () => {
 	})
 
 	it('should use the config file', async () => {
-		const renameReport = await renami({ config: './test/fixtures/test-config.ts' })
+		const renameReport = await renami({ config: './test/fixtures/test.config.ts' })
 
 		expect(renameReport).toBeDefined()
 		expect(sanitizeRenameReport(renameReport, process.cwd())).toMatchSnapshot()

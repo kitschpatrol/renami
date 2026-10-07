@@ -392,11 +392,12 @@ export function getSafeFilename(
 		replacement,
 	})
 
-	// Filenamify 7 work-around, since it does not respect blank replacement string
-	// when final result is ' ', it returns '!' instead
-	// if (basicSafeFilename === '!' && text !== '!') {
-	// 	basicSafeFilename = replacement
-	// }
+	// Filenamify 7 returns '!' instead of an empty string when nothing survives
+	// sanitization, since it strips the whitespace-only replacement. An input
+	// without '!' can only produce '!' through that fallback.
+	if (basicSafeFilename === '!' && !text.includes('!')) {
+		basicSafeFilename = ''
+	}
 
 	if (preserveTrailingPeriods) {
 		// Get trailing periods from original text
@@ -513,7 +514,11 @@ export function css(strings: TemplateStringsArray, ...values: unknown[]): string
  * Strip surplus delimiters from a string
  */
 export function collapseSurplusDelimiters(text: string, delimiter: string) {
-	if (delimiter.length === 0 || !text.includes(delimiter)) {
+	// Safe filename sanitization trims trailing whitespace, so a trailing
+	// delimiter like ' - ' may arrive as ' -'
+	const trailingDelimiter = delimiter.trimEnd()
+
+	if (delimiter.length === 0 || !text.includes(trailingDelimiter)) {
 		return text
 	}
 
@@ -527,10 +532,12 @@ export function collapseSurplusDelimiters(text: string, delimiter: string) {
 
 	// Trailing, possibly with extra trailing spaces
 	newText = newText.replaceAll(
-		new RegExp(String.raw`(${escapeStringRegexp(delimiter)}){1,}\s*$`, 'gv'),
+		new RegExp(
+			String.raw`(${escapeStringRegexp(delimiter)})*${escapeStringRegexp(trailingDelimiter)}\s*$`,
+			'gv',
+		),
 		'',
 	)
-	// NewText = newText.replace(new RegExp(`${escapeStringRegexp(delimiter)}\\s*$`), '')
 
 	// Middle
 	newText = newText.replaceAll(

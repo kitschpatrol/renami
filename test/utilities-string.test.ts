@@ -6,6 +6,7 @@ import { isDateFnsFormatString } from '../src/lib/utilities/date'
 import { isNumerableFormatString } from '../src/lib/utilities/number'
 import {
 	appendIncrement,
+	collapseSurplusDelimiters,
 	convertCase,
 	css,
 	emptyIsUndefined,
@@ -51,6 +52,29 @@ describe('getSafeFilename', () => {
 	test('preserves case when sanitizing', () => {
 		const mixedCase = 'File-NAME_example'
 		expect(getSafeFilename(mixedCase)).toMatch(PRESERVED_CASE_REGEX)
+	})
+
+	test('keeps a literal exclamation mark', () => {
+		expect(getSafeFilename('!')).toBe('!')
+	})
+})
+
+describe('collapseSurplusDelimiters', () => {
+	test('removes leading, trailing, and repeated delimiters', () => {
+		expect(collapseSurplusDelimiters(' - a -  -  - b - ', ' - ')).toBe('a - b')
+	})
+
+	test('removes trailing delimiters whose trailing whitespace was trimmed', () => {
+		expect(collapseSurplusDelimiters('a - b -  -', ' - ')).toBe('a - b')
+		expect(collapseSurplusDelimiters('a -', ' - ')).toBe('a')
+	})
+
+	test('leaves text without delimiters unchanged', () => {
+		expect(collapseSurplusDelimiters('a-b', ' - ')).toBe('a-b')
+	})
+
+	test('ignores an empty delimiter', () => {
+		expect(collapseSurplusDelimiters(' a ', '')).toBe(' a ')
 	})
 })
 

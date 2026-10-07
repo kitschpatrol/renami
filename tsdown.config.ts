@@ -11,10 +11,6 @@ export default defineConfig([
 	},
 	// Library
 	{
-		alias: {
-			// Polyfill for filenamify's use of node:path
-			'node:path': 'pathe',
-		},
 		deps: {
 			neverBundle: ['node:fs/promises'],
 		},

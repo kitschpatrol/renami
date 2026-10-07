@@ -5,12 +5,13 @@
 [![NPM Package @kitschpatrol/renami](https://img.shields.io/npm/v/@kitschpatrol/renami.svg)](https://www.npmjs.com/package/@kitschpatrol/renami)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/mit)
 [![CI](https://github.com/kitschpatrol/renami/actions/workflows/ci.yml/badge.svg)](https://github.com/kitschpatrol/renami/actions/workflows/ci.yml)
+[![Homebrew](https://img.shields.io/badge/Homebrew-kitschpatrol%2Ftap%2Frenami-FBB040?logo=homebrew&logoColor=white)](https://github.com/kitschpatrol/homebrew-tap/blob/HEAD/Formula/renami.rb)
 
 <!-- /badges -->
 
 <!-- short-description -->
 
-**A CLI tool and TypeScript library for config-driven and content-aware automatic filename management.**
+**CLI tool and TypeScript library for config-driven and content-aware automatic filename management.**
 
 <!-- /short-description -->
 
@@ -61,27 +62,53 @@ Despite being configuration-driven, Renami aspires to use convention over config
 
 ## Getting started
 
+<!-- dependencies -->
+
 ### Dependencies
 
-The `renami` CLI tool requires Node 20+. The exported APIs are isomorphic, and should work in any relatively recent runtime environment — though in the browser you will need to implement your own file handling and glob matching logic to suit your environment.
+- [Node.js](https://nodejs.org/) 24.16.0 or newer (specifically `^24.16.0 || >=26.3.0`)
+
+<!-- /dependencies -->
+
+The exported APIs are isomorphic, and should work in any relatively recent runtime environment — though in the browser you will need to implement your own file handling and glob matching logic to suit your environment.
 
 Renami is implemented in TypeScript and bundles a complete set of type definitions.
 
+<!-- install -->
+
 ### Installation
 
-Install the CLI tool globally via Homebrew:
+There are several ways to install @kitschpatrol/renami depending on how you're planning to use it:
+
+#### CLI
+
+Run it once without installing:
+
+```sh
+npx @kitschpatrol/renami
+```
+
+Or install it globally with Homebrew:
 
 ```sh
 brew install kitschpatrol/tap/renami
 ```
 
-Or, install locally to access the CLI commands in a single project or to import the provided TypeScript library APIs:
+Or install it globally with npm:
+
+```sh
+npm install --global @kitschpatrol/renami
+```
+
+#### Library
+
+Add it to your project to import the TypeScript API. This also puts the `renami` CLI on your project's path:
 
 ```sh
 npm install @kitschpatrol/renami
 ```
 
-See the sections below for details on configuration and available commands.
+<!-- /install -->
 
 ## Configuration
 
@@ -298,7 +325,7 @@ _If none of the above value / format string combinations are valid, then the for
 
 ## Usage
 
-### Library
+### Library usage
 
 ```ts
 import { renami } from '@kitschpatrol/renami'
@@ -327,9 +354,9 @@ const anotherReport = await renami({
 console.log(anotherReport)
 ```
 
-### CLI
+### CLI usage
 
-<!-- cli-help -->
+<!-- cli-help({ heading: false, headingLevel: 3 }) -->
 
 #### Command: `renami`
 
