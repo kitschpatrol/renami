@@ -1,6 +1,6 @@
 {
 	"name": "@kitschpatrol/renami",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"description": "CLI tool and TypeScript library for config-driven and content-aware automatic filename management.",
 	"keywords": [
 		"rename",
