@@ -79,7 +79,7 @@
 		"zod": "^4.6.5"
 	},
 	"devDependencies": {
-		"@kitschpatrol/shared-config": "^8.12.1",
+		"@kitschpatrol/shared-config": "^8.13.1",
 		"@types/node": "~24.13.4",
 		"@types/yargs": "^17.0.35",
 		"@vvo/tzdb": "^6.198.0",
