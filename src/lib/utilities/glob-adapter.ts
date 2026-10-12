@@ -1,6 +1,6 @@
 import { ENVIRONMENT } from './platform'
 
-type GlobAdapterOptions = {
+export type GlobAdapterOptions = {
 	/** Whether to return absolute paths or not, default false */
 	absolute?: boolean
 	/**

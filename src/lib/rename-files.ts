@@ -23,7 +23,7 @@ import { isAbsolute, pathIsFolderNote, pathObjectSetAll, pathObjectSetName } fro
 import { FILENAME_MAX_LENGTH } from './utilities/platform'
 import { appendIncrement, convertCase, getIncrement } from './utilities/string'
 
-type FileRenameTask = {
+export type FileRenameTask = {
 	filePathIntermediate: string | undefined
 	filePathOriginal: string
 	filePathRenamed: string | undefined
