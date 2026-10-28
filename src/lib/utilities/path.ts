@@ -86,17 +86,14 @@ export function resolveWithBasePath(
 
 	// Absolute
 	if (isAbsolute(filePath)) {
-		// Path is absolute by drive letter on Windows, or there's not base path to prepend
-		if (
-			basePath === undefined ||
+		// Keep paths that are absolute by drive letter on Windows, that have no base
+		// path to prepend, or that already start with a non-compound base path.
+		// Otherwise, resolve over the base path.
+		return basePath === undefined ||
 			WINDOWS_DRIVE_LETTER_REGEX.test(filePath) ||
 			(!compoundBase && filePath.startsWith(basePath))
-		) {
-			return filePath
-		}
-
-		// Resolve over base
-		return path.join(basePath, filePath)
+			? filePath
+			: path.join(basePath, filePath)
 	}
 
 	// Relative

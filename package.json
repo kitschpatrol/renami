@@ -36,15 +36,14 @@
 		"renami": "dist/bin/cli.js"
 	},
 	"files": [
-		"dist/*"
+		"dist"
 	],
 	"scripts": {
 		"build": "tsdown",
-		"clean-deep": "shx rm -f pnpm-lock.yaml && git clean -fdX -e !.claude/",
+		"clean-deep": "shx rm -f pnpm-lock.yaml && git clean -fdX",
 		"coverage": "vitest run --coverage",
-		"fix": "ksc fix",
-		"lint": "ksc lint",
-		"prepare": "skills experimental_sync -y -f",
+		"fix": "pnpm build && ksc fix",
+		"lint": "pnpm build && ksc lint",
 		"release": "bumpp --commit 'Release: %s' && pnpm build && pnpm publish --otp $(op item get npm --otp) && brewpub --tap kitschpatrol/tap",
 		"test": "vitest run"
 	},
@@ -80,7 +79,7 @@
 		"zod": "^4.6.5"
 	},
 	"devDependencies": {
-		"@kitschpatrol/shared-config": "^8.13.1",
+		"@kitschpatrol/shared-config": "^8.14.0",
 		"@types/node": "~24.13.6",
 		"@types/yargs": "^17.0.35",
 		"@vvo/tzdb": "^6.198.0",
@@ -88,12 +87,11 @@
 		"bumpp": "^12.3.0",
 		"mdat-plugin-cli-help": "^3.4.1",
 		"shx": "^0.4.0",
-		"skills": "^1.7.2",
 		"tsdown": "^0.23.1",
 		"typescript": "~6.0.3",
 		"vitest": "^5.0.3"
 	},
-	"packageManager": "pnpm@12.11.2",
+	"packageManager": "pnpm@12.15.0",
 	"engines": {
 		"node": "^24.16.0 || >=26.3.0"
 	},

@@ -34,18 +34,13 @@ const defaultFormatOptions: FormatOptions = {
  *   primitives
  */
 function emptyCollectionToString(value: unknown): string {
-	if (
-		is.nullOrUndefined(value) ||
+	return is.nullOrUndefined(value) ||
 		is.emptyArray(value) ||
 		is.emptyObject(value) ||
 		is.symbol(value)
-	) {
-		// Return empty string for null, undefined, empty array, empty object, or symbol
-		return ''
-	}
-
-	// eslint-disable-next-line ts/no-base-to-string
-	return String(value)
+		? ''
+		: // eslint-disable-next-line ts/no-base-to-string
+			String(value)
 }
 
 /**

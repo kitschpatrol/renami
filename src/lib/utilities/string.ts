@@ -308,19 +308,17 @@ export function convertCase(text: string, caseType: CaseType): string {
 		}
 
 		case 'sentence': {
-			if (words.length === 0) {
-				// If there are no words but there is text, attempt to capitalize the first letter
-				return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
-			}
-
-			// For sentence case, capitalize first word, lowercase the rest
-			return words
-				.map((word, index) =>
-					index === 0
-						? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-						: word.toLowerCase(),
-				)
-				.join(' ')
+			// Capitalize the first word and lowercase the rest, or capitalize the raw
+			// text if there are no words
+			return words.length === 0
+				? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+				: words
+						.map((word, index) =>
+							index === 0
+								? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+								: word.toLowerCase(),
+						)
+						.join(' ')
 		}
 
 		case 'slug': {

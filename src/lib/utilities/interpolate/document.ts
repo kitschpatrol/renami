@@ -63,11 +63,7 @@ export function interpolateDocument(
 			}
 		}
 
-		if (braceCount === 3) {
-			// Triple braces: Not implemented in this version
-			return ''
-		}
-
+		// Triple braces are not implemented in this version
 		return ''
 	})
 
