@@ -66,7 +66,7 @@
 		"numerable": "^0.3.15",
 		"pathe": "^2.0.3",
 		"picocolors": "^1.1.1",
-		"pretty-ms": "^9.3.1",
+		"pretty-ms": "^10.0.0",
 		"property-expr": "^2.0.6",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
@@ -76,22 +76,22 @@
 		"vfile": "^6.0.3",
 		"vfile-matter": "^5.0.1",
 		"yargs": "^18.2.0",
-		"zod": "^4.6.5"
+		"zod": "^4.6.7"
 	},
 	"devDependencies": {
 		"@kitschpatrol/shared-config": "^8.14.0",
 		"@types/node": "~24.13.6",
 		"@types/yargs": "^17.0.35",
-		"@vvo/tzdb": "^6.198.0",
+		"@vvo/tzdb": "^6.202.0",
 		"brewpub": "^0.5.0",
 		"bumpp": "^12.3.0",
 		"mdat-plugin-cli-help": "^3.4.1",
 		"shx": "^0.4.0",
-		"tsdown": "^0.23.1",
+		"tsdown": "^0.23.4",
 		"typescript": "~6.0.3",
-		"vitest": "^5.0.3"
+		"vitest": "^5.0.5"
 	},
-	"packageManager": "pnpm@12.15.0",
+	"packageManager": "pnpm@12.16.1",
 	"engines": {
 		"node": "^24.16.0 || >=26.3.0"
 	},
